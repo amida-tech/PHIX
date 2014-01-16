@@ -18,6 +18,24 @@ path = require('path');
 
 module.exports = {
   server: {
-    listenPort: 3000                                   // The port on which the server is to listen (means that the app is at http://localhost:3000 for instance)
+  	URL: 'localhost'  ,						       // The URL where the server is deployed to.  Typically localhost for development.
+    port: 3000  ,                                  // The port on which the server is to listen (means that the app is at http://localhost:3000 for instance).				   							   
+	sessionCookieName: 'phix.sid'  ,			   // The name of the cookie used to pass session information to the client.
+	logging: 'dev'		 		 		           // Sets logging levels for server, can be either 'dev' or 'prod'.
+  },
+  database: {
+  	URL: 'localhost'  ,			  				   // The URL where the database server is deployed.
+  	port: 12345									   // The port on which the database server is deployed.
+  },
+  client: {
+  	URL: 'localhost'  ,							   // The URL of the server where the browser-based client is located.  Typically localhost for development.
+  	port: 3001									   // The port on which the client is located.  Must be different than server for development.
+  },
+  smtp: {
+  	enabled: true  ,							   // Enables or disables the SMTP server.
+	URL: 'localhost'  ,							   // The URL of the SMTP server used to transmit DIRECT messages.
+	port: 465  ,								   // The port on which the SMTP server is listenting.
+	username: 'test'  ,							   // The username the SMTP server requires for login.
+	password: 'test'						       // The password associated with the username to login to the SMTP server.
   }
 };

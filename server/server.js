@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var express = require("express")
+var express = require('express')
   , fs = require('fs')
   , http = require('http')
   , path = require('path')
@@ -22,44 +22,17 @@ var express = require("express")
   , passport = require('passport')
   , jsdom = require('jsdom');
 
+var config = require('./config.js');
+
+console.log(config.server.listenPort);
+
 var app = express();
-var viewDir = __dirname + '/views';
 var sessionIdentifier = '';
 
-
-//TODO: review all of those app settings
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.set('view options', { layout: false });
-
+//Static Server Configuration.
 app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.favicon(__dirname + '/public/img/favicon.ico'));
-
-
-
-
-//app.set('views', viewDir)
-//app.set('view engine', 'jade')
-app.use(express.static('public'))
-//app.use(express.logger('dev'))
-app.use(function (req, res, next) {
-    var viewPath = viewDir + req.path + '.jade';
-    fs.exists(viewPath, function (exists) {
-      if (exists) {
-        res.render(req.path.substr(1));
-      } else {
-        next();
-      }
-    });
-  })
-
-
-
-
-app.use(express.static(path.join(__dirname, 'public')));
-//App configuration done
 
 //Allow CORS requests fix for cross-domain requests.
 //TODO:  Need to limit origin to app url.
