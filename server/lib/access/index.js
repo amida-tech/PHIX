@@ -38,7 +38,7 @@ app.get('/access/pending', auth.ensureAuthenticated, function(req, res) {
     });
 });
 
-app.delete('/access/pending/:clinician', auth.ensureAuthenticated, function (req, res) {
+app.del('/access/pending/:clinician', auth.ensureAuthenticated, function (req, res) {
 
     Request.update({'username': req.user.username, 'status': 'pending', 'clinician.clinicianID': req.params.clinician}, {'status': 'denied'}, {multi: true}, function (err, queryResults) {
         if (!queryResults || queryResults.length === 0) {
@@ -87,7 +87,7 @@ app.get('/access', auth.ensureAuthenticated, function(req, res){
 });
 
 //Delete user's access rule
-app.delete('/access/:clinician', auth.ensureAuthenticated, function(req, res){
+app.del('/access/:clinician', auth.ensureAuthenticated, function(req, res){
 
     console.log(req.params.clinician);
 
@@ -107,7 +107,7 @@ app.post('/access/:clinician', auth.ensureAuthenticated, function(req, res) {
     var updateJSON = req.body.permissions;
 
     Request.update({'username': req.user.username, 'status': 'approved', 'clinician.clinicianID': req.params.clinician}, {'permissions': updateJSON}, {multi: true}, function(err, queryResults) {
-        if (err) throw err;
+        if (err) {throw err;}
         if (!queryResults || queryResults.length === 0) {
           res.send(404, 'No records found for update.');
         } else {

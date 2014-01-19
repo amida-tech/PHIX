@@ -14,35 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var express = require('express')
-  , app = module.exports = express()
-  , Account = require('../../models/account')
-  , Personals = require('../../models/personal')
-  , Delegations = require('../../models/delegation')
-  , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+var express = require('express');
+var app = module.exports = express();
+var Account = require('../../models/account');
+var Personals = require('../../models/personal');
+var Delegations = require('../../models/delegation');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 //Apply inherited extensions from passport-local-mongoose.
 passport.use(Account.createStrategy());
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
+   
+function ensureAuthenticated (req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.send(401);
+}
+
+module.exports.ensureAuthenticated = ensureAuthenticated;
+
+
 //Verify user, used by lookup page.
 app.post('/verify', function(req, res) {
     
     var json = req.body;   
-    if (!json) {res.send(400)};
-
-    checkRecord();
+    if (!json) {res.send(400);}
     
     function checkRecord () {
        Account.findOne({directemail: json.directemail}, function (err, account) {
-           if (err) throw err;
+           if (err) {throw err;}
            if (!account) {
              res.send({verified: false});   
            } else {
            Personals.findOne({username: account.username}, function (err, personal) {
-               if (err) throw err;
+               if (err) {throw err;}
                var jsonBirthdate = new Date(json.birthdate);
                if (json.middlename) { 
                   if (json.firstname === personal.firstname && json.middlename === personal.middlename && json.lastname === personal.lastname && jsonBirthdate.getTime() === personal.birthdate.getTime()) {
@@ -56,11 +63,14 @@ app.post('/verify', function(req, res) {
                   } else {
                      res.send({verified: false});  
                   }         
-               };
+               }
            });
            }
        });     
     }
+
+    checkRecord();
+
 });
 
 
@@ -68,7 +78,7 @@ app.post('/verify', function(req, res) {
 app.post('/validuser', ensureAuthenticated, function(req, res) {
     
     var json = req.body;    
-    if (!json) {res.send(400)};
+    if (!json) {res.send(400);}
     
     Account.findOne({username: req.body.username}, function (err, account) {
         if (account) {
@@ -77,7 +87,7 @@ app.post('/validuser', ensureAuthenticated, function(req, res) {
                firstname: personal.firstname,
                middlename: personal.middlename,
                lastname: personal.lastname
-              }
+              };
                res.send(resJSON);     
            });
         } else {
@@ -96,7 +106,7 @@ app.get('/switch/:user', ensureAuthenticated, function(req, res) {
         } else {
             //Grab account for delegate.
             Account.findOne({username: req.params.user}, function (err, switchAccount) {
-                if (err) throw err;
+                if (err) {throw err;}
                 if (!switchAccount) {
                     res.send(400, 'Account not found to log into.');
                 } else {
@@ -104,7 +114,7 @@ app.get('/switch/:user', ensureAuthenticated, function(req, res) {
                //passport.authenticate('local', function(err, user, info) {
                 
                  req.login(switchAccount, function(err) {
-                   if (err) throw err;
+                   if (err) {throw err;}
                    res.send(200);
                  });
                //});
@@ -127,16 +137,16 @@ app.get('/loggedin', function(req, res) {
 // Log user in.
 app.post('/login', passport.authenticate('local'), function(req, res) {
   Account.findOne({username: req.body.username}, function(err, account) {
-      if (err) throw err;
+      if (err) {throw err;}
       Personals.findOne({username: req.body.username}, function(err, profile) {
-        if (err) throw err;  
+        if (err) {throw err;}  
         if (account && profile) {
-            res.send(200)
+            res.send(200);
         } else if (account && !profile) {
             res.send(200, 'Profile not found');   
         } else {
-            res.send(400, 'Incorrect Username/Password.')
-        };      
+            res.send(400, 'Incorrect Username/Password.');
+        }
       });
     
   });
@@ -153,17 +163,17 @@ app.get('/account', ensureAuthenticated, function(req, res) {
   var resJSON = {};
     
   Account.findOne({username: req.user.username}, function(err, account) {
-    if (err) throw err;
-    if (!account)
+    if (err) {throw err;}
+    if (!account) {
         res.send(404, 'Account not found');
-    else {
+    } else {
      Personals.findOne({username: req.user.username}, function(err, profile) {
         
         if (profile !== null) {         
              if (profile.firstname && profile.lastname && profile.middlename) {
-                 resJSON.fullname = profile.firstname + ' ' + profile.middlename.substring(0,1) + '. ' + profile.lastname
+                 resJSON.fullname = profile.firstname + ' ' + profile.middlename.substring(0,1) + '. ' + profile.lastname;
              } else if (profile.firstname && profile.lastname) {
-                 resJSON.fullname = profile.firstname + ' ' + profile.lastname
+                 resJSON.fullname = profile.firstname + ' ' + profile.lastname;
              } else {
                  resJSON.fullname = account.username;   
              }
@@ -194,12 +204,12 @@ app.post('/account', ensureAuthenticated, function(req, res) {
     updateJSON.email = req.body.email;
     
     Account.findOne({username: req.user.username}, function(err, account) {
-    if (err) throw err;
-    if (!account)
+    if (err) {throw err;}
+    if (!account) {
         res.send(404, 'Account not found');
-    else {
+    } else {
         Account.update({username: req.user.username}, updateJSON, function (err, smth) {
-        if (err) throw err;
+        if (err) {throw err;}
         res.send(200);
         });
     }
@@ -208,8 +218,6 @@ app.post('/account', ensureAuthenticated, function(req, res) {
 });
 
 app.put('/account', function(req, res) {
-    
-    checkMessage(registerAccount);
     
     //Check for well formed message.
     function checkMessage (callback) {
@@ -226,8 +234,8 @@ app.put('/account', function(req, res) {
           if (results) {
             res.send(401, "Username already taken, please select another.");  
           } else {
-            callback(); 
-          };
+            callback();
+          }
          });  
        }
     }
@@ -237,16 +245,11 @@ app.put('/account', function(req, res) {
     function registerAccount() {
       var account = new Account({ username : req.body.username, email: req.body.email, directemail:"", verified:false, token: randomToken});
       Account.register(account, req.body.password, function(err, account) {
-        if (err) throw (err);
+        if (err) {throw (err);}
         res.send(200); 
       });       
     }
+
+    checkMessage(registerAccount);
     
 });
-
-module.exports.ensureAuthenticated = ensureAuthenticated;
-    
-function ensureAuthenticated (req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.send(401);
-}

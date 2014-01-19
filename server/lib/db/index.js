@@ -30,15 +30,11 @@ exports.init = function(settings, callback) {
 
     console.log("initializing DB connections: "+JSON.stringify(settings));
 
-    dbConn(done);
-
-    if (!settings["direct"]) dbConn_other(done);
-
     function done()
     {
         conn_count=conn_count+2;
-        if ((settings["direct"] && conn_count==2) ||
-            conn_count==4) {
+        if ((settings["direct"] && conn_count===2) ||
+            conn_count===4) {
               callback(connections);
 
         }
@@ -47,7 +43,7 @@ exports.init = function(settings, callback) {
 
     function dbConn(done) {
         Db.connect('mongodb://localhost/' + settings["database"], function(err, dbase) {
-            if (err) throw err;
+            if (err) {throw err;}
             connections["database"] = dbase;
             connections["grid"] = new Grid(dbase, 'storage');
             done();
@@ -56,7 +52,7 @@ exports.init = function(settings, callback) {
 
     function dbConn_other(done) {
         Db.connect('mongodb://localhost/' + settings["other_database"], function(err, dbase) {
-            if (err) throw err;
+            if (err) {throw err;}
             connections["other_database"] = dbase;
             connections["other_grid"] = new Grid(dbase, 'storage');
 
@@ -66,6 +62,10 @@ exports.init = function(settings, callback) {
             done();
         });
     }
+
+    if (!settings["direct"]) {dbConn_other(done);}
+    dbConn(done);
+
 };
 
 

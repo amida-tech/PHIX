@@ -14,25 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var express = require('express')
-  , fs = require('fs')
-  , http = require('http')
-  , path = require('path')
-  , mongoose = require('mongoose')
-  , passport = require('passport')
-  , jsdom = require('jsdom');
-
+var express = require('express');
+var fs = require('fs');
+var http = require('http');
+var path = require('path');
+var mongoose = require('mongoose');
+var passport = require('passport');
+var jsdom = require('jsdom');
 var config = require('./config.js');
 
-console.log(config.server.listenPort);
-
 var app = express();
-var sessionIdentifier = '';
 
-//Static Server Configuration.
 app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+app.use(express.cookieParser());
+app.use(express.session({ secret: config.server.session.key, key: config.server.session.name }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Allow CORS requests fix for cross-domain requests.
 //TODO:  Need to limit origin to app url.
@@ -43,97 +42,21 @@ app.all("/*", function(req, res, next) {
   return next();
 });
 
-function prod_env(){
-    console.log("env: production");
-    app.use(function(err, req, res, next){
-        console.log(err.stack);
-        res.send(500, 'Something broke!');
-    });
-    app.set('phix_path','http://phix.amida-demo.com');
-    app.set('clinician_path','http://clinician.amida-demo.com');
-    app.set('ip','127.0.0.1');
 
-    app.set('smtp_host','localhost');
-    app.set('smtp_port','465');
-    app.set('smtp_user', 'catchall');
-    app.set('smtp_password', 'password');
-    app.set('smtp_debug',true)
 
-    app.set('hub_domain', 'hub.amida-demo.com');
-    app.set('node_domain', 'node.amida-demo.com');
 
-    app.set('direct', true);
-}
-
-function dev_env(){
-    console.log("env: development");
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-    app.set('phix_path','http://localhost:3001');
-    app.set('clinician_path','http://localhost:3002');
-    app.set('ip','0.0.0.0');
-
-    app.set('hub_domain', 'hub.amida-demo.com');
-    app.set('node_domain', 'node.amida-demo.com');
-
-    app.set('direct', false);
-}
-
-function phix_env() {
-    console.log("app: phix");
-    sessionIdentifier = 'phix.sid';
-    app.set('database','portal');
-    app.set('other_database','portal_clinician');
-
-    app.set('role','phix');
-    app.set('port','3001');
-
-    app.set('sender_host', 'test1.amida-demo.com');
-    app.set('receiver_host', 'test2.amida-demo.com');
-
-}
-
-function clinician_env(){
-    console.log("app: clinician front-end");
-    sessionIdentifier = 'clinician.sid';
-    app.set('database','portal_clinician');
-    app.set('other_database','portal');
-
-    app.set('role','clinician');
-    app.set('port','3002');
-
-    app.set('sender_host', 'test2.amida-demo.com');
-    app.set('receiver_host', 'test1.amida-demo.com');
-}
-
-app.configure('phix.dev', function(){
-    phix_env();
-    dev_env();
-});
-
-app.configure('clinician.dev', function(){
-    clinician_env();
-    dev_env();
-});
-
-app.configure('phix.prod', function(){
-    phix_env();
-    prod_env();
-});
-
-app.configure('clinician.prod', function(){
-    clinician_env();
-    prod_env();
-});
-
-app.use(express.cookieParser('your secret here'));
-app.use(express.session({ secret: '<*> ITS A SECRET TO EVERYBODY. <*>', key: sessionIdentifier }));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(function(req, res, next) {
+//app.set('phix_path','http://' + config.server.url + ':' + config.server.port);
+/*app.use(function(req, res, next) {
   res.locals.messages = req.session.messages;
   next();
 });
+*/
 
+// Connect mongoose
+mongoose.connect('mongodb://' + config.database.url + '/'+ app.get("database"));
+
+
+/*
 var identity = require('./lib/identity');
 var storage = require('./lib/storage');
 var access = require('./lib/access');
@@ -144,11 +67,9 @@ var account = require('./lib/account');
 var profile = require('./lib/profile');
 var provider = require('./lib/provider');
 var delegation  = require('./lib/delegation');
+*/
 
-// Connect mongoose
-mongoose.connect('mongodb://localhost/'+app.get("database"));
-
-
+/*
 app.use(identity);
 app.use(storage);
 app.use(access);
@@ -159,13 +80,11 @@ app.use(account);
 app.use(profile);
 app.use(delegation);
 app.use(provider);
+*/
 
-var db_settings = {
-    "database": app.get("database"),
-    "other_database": app.get("other_database"),
-    "direct": app.get("direct")
-};
+app.listen(config.server.port);
 
+/*
 //launch Nodejs/Express only after DBs are initialized
 require('./lib/db').init(db_settings, function(connections) {
     app.set("db_conn",connections["database"]);
@@ -180,3 +99,4 @@ require('./lib/db').init(db_settings, function(connections) {
     console.log("listening on port "+app.get('port'));
 });
 
+*/
