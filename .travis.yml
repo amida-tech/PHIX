@@ -5,7 +5,10 @@ node_js:
   - "0.8"
 
 before_script:
-npm install -g grunt-cli@0.1.x
+ - npm install -g grunt-cli@0.1.x
+ - cd server
+ - npm install --quiet
+ - node server.js &
 
 services:
   - mongodb
