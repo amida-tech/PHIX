@@ -28,7 +28,8 @@ module.exports = {
   },
   database: {
   	url: 'localhost'  ,			  				   // The URL where the database server is deployed.
-  	port: 12345									   // The port on which the database server is deployed.
+  	port: 12345  ,									   // The port on which the database server is deployed.
+    name: 'portal'                      // Name of the database.
   },
   client: {
   	url: 'localhost'  ,							   // The URL of the server where the browser-based client is located.  Typically localhost for development.
@@ -36,9 +37,9 @@ module.exports = {
   },
   smtp: {
   	enabled: true  ,							   // Enables or disables the SMTP server.
-	url: 'localhost'  ,							   // The URL of the SMTP server used to transmit DIRECT messages.
-	port: 465  ,								   // The port on which the SMTP server is listenting.
-	username: 'test'  ,							   // The username the SMTP server requires for login.
-	password: 'test'						       // The password associated with the username to login to the SMTP server.
+	  url: 'localhost'  ,							 // The URL of the SMTP server used to transmit DIRECT messages.
+	  port: 465  ,								     // The port on which the SMTP server is listenting.
+	  username: 'test'  ,							 // The username the SMTP server requires for login.
+	  password: 'test'						     // The password associated with the username to login to the SMTP server.
   }
 };

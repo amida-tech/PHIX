@@ -281,6 +281,8 @@ function sendMessageLocal(requestJSON, callback) {
                                         console.log(e);
                                     }
 
+                                    /*
+                                    //temporary squash while MM refactors on this branch.
                                     //now add this attachment to Grid2 and add to Message2 attachments list
                                     var buffer = new Buffer(returnFile);
                                     grid_other.put(buffer, {
@@ -309,7 +311,7 @@ function sendMessageLocal(requestJSON, callback) {
 
                                         done();
 
-                                    });
+                                    });*/
 
 
                                 });

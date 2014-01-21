@@ -3,11 +3,15 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-mocha-test');
+
+  var deploymentLocation = 'http://localhost:3001';
+  var databaseLocation = 'mongodb://localhost/portal';
 
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js', 'lib/delegation/index.js'],
+      files: ['gruntFile.js', 'server.js'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -22,11 +26,20 @@ module.exports = function(grunt) {
         node: true,
         globals: {}
       }
+    },
+    mochaTest: {
+      test: {
+        options: {
+            reporter: 'spec',
+            timeout: '10000'
+        },
+       src: ['test/api/*.js']
+      }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['jshint', 'mochaTest']);
 
   grunt.registerTask('timestamp', function() {
     grunt.log.subhead(Date());

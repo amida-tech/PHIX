@@ -1,0 +1,55 @@
+			<!--
+
+********************************************************
+
+VITAL SIGNS
+
+********************************************************
+
+-->
+			<component>
+				<section>
+					<templateId root="2.16.840.1.113883.10.20.22.2.4.1"/>
+					<code code="8716-3" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="VITAL SIGNS"/>
+					<title>Vital Signs</title>
+					<text>
+					</text>
+
+
+					<% for (var i=0; i<vitals.length; i++) { %>
+
+
+					<entry typeCode="DRIV">
+						<organizer classCode="CLUSTER" moodCode="EVN">
+							<templateId root="2.16.840.1.113883.10.20.22.4.26"/>
+							<!-- Vital signs organizer template -->
+							<id root="c6f88320-67ad-11db-bd13-0800200c9a66"/>
+							<code code="46680005" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED -CT" displayName="Vital signs"/>
+							<statusCode code="completed"/>
+							<effectiveTime value="<%=vitals[i].date%>"/>
+
+							<% for (var j=0; j<vitals[i].results.length;j++) {%>
+							<component>
+								<observation classCode="OBS" moodCode="EVN">
+									<templateId root="2.16.840.1.113883.10.20.22.4.27"/>
+									<!-- Vital Sign Observation template -->
+									<id root="c6f88321-67ad-11db-bd13-0800200c9a66"/>
+									<code code="<%=vitals[i].results[j].code%>" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="<%=vitals[i].results[j].name%>"/>
+									<text>
+										<reference value="#vit<%=j%>"/>
+									</text>
+									<statusCode code="completed"/>
+									<effectiveTime value="<%=vitals[i].date%>"/>
+									<value xsi:type="PQ" value="<%=vitals[i].results[j].value%>" unit="<%=vitals[i].results[j].unit%>"/>
+									<interpretationCode code="N" codeSystem="2.16.840.1.113883.5.83"/>
+								</observation>
+							</component>
+							<% } %>
+							
+						</organizer>
+					</entry>
+
+
+					<% } %>
+				</section>
+			</component>

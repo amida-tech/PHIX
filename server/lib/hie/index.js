@@ -157,27 +157,7 @@ app.delete('/hie/:clinician/:username', function(req, res){
 //TODO: this API call is not used (I think?)
 //Add/modify user's new access_rule
 app.put('/hie/:clinician', function(req, res){
-    if (app.get("role")==="phix") {
 
-      var clinician=req.params.clinician;
-      var reqJSON = req.body.request;
-      //TODO: implement modify rule functionality
-      console.log(reqJSON);
-
-      reqJSON.status="pending";
-      reqJSON.active=false;
-
-      var r = new Request(reqJSON);
-
-      r.save( function(err, qres) {
-        if (err) throw err;
-                //Log successful save status.
-                //req.session.messages = [{'status': 'success', 'description': 'Profile updated successfully.'}];
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.write(JSON.stringify({status:"saved"}));
-                res.end();
-              });
-    };
     if (app.get("role")=="clinician") {
         var clinician=req.params.clinician;
         //var reqJSON = req.body.request;
@@ -196,5 +176,24 @@ app.put('/hie/:clinician', function(req, res){
                     res.end();
 
           });
+    } else {
+            var clinician=req.params.clinician;
+      var reqJSON = req.body.request;
+      //TODO: implement modify rule functionality
+      console.log(reqJSON);
+
+      reqJSON.status="pending";
+      reqJSON.active=false;
+
+      var r = new Request(reqJSON);
+
+      r.save( function(err, qres) {
+        if (err) throw err;
+                //Log successful save status.
+                //req.session.messages = [{'status': 'success', 'description': 'Profile updated successfully.'}];
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.write(JSON.stringify({status:"saved"}));
+                res.end();
+              });
     }
 });

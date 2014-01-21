@@ -56,7 +56,7 @@ app.all("/*", function(req, res, next) {
 mongoose.connect('mongodb://' + config.database.url + '/'+ app.get("database"));
 
 
-/*
+
 var identity = require('./lib/identity');
 var storage = require('./lib/storage');
 var access = require('./lib/access');
@@ -66,10 +66,10 @@ var direct = require('./lib/direct');
 var account = require('./lib/account');
 var profile = require('./lib/profile');
 var provider = require('./lib/provider');
-var delegation  = require('./lib/delegation');
-*/
+/*var delegation  = require('./lib/delegation');*/
 
-/*
+
+
 app.use(identity);
 app.use(storage);
 app.use(access);
@@ -78,13 +78,20 @@ app.use(master);
 app.use(direct);
 app.use(account);
 app.use(profile);
-app.use(delegation);
+/*app.use(delegation);*/
 app.use(provider);
-*/
 
-app.listen(config.server.port);
 
-/*
+//app.listen(config.server.port);
+
+//This is code used to override the need of a second database.
+var db_settings = {database: 'portal',
+                   other_database: 'portal',
+                   direct: 'false'};
+
+
+
+
 //launch Nodejs/Express only after DBs are initialized
 require('./lib/db').init(db_settings, function(connections) {
     app.set("db_conn",connections["database"]);
@@ -95,8 +102,7 @@ require('./lib/db').init(db_settings, function(connections) {
         app.set("message2",connections["message2"]);
     }
 
-    app.listen(app.get('port'));
-    console.log("listening on port "+app.get('port'));
+    app.listen(config.server.port);
+    console.log("listening on port "+ config.server.port);
 });
 
-*/
