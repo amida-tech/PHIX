@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js', './models/*.js', 'package.json'],
+      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js', './models/*.js', 'package.json', './test/api/access.js'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -23,7 +23,12 @@ module.exports = function(grunt) {
         boss: true,
         eqnull: true,
         node: true,
-        globals: {}
+        globals: {
+          'it': true,
+          'describe': true,
+          'before': true,
+          'after': true
+        }
       }
     },
     express: {
@@ -35,7 +40,7 @@ module.exports = function(grunt) {
     },
     watch: {
       all: {
-        files: ['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js'],
+        files: ['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js', './test/api/*.js'],
         tasks: ['default']
       }
     },
