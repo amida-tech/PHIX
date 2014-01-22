@@ -14,12 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var should = require('should'),
-    supertest = require('supertest'),
-    api = supertest.agent(deploymentLocation),
-    fs = require('fs'),
-    mongoose = require('mongoose'),
-    common = require('../common/commonFunctions');
+var should = require('should');
+var supertest = require('supertest');
+var config = require('../../config.js')
+var deploymentLocation = 'http://' + config.server.url + ':' + config.server.port;
+var databaseLocation = 'mongodb://' + config.database.url + '/' + config.database.name;
+var api = supertest.agent(deploymentLocation);
+var fs = require('fs');
+var mongoose = require('mongoose');
+var common = require('../common/commonFunctions');
 
 if (mongoose.connection.readyState === 0) {
     mongoose.connect(databaseLocation);

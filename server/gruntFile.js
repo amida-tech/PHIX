@@ -5,6 +5,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-express-server');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Project configuration.
   grunt.initConfig({
@@ -30,6 +31,12 @@ module.exports = function(grunt) {
         options: {
           script: './server.js'
         }
+      }
+    },
+    watch:{
+      all: {
+        files:['./test/api/*.js'],
+        tasks:['default']
       }
     },
     mochaTest: {

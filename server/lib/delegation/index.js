@@ -27,13 +27,17 @@ app.put('/delegation/:delegate', auth.ensureAuthenticated, function(req, res){
       var reqDelegate = req.params.delegate;
       var delegateJSON = {delegate: reqDelegate};
     
+      findDelegate(reqDelegate, function() {
+          res.send(200);
+      });
+    
     function findDelegate (delegate, callback) {
         if (delegate === req.user.username) {
          res.send(400, 'Cannot delegate yourself.');
         } else {
         //Assign to their account
         Delegation.findOne({'username': req.user.username, 'delegate': delegate, 'active': true}, function(err, results) {
-          if (err) {throw err;}
+          if (err) throw err;
             console.log(results);
            if (results) {
             res.send(400, 'Delegation already active for this account.');
@@ -45,10 +49,6 @@ app.put('/delegation/:delegate', auth.ensureAuthenticated, function(req, res){
         });
         }
     }
-
-          findDelegate(reqDelegate, function() {
-          res.send(200);
-      });
     
     function validateDelegation (delegate, callback) {
      //TODO: Validate that the individual is verified?
@@ -56,7 +56,7 @@ app.put('/delegation/:delegate', auth.ensureAuthenticated, function(req, res){
         saveDelegation(delegate, function () {
           callback();   
         });  
-    }
+    };
     
     function saveDelegation (delegate, callback) {
         delegateJSON.granted = new Date();
@@ -65,35 +65,20 @@ app.put('/delegation/:delegate', auth.ensureAuthenticated, function(req, res){
         var delegation = new Delegation(delegateJSON);
         delegation.save(function (err, saveResults) {
           console.log(err);
-          if (err) {throw err;}
+          if (err) throw err;
             
           callback();
         });    
-    }
-
+    };
+    
 });
 
 //Returns a list of those who have delegated to the user.
 app.get('/delegation/recieved', auth.ensureAuthenticated, function(req, res) {
  
     resJSON = {delegates: []};
-
-    function getPersonals(input, callback) {
-        Personal.findOne({username: input.username}, 'firstname lastname', function(err, personalData) {
-            if (err) throw err;
-            if (personalData) {
-              strJSON = '{"firstname":"' + personalData.firstname + '", "lastname":"' + personalData.lastname + '", "username":"' + input.username + '", "granted":"' + input.granted + '"}'
-              callback(JSON.parse(strJSON));
-            } else {
-              strJSON = '{"firstname":"' + '", "lastname":"' + '", "username":"' + input.username + '", "granted":"' + input.granted +'"}' 
-              callback(JSON.parse(strJSON));
-            }
-        });
-      }
-    });
-
     Delegation.find({delegate: req.user.username, active: true}, function(err, results) {
-      if (err) {throw err;}
+      if (err) throw err;
       if (results.length === 0) {
        res.send('200', 'No active delegations.'); 
       } else {
@@ -108,6 +93,19 @@ app.get('/delegation/recieved', auth.ensureAuthenticated, function(req, res) {
         }
       }
         
+    function getPersonals(input, callback) {
+        Personal.findOne({username: input.username}, 'firstname lastname', function(err, personalData) {
+            if (err) throw err;
+            if (personalData) {
+              strJSON = '{"firstname":"' + personalData.firstname + '", "lastname":"' + personalData.lastname + '", "username":"' + input.username + '", "granted":"' + input.granted + '"}'
+              callback(JSON.parse(strJSON));
+            } else {
+              strJSON = '{"firstname":"' + '", "lastname":"' + '", "username":"' + input.username + '", "granted":"' + input.granted +'"}' 
+              callback(JSON.parse(strJSON));
+            }
+        });
+      }
+    });
 });
 
 //Returns a list of delegations granted by the user.

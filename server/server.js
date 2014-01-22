@@ -53,7 +53,7 @@ app.all("/*", function(req, res, next) {
 */
 
 // Connect mongoose
-mongoose.connect('mongodb://' + config.database.url + '/'+ app.get("database"));
+mongoose.connect('mongodb://' + config.database.url + '/'+ config.database.name);
 
 
 
@@ -66,7 +66,7 @@ var direct = require('./lib/direct');
 var account = require('./lib/account');
 var profile = require('./lib/profile');
 var provider = require('./lib/provider');
-/*var delegation  = require('./lib/delegation');*/
+var delegation  = require('./lib/delegation');
 
 
 
@@ -78,7 +78,7 @@ app.use(master);
 app.use(direct);
 app.use(account);
 app.use(profile);
-/*app.use(delegation);*/
+app.use(delegation);
 app.use(provider);
 
 

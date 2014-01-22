@@ -14,15 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var should = require('should'),
-    supertest = require('supertest'),
-    Profile = require('../../models/personal'),
-    Account = require('../../models/account'),
-    Message = require('../../models/message'),
-    Delegation = require('../../models/delegation'),
-    mongoose = require('mongoose'),
-    api = supertest.agent(deploymentLocation),
-    common = require('../common/commonFunctions');
+var should = require('should');
+var supertest = require('supertest');
+var Profile = require('../../models/personal');
+var Account = require('../../models/account');
+var Message = require('../../models/message');
+var Delegation = require('../../models/delegation');
+var mongoose = require('mongoose');
+var config = require('../../config.js')
+var deploymentLocation = 'http://' + config.server.url + ':' + config.server.port;
+var databaseLocation = 'mongodb://' + config.database.url + '/' + config.database.name;
+var api = supertest.agent(deploymentLocation);
+var common = require('../common/commonFunctions');
 
 if (mongoose.connection.readyState === 0) {
     mongoose.connect(databaseLocation);

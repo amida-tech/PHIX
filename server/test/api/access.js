@@ -360,7 +360,7 @@ describe('Test GET Approved API', function () {
         });
     });
 
-     xit('GET Approved Requests', function(done) {
+     it('GET Approved Requests', function(done) {
        api.get('/access')
        .expect(200)
        .end(function (err, res) {
