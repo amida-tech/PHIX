@@ -45,11 +45,7 @@ var Personal = new Schema({
     token: String,
 
     username: String,
-
-    verified: Boolean,
-    token: String,
-
-
+    
     //DIRECT email assigned after in-person verification
     directemail: String
 

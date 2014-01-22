@@ -19,19 +19,25 @@ var mongoose = require('mongoose'),
 
 //This is data model used for Identity Validation and user's profile "personal attributes" (can be used later for something)
 var Attachments = new Schema({
-  fileName:  String, //filename of file.
-  identifier: String  //identifier pointing to grid record.
+    fileName: String, //filename of file.
+    identifier: String //identifier pointing to grid record.
 });
 
 var Message = new Schema({
-	user: String,
+    user: String,
     sender: String,
     recipient: String,
     received: Date,
     subject: String,
     contents: String,
-    read: {type: Boolean, default: false},
-    archived: {type: Boolean, default: false},
+    read: {
+        type: Boolean,
+        "default": false
+    },
+    archived: {
+        type: Boolean,
+        "default": false
+    },
     attachments: [Attachments]
 });
 

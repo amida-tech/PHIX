@@ -15,15 +15,15 @@ limitations under the License.
 ======================================================================*/
 
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    passportLocalMongoose = require('passport-local-mongoose');
+	Schema = mongoose.Schema,
+	passportLocalMongoose = require('passport-local-mongoose');
 
 //This is data model used purely for portal user authentication purposes
 var Account = new Schema({
-    email: String,
-    token: String,
-    directemail: String,
-    verified:Boolean
+	email: String,
+	token: String,
+	directemail: String,
+	verified: Boolean
 });
 
 Account.plugin(passportLocalMongoose);

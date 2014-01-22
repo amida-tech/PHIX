@@ -20,27 +20,28 @@ var mongoose = require('mongoose'),
 //This is data model used for keeping tabs on data requests
 var Request = new Schema({
     username: String,
-    clinician:
-        {clinicianName: String,
-         clinicianID: String,
-         directemail: String
-        },
+    clinician: {
+        clinicianName: String,
+        clinicianID: String,
+        directemail: String
+    },
     name: String,
-    permissions:
-    	{all:Boolean, 
-    		demographics:Boolean,
-            results:Boolean,
-    		medications:Boolean, 
-    		allergies:Boolean, 
-    		vitals:Boolean, 
-    		immunizations:Boolean, 
-    		encounters:Boolean,
-            procedures:Boolean,
-    		problems:Boolean},
-    er:Boolean,
+    permissions: {
+        all: Boolean,
+        demographics: Boolean,
+        results: Boolean,
+        medications: Boolean,
+        allergies: Boolean,
+        vitals: Boolean,
+        immunizations: Boolean,
+        encounters: Boolean,
+        procedures: Boolean,
+        problems: Boolean
+    },
+    er: Boolean,
     timestamp: Date,
-    status:String,
-    active:Boolean
+    status: String,
+    active: Boolean
 });
 
 module.exports = mongoose.model('Request', Request);

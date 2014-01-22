@@ -20,20 +20,21 @@ var mongoose = require('mongoose'),
 //This is data model used for access rules
 var Access = new Schema({
     username: String,
-    clinician:
-        {clinicianName: String,
-         clinicianID: String
-        },
+    clinician: {
+        clinicianName: String,
+        clinicianID: String
+    },
     name: String,
-    permissions:
-    	{all:Boolean, 
-    		demographics:Boolean, 
-    		medications:Boolean, 
-    		allergies:Boolean, 
-    		vitals:Boolean, 
-    		immunizations:Boolean, 
-    		encounters:Boolean, 
-    		problems:Boolean},
+    permissions: {
+        all: Boolean,
+        demographics: Boolean,
+        medications: Boolean,
+        allergies: Boolean,
+        vitals: Boolean,
+        immunizations: Boolean,
+        encounters: Boolean,
+        problems: Boolean
+    },
 
     timestamp: Date
 

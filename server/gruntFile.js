@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js'],
+      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js', './models/*.js', 'package.json'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -33,19 +33,19 @@ module.exports = function(grunt) {
         }
       }
     },
-    watch:{
+    watch: {
       all: {
-        files:['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js'],
-        tasks:['default']
+        files: ['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js'],
+        tasks: ['default']
       }
     },
     mochaTest: {
       test: {
         options: {
-            reporter: 'spec',
-            timeout: '10000'
+          reporter: 'spec',
+          timeout: '10000'
         },
-       src: ['test/api/*.js']
+        src: ['test/api/*.js']
       }
     }
   });
@@ -54,9 +54,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'express:dev', 'mochaTest']);
   //Express omitted for travis build.
   grunt.registerTask('commit', ['jshint', 'mochaTest']);
-  grunt.registerTask('mocha', ['express:dev','mochaTest']);
-
-
+  grunt.registerTask('mocha', ['express:dev', 'mochaTest']);
   grunt.registerTask('timestamp', function() {
     grunt.log.subhead(Date());
   });

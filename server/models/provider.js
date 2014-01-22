@@ -15,33 +15,34 @@ limitations under the License.
 ======================================================================*/
 
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+  Schema = mongoose.Schema;
 
 var Provider = new Schema({
-    npi: String,
-    type: String,
-    last_name: String,
-    first_name: String,
-    middle_name: String,
-    full_name: String,
-    credential: String,
-    business_address: String,
-    practice_address:
-     { address_line: String,
-       address_details_line: String,
-       city: String,
-       state: String,
-       zip: String,
-       phone: String,
-       fax: String},
-    provider_business_practice_location_address_country_code_if_out:  String,
-    enumeration_date: Date,
-    last_update_date: Date,
-    gender: String,
-    provider_details: String,
-    other_identifiers: String,
-    sole_proprietor: String,
-    direct_email: String
+  npi: String,
+  type: String,
+  last_name: String,
+  first_name: String,
+  middle_name: String,
+  full_name: String,
+  credential: String,
+  business_address: String,
+  practice_address: {
+    address_line: String,
+    address_details_line: String,
+    city: String,
+    state: String,
+    zip: String,
+    phone: String,
+    fax: String
+  },
+  provider_business_practice_location_address_country_code_if_out: String,
+  enumeration_date: Date,
+  last_update_date: Date,
+  gender: String,
+  provider_details: String,
+  other_identifiers: String,
+  sole_proprietor: String,
+  direct_email: String
 });
-             
+
 module.exports = mongoose.model('Provider', Provider);

@@ -15,15 +15,15 @@ limitations under the License.
 ======================================================================*/
 
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+	Schema = mongoose.Schema;
 
 //This is data model used for access rules
 var Delegation = new Schema({
-    username: String,
-    delegate: String,
-    active: Boolean,
-    granted: Date,
-    revoked: Date
+	username: String,
+	delegate: String,
+	active: Boolean,
+	granted: Date,
+	revoked: Date
 });
 
 module.exports = mongoose.model('Delegation', Delegation);
