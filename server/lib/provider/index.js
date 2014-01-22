@@ -35,7 +35,7 @@ app.put('/providers', function(req, res){
     
     var provider = new Provider(json);
     provider.save(function (err, saveResults) {
-      if (err) throw err;
+      if (err) {throw err;}
       res.send(200);
     });
 

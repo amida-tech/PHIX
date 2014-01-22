@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var express = require('express')
-, mongo = require('mongodb')
-, ObjectId = require('mongodb').ObjectID
-, app = module.exports = express()
-, Db = mongo.Db
-, Grid = mongo.Grid
-, blueButton = require('../parse/bluebutton.js')
-, auth = require('../../lib/account');
+var express = require('express');
+var mongo = require('mongodb');
+var ObjectId = require('mongodb').ObjectID;
+var app = module.exports = express();
+var Db = mongo.Db;
+var Grid = mongo.Grid;
+var blueButton = require('../parse/bluebutton.js');
+var auth = require('../../lib/account');
 
 var grid;
 var db;
@@ -42,13 +42,13 @@ app.get('/storage/record', auth.ensureAuthenticated, function(req, res) {
   var responseJSON = {};
 
   db.collection('storage.files', function(err, coll) {
-    if (err) throw err;
+    if (err) {throw err;}
     var objectID = new ObjectId(req.body.identifier);
     coll.findOne({"_id": objectID, "metadata.owner": req.user.username}, function(err, results) {
-    if (err) throw err;
+    if (err) {throw err;}
       if (results) {
         grid.get(objectID, function(err, data) {
-          if (err) throw err;
+          if (err) {throw err;}
           var returnFile = data.toString();
           responseJSON.file = returnFile;
           db.close();
@@ -69,13 +69,13 @@ app.get('/storage/record/:identifier', auth.ensureAuthenticated, function(req, r
 
   //Removed owner validation for demo purposes.
   db.collection('storage.files', function(err, coll) {
-    if (err) throw err;
+    if (err) {throw err;}
     var objectID = new ObjectId(req.params.identifier);
     coll.findOne({"_id": objectID}, function(err, results) {
-    if (err) throw err;
+    if (err) {throw err;}
       if (results) {
         grid.get(objectID, function(err, data) {
-          if (err) throw err;
+          if (err) {throw err;}
           var returnFile = data.toString();
           //res.attachment();
           db.close();
@@ -102,8 +102,8 @@ app.put('/storage', auth.ensureAuthenticated, function(req, res) {
   var source='';
   var details='';
 
-  if (req.body.source) source=req.body.source;
-  if (req.body.details) details=req.body.details;
+  if (req.body.source) {source=req.body.source;}
+  if (req.body.details) {details=req.body.details;}
 
   console.log("Storage PUT call");
   //console.log(req.body);
@@ -150,8 +150,8 @@ app.put('/storage', auth.ensureAuthenticated, function(req, res) {
   //TODO:  Fix once auth is implemented.
   var buffer = new Buffer(req.body.file);
   grid.put(buffer, {metadata: {source: source, details: details,owner: req.user.username, parsedFlag: false}, 'filename': req.body.filename, 'content_type': fileType}, function(err, fileInfo) {
-    if(err) throw err;
-    var recordId = fileInfo._id
+    if(err) {throw err;}
+    var recordId = fileInfo._id;
     //console.log("Record Stored in Gridfs: " + recordId);
     //console.log(fileInfo);
     res.send({fileName: fileInfo.filename, identifier: fileInfo._id});
@@ -159,7 +159,7 @@ app.put('/storage', auth.ensureAuthenticated, function(req, res) {
   });
 });
 
-module.exports.storeFile = storeFile;
+
 //Refactored out so can use internally.
 function storeFile (fileRequest, username, callback) {
     db=app.get("db_conn");
@@ -170,8 +170,8 @@ function storeFile (fileRequest, username, callback) {
   var source='';
   var details='';
 
-  if (fileRequest.source) source=fileRequest.source;
-  if (fileRequest.details) details=fileRequest.details;
+  if (fileRequest.source) {source=fileRequest.source;}
+  if (fileRequest.details) {details=fileRequest.details;}
 
   console.log("Storage PUT call");
   //console.log(fileRequest);
@@ -214,14 +214,14 @@ function storeFile (fileRequest, username, callback) {
   //TODO:  Fix once auth is implemented.
   var buffer = new Buffer(fileRequest.file);
   grid.put(buffer, {metadata: {source: source, details: details,owner: username, parsedFlag: false}, 'filename': fileRequest.filename, 'content_type': fileType}, function(err, fileInfo) {
-    if(err) throw err;
-    var recordId = fileInfo._id
+    if(err) {throw err;}
+    var recordId = fileInfo._id;
     //console.log("Record Stored in Gridfs: " + recordId);
     callback(err, fileInfo);
   });
 
 }
-
+module.exports.storeFile = storeFile;
 
 app.del('/storage/:identifier', auth.ensureAuthenticated, function(req, res) {
     db=app.get("db_conn");
@@ -230,13 +230,13 @@ app.del('/storage/:identifier', auth.ensureAuthenticated, function(req, res) {
   if (req.params.identifier) {
     console.log("deleting record: "+req.params.identifier);
     db.collection('storage.files', function(err, coll) {
-      if (err) throw err;
+      if (err) {throw err;}
       var objectID = new ObjectId(req.params.identifier);
       coll.findOne({"_id": objectID, "metadata.owner": req.user.username}, function(err, results) {
-        if (err) throw err;
+        if (err) {throw err;}
           if (results) {
-            grid.delete(objectID, function(err, delres) {
-              if (err) throw err;
+            grid['delete'](objectID, function(err, delres) {
+              if (err) {throw err;}
               res.statusCode = 200;
               res.end();
             });
@@ -252,7 +252,7 @@ app.post('/storage/preview', auth.ensureAuthenticated, function(req, res) {
     grid=app.get("grid_conn");
 
   db.collection('storage.files', function(err, fileColl) {
-     if (err) throw err;
+     if (err) {throw err;}
       var objectID = new ObjectId(req.body.identifier);
       fileColl.findOne({"_id": objectID}, function (err, results) {
         //console.log("results: "+JSON.stringify(results));
@@ -312,22 +312,22 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
   //Insert bb parsing logic.
   if (req.body.parsedFlag === true) {
     db.collection('storage.files', function(err, fileColl) {
-       if (err) throw err;
+       if (err) {throw err;}
         var objectID = new ObjectId(req.body.identifier);
        fileColl.findOne({"_id": objectID}, function (err, results) {
           console.log("results: "+JSON.stringify(results));
 
 
-          if (err) throw err;
+          if (err) {throw err;}
            if (results.metadata.parsedFlag === false) {
              //Need to SAVE update flag to be true.
              results.metadata.parsedFlag = true;
-             r=results;
+             var r=results;
             fileColl.update({"_id": objectID, 'metadata.owner': req.user.username}, {$set: {'metadata.parsedFlag': true}}, function(err, index, results2) {
               console.log("results1: "+JSON.stringify(results));
               console.log("results2: "+JSON.stringify(results2));
 
-             if (err) throw err;
+             if (err) {throw err;}
 
              grid.get(objectID, function(err, data) {
               var inputFile = data.toString('utf8');
@@ -337,18 +337,14 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
 
               var bbMeta = bb.document();
 
-              if (bbMeta.type === 'ccda') {
-
-                  bbStore();
-
-                function bbStore() {
+              function bbStore() {
                   //Counter for all async calls to complete.
                   var persistCount = 0;
                   var persistElements = 9;
 
                   //Persist Demographics.
                   db.collection('demographics', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.demographics();
 
                     //console.log("demographics: "+JSON.stringify(bbDocument,null, 4));
@@ -363,16 +359,23 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument.archived = false;
                       bbDocument.ignored = false;
                       coll.insert(bbDocument, function (err, res) {
-                        if (err) throw err;
+                        if (err) {throw err;}
                         persistCount = persistCount + 1;
                         persistComplete();
                       });
                     //}
                   });
 
+
+                  function persistDocument (err, res) {
+                    if (err) {throw err;}
+                    persistCount = persistCount + 1;
+                    persistComplete();  
+                  }
+
                   //Persist Allergies.
                   db.collection('allergies', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.allergies();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -380,17 +383,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Encounters.
                   db.collection('encounters', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.encounters();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -398,17 +397,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Immunizations.
                   db.collection('immunizations', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.immunizations();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -416,17 +411,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Labs.
                   db.collection('results', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.labs();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -434,17 +425,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Medications.
                   db.collection('medications', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.medications();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -452,17 +439,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Problems.
                   db.collection('problems', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.problems();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -470,17 +453,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Procedures.
                   db.collection('procedures', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.procedures();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -488,17 +467,13 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
                   //Persist Vitals.
                   db.collection('vitals', function(err, coll) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     var bbDocument = bb.vitals();
                     for (var i=0;i<bbDocument.length;i++) {
                       bbDocument[i].owner = results.metadata.owner;
@@ -506,11 +481,7 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                       bbDocument[i].approved = false;
                       bbDocument[i].archived = false;
                       bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], function (err, res) {
-                        if (err) throw err;
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
+                      coll.insert(bbDocument[i], persistDocument);
                     }
                   });
 
@@ -520,6 +491,12 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
                     }
                   }
                 }
+
+              if (bbMeta.type === 'ccda') {
+
+                  bbStore();
+
+                
               }
              });
             });
@@ -545,9 +522,9 @@ app.get('/storage', auth.ensureAuthenticated, function(req, res) {
   var responseArray = [];
 
   db.collection('storage.files', function(err, coll) {
-    if (err) throw err;
+    if (err) {throw err;}
     coll.find({'metadata.owner': req.user.username}, function(err, results) {
-      if (err) throw err;
+      if (err) {throw err;}
       results.toArray(function(err, docs) {
         for (var i=0;i<docs.length;i++) {
           var documentJSON = {};

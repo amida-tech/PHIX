@@ -28,7 +28,7 @@ app.put('/profile', auth.ensureAuthenticated, function(req, res){
     json.username = req.user.username;
 
     Personal.findOne({username: req.user.username}, function(err, results) {
-      if (err) throw err;
+      if (err) {throw err;}
        if (results) {
         res.send(400, 'Personal Information Already exists for this account');
        } else {
@@ -74,7 +74,7 @@ app.put('/profile', auth.ensureAuthenticated, function(req, res){
     var personal = new Personal(json);
     
     personal.save(function (err, smth) {
-      if (err) throw err;
+      if (err) {throw err;}
       res.send(200);
     });
     }
@@ -86,57 +86,13 @@ app.put('/profile', auth.ensureAuthenticated, function(req, res){
 app.get('/profile', auth.ensureAuthenticated, function(req, res){
 
     Personal.findOne({username: req.user.username}, function(err, results) {
-      if (err) throw err;
+      if (err) {throw err;}
        if (!results) {
         res.send(400, 'Profile not found.');
        } else {
         res.send(results);
        }
     });
-});
-
-app.post('/profile', auth.ensureAuthenticated, function(req, res){
-
-    var json = req.body;
-    var verifiedFlag = false;
-
-    //TODO:  Will need to modify this so only users or admins can mod their records.
-    Personal.findOne({username: req.user.username}, function(err, results) {
-      if (err) throw err;
-       if (!results) {
-        res.send(404, 'Profile not found.');
-       } else {
-         vertifiedFlag = results.verified;
-         validateInput(json, function(err, validResponse) {
-           if (err) throw err;
-           updateProfile(json);
-         });
-       }
-    });
-    
-    function updateProfile(inputJSON) {
-    updateJSON = {};    
-    
-    //TODO:  Will need to modify this so only admins can update verified flag.
-    if (verifiedFlag) {
-        if (inputJSON.email) {updateJSON.email = inputJSON.email};
-        if (inputJSON.address) {updateJSON.address = inputJSON.address};
-        if (inputJSON.address2) {updateJSON.address2 = inputJSON.address2};
-        if (inputJSON.city) {updateJSON.city = inputJSON.city};    
-        if (inputJSON.state) {updateJSON.state = inputJSON.state};    
-        if (inputJSON.zipcode) {updateJSON.zipcode = inputJSON.zipcode}; 
-        if (inputJSON.phone) {updateJSON.phone = inputJSON.phone};
-        if (inputJSON.phonetype) {updateJSON.phonetype = inputJSON.phonetype};
-    } else {
-        updateJSON = inputJSON;   
-    }
-        
-    Personal.update({username: req.user.username}, updateJSON, function (err, smth) {
-      if (err) throw err;
-      res.send(200);
-    });
-    }
-    
 });
 
 //Validates input, callback in (err, res) form.
@@ -176,3 +132,48 @@ function validateInput(json, callback) {
       }
 }
     
+
+app.post('/profile', auth.ensureAuthenticated, function(req, res){
+
+    var json = req.body;
+    var verifiedFlag = false;
+
+    //TODO:  Will need to modify this so only users or admins can mod their records.
+    Personal.findOne({username: req.user.username}, function(err, results) {
+      if (err) {throw err;}
+       if (!results) {
+        res.send(404, 'Profile not found.');
+       } else {
+         verifiedFlag = results.verified;
+         validateInput(json, function(err, validResponse) {
+           if (err) {throw err;}
+           updateProfile(json);
+         });
+       }
+    });
+    
+    function updateProfile(inputJSON) {
+    var updateJSON = {};    
+    
+    //TODO:  Will need to modify this so only admins can update verified flag.
+    if (verifiedFlag) {
+        if (inputJSON.email) {updateJSON.email = inputJSON.email;}
+        if (inputJSON.address) {updateJSON.address = inputJSON.address;}
+        if (inputJSON.address2) {updateJSON.address2 = inputJSON.address2;}
+        if (inputJSON.city) {updateJSON.city = inputJSON.city;} 
+        if (inputJSON.state) {updateJSON.state = inputJSON.state;}   
+        if (inputJSON.zipcode) {updateJSON.zipcode = inputJSON.zipcode;}
+        if (inputJSON.phone) {updateJSON.phone = inputJSON.phone;}
+        if (inputJSON.phonetype) {updateJSON.phonetype = inputJSON.phonetype;}
+    } else {
+        updateJSON = inputJSON;   
+    }
+        
+    Personal.update({username: req.user.username}, updateJSON, function (err, smth) {
+      if (err) {throw err;}
+      res.send(200);
+    });
+    }
+    
+});
+
