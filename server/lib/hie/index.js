@@ -20,27 +20,37 @@ var Personal = require('../../models/personal');
 var express = require('express');
 var app = module.exports = express();
 
-var fs = require('fs')
+var fs = require('fs');
 var request = require('request');
 
 
 app.post('/hie/lookup', function(req,res) {
+
+    var queryParameters = req.body;
+
     if (app.get("role")==="phix") {
-        var queryParameters = req.body;
+
         var queryArray = [];
         var queryJSON = {};
 
         if (queryParameters.middlename) {
-            queryJSON = {firstname: queryParameters.firstname, middlename: queryParameters.middlename, lastname: queryParameters.lastname, birthdate: queryParameters.birthdate}
+            queryJSON = {firstname: queryParameters.firstname, middlename: queryParameters.middlename, lastname: queryParameters.lastname, birthdate: queryParameters.birthdate};
         } else {
-            queryJSON = {firstname: queryParameters.firstname, lastname: queryParameters.lastname, birthdate: queryParameters.birthdate}
+            queryJSON = {firstname: queryParameters.firstname, lastname: queryParameters.lastname, birthdate: queryParameters.birthdate};
         }
 
         Personal.find(queryJSON, function(err, personalQueryResults) {
-           if (err) throw err;
-            if (personalQueryResults.length === 0) {res.send(200, 'no results')};
-            for (var i=0;i<personalQueryResults.length;i++) {
-                findAccount(personalQueryResults[i], i, function (personalResults, accountResults, iteration) {
+           if (err) {throw err;}
+            if (personalQueryResults.length === 0) {res.send(200, 'no results');}
+
+            function findAccount (personal, iter, callback) {
+                Account.findOne({username: personal.username}, function(err, accountQueryResults) {
+                    if (err) {throw err;}
+                    callback(personal, accountQueryResults, iter);
+                });
+            }
+
+            function returnAccount (personalResults, accountResults, iteration) {
 
                     //console.log(personalResults);
                     //console.log(accountResults);
@@ -49,9 +59,9 @@ app.post('/hie/lookup', function(req,res) {
                     var queryResponse = {};
 
                     if (personalResults.firstname && personalResults.lastname && personalResults.middlename) {
-                         queryResponse.fullname = personalResults.firstname + ' ' + personalResults.middlename + ' ' + personalResults.lastname
+                         queryResponse.fullname = personalResults.firstname + ' ' + personalResults.middlename + ' ' + personalResults.lastname;
                      } else if (personalResults.firstname && personalResults.lastname) {
-                         queryResponse.fullname = personalResults.firstname + ' ' + personalResults.lastname
+                         queryResponse.fullname = personalResults.firstname + ' ' + personalResults.lastname;
                      }
 
                     queryResponse.directemail = accountResults.directemail;
@@ -63,24 +73,23 @@ app.post('/hie/lookup', function(req,res) {
                     queryArray.push(queryResponse);
 
                     if ((iteration + 1) === personalQueryResults.length) {
-                     queryResponse = {accounts: queryArray}
+                     queryResponse = {accounts: queryArray};
                      res.send(queryResponse);
                     }
-                });
+                
+
             }
 
-            function findAccount (personal, iter, callback) {
-                Account.findOne({username: personal.username}, function(err, accountQueryResults) {
-                    if (err) throw err;
-                    callback(personal, accountQueryResults, iter);
-                });
+
+            for (var i=0;i<personalQueryResults.length;i++) {
+                findAccount(personalQueryResults[i], i, returnAccount);
             }
+
+
 
         });
     }
     if (app.get("role")==="clinician") {
-        var queryParameters = req.body;
-
 
       request(
         {url:app.get("phix_path")+'/hie/lookup',
@@ -103,12 +112,12 @@ app.post('/hie/lookup', function(req,res) {
 //Get clinician's data requests
 app.get('/hie/:clinician', function(req, res){
     if (app.get("role")==="phix") {
-      var req = Request.find({clinician: req.params.clinician});
+      var reqQuery = Request.find({clinician: req.params.clinician});
 
-      req.exec(function (err, val) {
-        if (err) throw err;
+      reqQuery.exec(function (err, val) {
+        if (err) {throw err;}
         var reqs={requests:[]};
-        for (r in val) {
+        for (var r in val) {
           reqs.requests.push(val[r]);
         }
 
@@ -119,8 +128,8 @@ app.get('/hie/:clinician', function(req, res){
         res.write(JSON.stringify(reqs));
         res.end();
       });
-    };
-    if (app.get("role")=="clinician") {
+    }
+    if (app.get("role")==="clinician") {
         var clinician=req.params.clinician;
       //TODO: implement modify rule functionality
 
@@ -131,7 +140,7 @@ app.get('/hie/:clinician', function(req, res){
           body:JSON.stringify(req.body)
         },
         function (error, response, body) {
-                if (error) throw error;
+                if (error) {throw error;}
                 console.log(JSON.stringify(body));
                 res.writeHead(response.statusCode, { 'Content-Type': 'application/json' });
                 res.write(body);
@@ -143,11 +152,11 @@ app.get('/hie/:clinician', function(req, res){
 
 //TODO: this API call is not used (I think?)
 //Delete clinician's data request for username's data
-app.delete('/hie/:clinician/:username', function(req, res){
-  var req = Request.findOne({username: req.params.username, 'clinician.clinicianID':req.params.clinician});
+app.del('/hie/:clinician/:username', function(req, res){
+  var reqQuery = Request.findOne({username: req.params.username, 'clinician.clinicianID':req.params.clinician});
 
-  req.remove(function (err) {
-    if (err) return handleError(err);
+  reqQuery.remove(function (err) {
+    if (err) {throw (err);}
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.write(JSON.stringify({status:"deleted"}));
       res.end();
@@ -158,8 +167,10 @@ app.delete('/hie/:clinician/:username', function(req, res){
 //Add/modify user's new access_rule
 app.put('/hie/:clinician', function(req, res){
 
-    if (app.get("role")=="clinician") {
-        var clinician=req.params.clinician;
+    var clinician=req.params.clinician;
+
+    if (app.get("role")==="clinician") {
+        
         //var reqJSON = req.body.request;
 
           request(
@@ -169,7 +180,7 @@ app.put('/hie/:clinician', function(req, res){
               body:JSON.stringify(req.body)
             },
             function (error, response, body) {
-                    if (error) throw error;
+                    if (error) {throw error;}
                     console.log(JSON.stringify(body));
                     res.writeHead(response.statusCode, { 'Content-Type': 'application/json' });
                     res.write(body);
@@ -177,7 +188,7 @@ app.put('/hie/:clinician', function(req, res){
 
           });
     } else {
-            var clinician=req.params.clinician;
+  
       var reqJSON = req.body.request;
       //TODO: implement modify rule functionality
       console.log(reqJSON);
@@ -188,7 +199,7 @@ app.put('/hie/:clinician', function(req, res){
       var r = new Request(reqJSON);
 
       r.save( function(err, qres) {
-        if (err) throw err;
+        if (err) {throw err;}
                 //Log successful save status.
                 //req.session.messages = [{'status': 'success', 'description': 'Profile updated successfully.'}];
                 res.writeHead(200, { 'Content-Type': 'application/json' });
