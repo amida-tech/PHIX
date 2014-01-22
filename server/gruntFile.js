@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js', './models/*.js', 'package.json', './test/api/access.js'],
+      files: ['gruntFile.js', 'server.js', 'config.js', './lib/**/index.js', './models/*.js', 'package.json', './test/api/account.js'],
       options: {
         curly: true,
         eqeqeq: true,
