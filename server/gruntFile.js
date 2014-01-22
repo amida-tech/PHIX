@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js', 'config.js', './lib/delegation/index.js'],
+      files: ['gruntFile.js', 'server.js', 'config.js', './lib/direct/index.js'],
       options: {
         curly: true,
         eqeqeq: true,
