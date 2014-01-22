@@ -66,13 +66,13 @@ app.put('/identity/validate/:token', function(req, res){
 
         if (account.verified) {
             var domain="";
-            if (app.get("role")==="phix") domain=app.get("hub_domain");
-            if (app.get("role")==="clinician") domain=app.get("node_domain");
+            if (app.get("role")==="phix") {domain=app.get("hub_domain");}
+            if (app.get("role")==="clinician") {domain=app.get("node_domain");}
 
             account.directemail=account.username+"@"+domain;
             account.token="";
         }
-        else  account.directemail="";
+        else { account.directemail="";}
 
         account.save(function (err, account) {
           if (err) { console.log("some err in account save call");} // TODO handle the error
@@ -80,8 +80,8 @@ app.put('/identity/validate/:token', function(req, res){
           console.log("account saved");
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            if (account.verified) res.end(JSON.stringify({directemail:account.directemail, status:"approved"}))
-            else res.end(JSON.stringify({directemail:account.directemail, status:"rejected"}));
+            if (account.verified) {res.end(JSON.stringify({directemail:account.directemail, status:"approved"}));}
+            else {res.end(JSON.stringify({directemail:account.directemail, status:"rejected"}));}
         });
 
         } else {

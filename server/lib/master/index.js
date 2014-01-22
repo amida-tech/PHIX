@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var express = require('express')
-, app = module.exports = express()
-, mongo = require('mongodb')
-, ObjectId = require('mongodb').ObjectID
-, Db = mongo.Db
-, auth = require('../../lib/account')
-, fs = require('fs');
+var express = require('express');
+var app = module.exports = express();
+var mongo = require('mongodb');
+var ObjectId = require('mongodb').ObjectID;
+var Db = mongo.Db;
+var auth = require('../../lib/account');
+var fs = require('fs');
 
 var ejs=require('ejs');
 
@@ -39,9 +39,6 @@ app.get('/master', auth.ensureAuthenticated, function (req, res) {
     var elementList = ['demographics', 'allergies', 'encounters', 'immunizations',  'results', 'medications', 'problems', 'procedures', 'vitals'];
     var responseJSON = {};
     var elementCount = 0;
-    for (var i=0; i<elementList.length; i++) {
-    lookupElement(elementList[i], i, elementList.length);
-    }
 
     function lookupDone () {
       if (elementCount === elementList.length) {
@@ -52,7 +49,7 @@ app.get('/master', auth.ensureAuthenticated, function (req, res) {
     function lookupElement (element) {
     db.collection(element, function(err, coll) {
       coll.find({'owner': req.user.username}, function(err, results) {
-        if (err) throw err;
+        if (err) {throw err;}
           results.toArray(function(err, docs) {
           responseJSON[element] = docs;
           elementCount = elementCount + 1;
@@ -62,8 +59,28 @@ app.get('/master', auth.ensureAuthenticated, function (req, res) {
     });
     }
 
+    for (var i=0; i<elementList.length; i++) {
+       lookupElement(elementList[i], i, elementList.length);
+    }
+
 });
 
+
+//Retrieves all elements of a specified type.
+function getSection(element, username, done) {
+  db=app.get("db_conn");
+  console.log("getSection - element: "+element+" user: "+username);
+  db.collection(element, function(err, coll) {
+    //TODO:  Client Side Filtering of approved items.
+    coll.find({'owner': username}, function(err, results) {
+      console.log("element: "+element+" user: "+username);
+      if (err) {throw err;}
+      results.toArray(function(err, docs) {
+        done(element, docs);
+      });
+    });
+  });
+}
 
 // Get CCDA file based on Master health record, filtered by section if needed
 // expect filter parameter with true/false for every section (or all=true) e.g. filter = {all:false, allergies:true, medications:false, etc}
@@ -78,10 +95,26 @@ app.post('/master/ccda', auth.ensureAuthenticated, function(req, res){
   var bb={};
   bb.filter={};
 
-  if (req.body.filter) bb.filter=req.body.filter
-  else bb.filter.all=true;
+  if (req.body.filter) {bb.filter=req.body.filter;}
+  else {bb.filter.all=true;}
 
   console.log('bb.filter: ' + JSON.stringify(bb.filter));
+
+
+  var count=0;
+
+    function done(element, docs) {
+    count=count+1;
+
+    if (bb.filter.all || bb.filter[element]) {
+      bb[element]=docs;
+      //TODO: demographics section should be unique (currently multiple sections possible)
+      if (element==="demographics") {bb[element]=docs[0];}
+    }
+    else {
+      if (element==="demographics") {bb[element]=docs[0];}
+      //bb[element]=[];
+    }
 
   getSection("demographics", req.user.username, done);
   getSection("allergies", req.user.username, done);
@@ -96,23 +129,9 @@ app.post('/master/ccda', auth.ensureAuthenticated, function(req, res){
   getSection("vitals", req.user.username, done);
 
 
-  var count=0;
-
-  function done(element, docs) {
-    count=count+1;
-
-    if (bb.filter.all || bb.filter[element]) {
-      bb[element]=docs;
-      //TODO: demographics section should be unique (currently multiple sections possible)
-      if (element=="demographics") bb[element]=docs[0];
-    }
-    else {
-      if (element=="demographics") bb[element]=docs[0];
-      //bb[element]=[];
-    }
 
 
-    if (count==9) {
+    if (count===9) {
       var ccda="<?xml version='1.0'?><empty></empty>";
 
       //if patients master record is empty return empty file
@@ -135,40 +154,18 @@ app.post('/master/ccda', auth.ensureAuthenticated, function(req, res){
 
 
 
-// Catch all method for merging section of health records
-app.post('/master/:element', auth.ensureAuthenticated, function (req, res) {
-  postMaster(req, res, req.params.element);
-});
-
-module.exports.retrieveMasterFile = retrieveMasterFile;
 
 function retrieveMasterFile (filter, username, callback) {
 
   var bb = {};
   bb.filter = {};
 
-  if (filter) bb.filter=filter
-  else bb.filter.all=true;
+  if (filter) {bb.filter=filter;}
+  else {bb.filter.all=true;}
 
   if (bb.filter.all === "false") {
     bb.filter.all = false;
   }
-
-  console.log('bb.filter: ' + JSON.stringify(bb.filter));
-
-  getSection("demographics", username, done);
-  getSection("allergies", username, done);
-  getSection("medications", username, done);
-
-  getSection("problems", username, done);
-  getSection("procedures", username, done);
-  getSection("results", username, done);
-
-  getSection("immunizations", username, done);
-  getSection("encounters", username, done);
-  getSection("vitals", username, done);
-
-  var count=0;
 
   function done(element, docs) {
     count=count+1;
@@ -176,16 +173,16 @@ function retrieveMasterFile (filter, username, callback) {
     if (bb.filter.all || bb.filter[element]) {
       bb[element]=docs;
       //TODO: demographics section should be unique (currently multiple sections possible)
-      if (element=="demographics") bb[element]=docs[0];
+      if (element==="demographics") {bb[element]=docs[0];}
     }
     else {
-      if (element=="demographics") bb[element]=docs[0];
+      if (element==="demographics") {bb[element]=docs[0];}
       //bb[element]=[];
     }
 
 
 
-    if (count==9) {
+    if (count===9) {
       var template = fs.readFileSync( "./template/ccda-filtered.xml" ).toString('utf-8');
       //console.log("bb: "+JSON.stringify(bb, null, 4));
 
@@ -193,7 +190,7 @@ function retrieveMasterFile (filter, username, callback) {
 
       //if patients master record is empty return empty file
       if (bb.demographics!=null){
-        var template = fs.readFileSync( "./template/ccda-filtered.xml" ).toString('utf-8');
+        //var template = fs.readFileSync( "./template/ccda-filtered.xml" ).toString('utf-8');
         console.log("bb: "+JSON.stringify(bb, null, 4));
 
         try {
@@ -212,21 +209,110 @@ function retrieveMasterFile (filter, username, callback) {
 
     }
   }
-};
+
+  console.log('bb.filter: ' + JSON.stringify(bb.filter));
+
+  getSection("demographics", username, done);
+  getSection("allergies", username, done);
+  getSection("medications", username, done);
+
+  getSection("problems", username, done);
+  getSection("procedures", username, done);
+  getSection("results", username, done);
+
+  getSection("immunizations", username, done);
+  getSection("encounters", username, done);
+  getSection("vitals", username, done);
+
+  var count=0;
+
+  
+}
+
+module.exports.retrieveMasterFile = retrieveMasterFile;
+
 
 
 //Retrieves all elements of a specified type.
-function getSection(element, username, done) {
-  db=app.get("db_conn");
-  console.log("getSection - element: "+element+" user: "+username);
+function getMaster(request, response, element) {
+    db=app.get("db_conn");
+
   db.collection(element, function(err, coll) {
     //TODO:  Client Side Filtering of approved items.
-    coll.find({'owner': username}, function(err, results) {
-      console.log("element: "+element+" user: "+username);
-      if (err) throw err;
+    coll.find({'owner': request.params.user}, function(err, results) {
+    if (err) {throw err;}
       results.toArray(function(err, docs) {
-        done(element, docs)
+        var responseJSON = {};
+        responseJSON[element] = docs;
+        response.send(responseJSON);
       });
+    });
+  });
+}
+
+//Updates a single element (flags only).
+function postMaster (request, response, element) {
+    db=app.get("db_conn");
+
+  db.collection(element, function(err, coll) {
+      if (err) {throw err;}
+      var objectID = new ObjectId(request.body.identifier);
+      var updateCount = 0;
+      var updateMax = 3;
+
+      function updateDone() {
+        if (updateCount = updateMax) {
+          console.log("record updated, count: "+updateCount+" id: "+request.body.identifier+" element: "+element);
+          response.statusCode = 200;
+          response.end();
+        }
+      }
+
+      if (request.body.approved) {
+        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {approved: request.body.approved}}, function(err, results) {
+          if (err) {throw err;}
+          updateCount = updateCount + 1;
+          updateDone();
+        });
+      } else {
+        updateCount = updateCount + 1;
+        updateDone();
+      }
+      if (request.body.ignored) {
+        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {ignored: request.body.ignored}}, function(err, results) {
+          if (err) {throw err;}
+          updateCount = updateCount + 1;
+          updateDone();
+        });
+      } else {
+        updateCount = updateCount + 1;
+        updateDone();
+      }
+      if (request.body.archived) {
+        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {archived: request.body.archived}}, function(err, results) {
+          if (err) {throw err;}
+          updateCount = updateCount + 1;
+          updateDone();
+        });
+      }else {
+        updateCount = updateCount + 1;
+        updateDone();
+      }
+
+    });
+}
+
+//Loads a new element into db (for self entered).
+function putMaster (request, response, element) {
+    db=app.get("db_conn");
+
+  db.collection(element, function(err, coll) {
+    if (err) {throw err;}
+    coll.insert(request.body, {safe: true}, function(err, results) {
+      if (err) {throw err;}
+      //console.log('record saved');
+      response.statusCode = 200;
+      response.end();
     });
   });
 }
@@ -363,84 +449,3 @@ putMaster(req, res, 'vitals');
 });
 
 
-//Retrieves all elements of a specified type.
-function getMaster(request, response, element) {
-    db=app.get("db_conn");
-
-  db.collection(element, function(err, coll) {
-    //TODO:  Client Side Filtering of approved items.
-    coll.find({'owner': request.params.user}, function(err, results) {
-    if (err) throw err;
-      results.toArray(function(err, docs) {
-        var responseJSON = {};
-        responseJSON[element] = docs;
-        response.send(responseJSON);
-      });
-    });
-  });
-}
-
-//Updates a single element (flags only).
-function postMaster (request, response, element) {
-    db=app.get("db_conn");
-
-  db.collection(element, function(err, coll) {
-      if (err) throw err;
-      var objectID = new ObjectId(request.body.identifier);
-      var updateCount = 0;
-      var updateMax = 3;
-      if (request.body.approved) {
-        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {approved: request.body.approved}}, function(err, results) {
-          if (err) throw err;
-          updateCount = updateCount + 1;
-          updateDone();
-        });
-      } else {
-        updateCount = updateCount + 1;
-        updateDone();
-      }
-      if (request.body.ignored) {
-        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {ignored: request.body.ignored}}, function(err, results) {
-          if (err) throw err;
-          updateCount = updateCount + 1;
-          updateDone();
-        });
-      } else {
-        updateCount = updateCount + 1;
-        updateDone();
-      }
-      if (request.body.archived) {
-        coll.update({"_id": objectID, 'owner': request.user.username}, {$set: {archived: request.body.archived}}, function(err, results) {
-          if (err) throw err;
-          updateCount = updateCount + 1;
-          updateDone();
-        });
-      }else {
-        updateCount = updateCount + 1;
-        updateDone();
-      }
-
-      function updateDone() {
-        if (updateCount = updateMax) {
-          console.log("record updated, count: "+updateCount+" id: "+request.body.identifier+" element: "+element)
-          response.statusCode = 200;
-          response.end();
-        }
-      }
-    });
-}
-
-//Loads a new element into db (for self entered).
-function putMaster (request, response, element) {
-    db=app.get("db_conn");
-
-  db.collection(element, function(err, coll) {
-    if (err) throw err;
-    coll.insert(request.body, {safe: true}, function(err, results) {
-      if (err) throw err;
-      //console.log('record saved');
-      response.statusCode = 200;
-      response.end();
-    });
-  });
-}
