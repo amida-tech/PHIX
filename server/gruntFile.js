@@ -4,9 +4,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
-
-  var deploymentLocation = 'http://localhost:3001';
-  var databaseLocation = 'mongodb://localhost/portal';
+  grunt.loadNpmTasks('grunt-express-server');
 
   // Project configuration.
   grunt.initConfig({
@@ -27,6 +25,13 @@ module.exports = function(grunt) {
         globals: {}
       }
     },
+    express: {
+      dev: {
+        options: {
+          script: './server.js'
+        }
+      }
+    },
     mochaTest: {
       test: {
         options: {
@@ -39,7 +44,10 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'mochaTest']);
+  grunt.registerTask('default', ['jshint', 'express:dev', 'mochaTest']);
+  //Express omitted for travis build.
+  grunt.registerTask('commit', ['jshint', 'mochaTest']);
+
 
   grunt.registerTask('timestamp', function() {
     grunt.log.subhead(Date());

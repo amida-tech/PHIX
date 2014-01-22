@@ -12,4 +12,4 @@ before_script:
 services:
   - mongodb
 
-script: grunt
+script: grunt commit
