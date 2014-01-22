@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
-      files: ['gruntFile.js', 'server.js'],
+      files: ['gruntFile.js', 'server.js', 'config.js', './lib/delegation/index.js'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
     },
     watch:{
       all: {
-        files:['./test/api/*.js'],
+        files:['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js'],
         tasks:['default']
       }
     },
@@ -54,6 +54,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'express:dev', 'mochaTest']);
   //Express omitted for travis build.
   grunt.registerTask('commit', ['jshint', 'mochaTest']);
+  grunt.registerTask('mocha', ['express:dev','mochaTest']);
 
 
   grunt.registerTask('timestamp', function() {
