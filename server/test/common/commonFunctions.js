@@ -29,212 +29,300 @@ var ObjectId = require('mongodb').ObjectID;
 var Db = mongo.Db;
 var Grid = mongo.Grid;
 
-function createProfile(api, profileJSON, done) {  
-    api.put('/profile')
-       .send(profileJSON)
-       .expect(200)
-       .end(function(err, res) {
-          if (res.text === 'Personal Information Already exists for this account') {
-            done(null, res);
-          } else {
-            if (err) {return done(err);}
-            done(null, res);
-          }
-       });          
+function createProfile(api, profileJSON, done) {
+  api.put('/profile')
+    .send(profileJSON)
+    .expect(200)
+    .end(function(err, res) {
+      if (res.text === 'Personal Information Already exists for this account') {
+        done(null, res);
+      } else {
+        if (err) {
+          return done(err);
+        }
+        done(null, res);
+      }
+    });
 }
 
 function loginAccount(api, testName, testPass, done) {
-      api.post('/login')
-      .send({ username: testName, password: testPass })
-      .expect(200)
-      .end(function(err, res) {
-         if (err) {done (err);}
-         done(null, res);
-      });
+  api.post('/login')
+    .send({
+      username: testName,
+      password: testPass
+    })
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      }
+      done(null, res);
+    });
 }
 
 function logoutAccount(api, done) {
-   api.post('/logout')
-   .expect(200)
-   .end(function(err, res) {
-      if (err) {done (err);}
+  api.post('/logout')
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      }
       done(null, res);
     });
 }
 
 
 function createAccount(api, testName, testPass, testEmail, done) {
-    var putJSON = {'username': testName, 'password': testPass, 'email': testEmail};
-    api.put('/account')
+  var putJSON = {
+    'username': testName,
+    'password': testPass,
+    'email': testEmail
+  };
+  api.put('/account')
     .send(putJSON)
     .end(function(err, res) {
-         if (err) {done (err);}
-         done(null, res);
+      if (err) {
+        done(err);
+      }
+      done(null, res);
     });
 }
 
 function verifyAccount(api, token, done) {
-    api.put('/identity/validate/' + token)
-    .send({'verified': true})
+  api.put('/identity/validate/' + token)
+    .send({
+      'verified': true
+    })
     .expect(200)
     .end(function(err, res) {
-         if (err) {done (err);}
-         done(null, res);
+      if (err) {
+        done(err);
+      }
+      done(null, res);
     });
 }
 
 function createDelegation(api, delegation, done) {
-    api.put('/delegation/' + delegation)
+  api.put('/delegation/' + delegation)
     .expect(200)
     .end(function(err, res) {
-       if (err) {done(err);}
-       done();
+      if (err) {
+        done(err);
+      }
+      done();
     });
 }
 
 function createMessage(message, done) {
-    var myMessage = new Message({sender: message.sender, recipient: message.recipient, received: new Date(), subject: message.subject, contents: message.contents, archived: false, read:false, attachments: message.attachments});
-    myMessage.save(function(err, res) {
-        if (err) {done(err);}
-        done();
-    });
+  var myMessage = new Message({
+    sender: message.sender,
+    recipient: message.recipient,
+    received: new Date(),
+    subject: message.subject,
+    contents: message.contents,
+    archived: false,
+    read: false,
+    attachments: message.attachments
+  });
+  myMessage.save(function(err, res) {
+    if (err) {
+      done(err);
+    }
+    done();
+  });
 }
 
 function createRequest(api, request, done) {
-        api.put('/hie/' + request.clinician.clinicianID)
-        .send({'request': request})
-        .expect(200)
-        .end(function (err, res) {
-            if (err) {done(err);}
-            done();
-        });
+  api.put('/hie/' + request.clinician.clinicianID)
+    .send({
+      'request': request
+    })
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      }
+      done();
+    });
 }
 
 function removeRequest(api, request, done) {
-        Request.remove({'clinician.clinicianID': request.clinician.clinicianID}, function(err, res) {
-          if (err) {done(err);}
-          done();
-        });
+  Request.remove({
+    'clinician.clinicianID': request.clinician.clinicianID
+  }, function(err, res) {
+    if (err) {
+      done(err);
+    }
+    done();
+  });
 }
 
 
 
 function approveRequest(api, request, done) {
-        api.post('/access/pending/' + request.clinician.clinicianID)
-        .expect(200)
-        .end(function(err, res) {
-          if (err) {return done(err);}
-            done();      
-         });  
+  api.post('/access/pending/' + request.clinician.clinicianID)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        return done(err);
+      }
+      done();
+    });
 }
 
 
 function removeAccessRequest(testName, callback) {
-  Delegation.remove({username: testName}, function(err) {
-    if (err) {done(err);}
+  Delegation.remove({
+    username: testName
+  }, function(err) {
+    if (err) {
+      done(err);
+    }
     callback();
   });
 }
 
 function removeDelegations(testName, callback) {
-  Delegation.remove({username: testName}, function(err) {
-    if (err) {done(err);}
+  Delegation.remove({
+    username: testName
+  }, function(err) {
+    if (err) {
+      done(err);
+    }
     callback();
   });
 }
 
 function removeAccount(testName, callback) {
-  Account.remove({username: testName}, function(err) {
-    if (err) {done(err);}
+  Account.remove({
+    username: testName
+  }, function(err) {
+    if (err) {
+      done(err);
+    }
     callback();
-  });  
+  });
 }
 
 function removeProfile(testName, callback) {
-  Profile.remove({username: testName}, function(err) {
-    if (err) {done(err);}
+  Profile.remove({
+    username: testName
+  }, function(err) {
+    if (err) {
+      done(err);
+    }
     callback();
-  });  
+  });
 }
 
 function loadSampleRecord(callback) {
-    fs.readFile(process.cwd() + '/test/records/ccda/hl7/CCD.sample.xml', 'utf8', function(err, data) {
-      if (err) {callback(err);}
-      callback(null, data);
-    });  
+  fs.readFile(process.cwd() + '/test/records/ccda/hl7/CCD.sample.xml', 'utf8', function(err, data) {
+    if (err) {
+      callback(err);
+    }
+    callback(null, data);
+  });
 }
 
 function removeSampleRecords(userName, callback) {
 
-    var grid;
-    var db;
+  var grid;
+  var db;
 
-        Db.connect(databaseLocation, function(err, dbase) {
-            if (err) {throw err;}
-            db = dbase;
-            grid = new Grid(db, 'storage');
-            db.collection('storage.files', function(err, coll) {
-                if (err) {throw err;}
-                coll.find({'metadata.owner': userName}, function(err, results) {
-                    if (err) {throw err;}
-                    results.toArray(function(err, docs) {
+  Db.connect(databaseLocation, function(err, dbase) {
+    if (err) {
+      throw err;
+    }
+    db = dbase;
+    grid = new Grid(db, 'storage');
+    db.collection('storage.files', function(err, coll) {
+      if (err) {
+        throw err;
+      }
+      coll.find({
+        'metadata.owner': userName
+      }, function(err, results) {
+        if (err) {
+          throw err;
+        }
+        results.toArray(function(err, docs) {
 
-                        function removeFile(iteration) {
-                            grid['delete'](docs[i]._id, function(err, result) {
-                                if (err) {throw err;}
-                                if (iteration === (docs.length - 1)) {
-                                db.close();
-                                callback();   
-                                }
-                            });
-                        }
-
-                        if (docs.length >= 0) {
-                            for (var i=0;i<docs.length;i++) {
-                              removeFile(i); 
-                            }
-                        } else {
-                            callback();   
-                        }
-                    });
-                });
+          function removeFile(iteration) {
+            grid['delete'](docs[i]._id, function(err, result) {
+              if (err) {
+                throw err;
+              }
+              if (iteration === (docs.length - 1)) {
+                db.close();
+                callback();
+              }
             });
+          }
+
+          if (docs.length >= 0) {
+            for (var i = 0; i < docs.length; i++) {
+              removeFile(i);
+            }
+          } else {
+            callback();
+          }
         });
+      });
+    });
+  });
 }
 
 function removeProviders(callback) {
-    Provider.remove(function(err, res) {
-        if (err) {callback(err);}
-        callback(null, res);
-    });
+  Provider.remove(function(err, res) {
+    if (err) {
+      callback(err);
+    }
+    callback(null, res);
+  });
 }
 
 function removeMessages(testDirectAddress, callback) {
-   Message.remove({'sender': testDirectAddress}, function(err, res) {
-    if (err) {done(err);}
-      Message.remove({'recipient': testDirectAddress}, function(err, res) {
-          if (err) {done(err);}
-          callback();
-      });
-   });
+  Message.remove({
+    'sender': testDirectAddress
+  }, function(err, res) {
+    if (err) {
+      done(err);
+    }
+    Message.remove({
+      'recipient': testDirectAddress
+    }, function(err, res) {
+      if (err) {
+        done(err);
+      }
+      callback();
+    });
+  });
 }
 
 function removeCollection(userName, inputCollection, callback) {
-    
-    var db;
-    Db.connect(databaseLocation, function(err, dbase) {
-            if (err) {throw err;}
-            db = dbase;
-            db.collection(inputCollection, function(err, coll) {
-                if (err) {throw err;}
-                coll.remove({'owner': userName}, function(err, results) {
-                    if (err) {throw err;}
-                    db.close();
-                    callback();
-                });
-            });
-        });    
-    
+
+  var db;
+  Db.connect(databaseLocation, function(err, dbase) {
+    if (err) {
+      throw err;
+    }
+    db = dbase;
+    db.collection(inputCollection, function(err, coll) {
+      if (err) {
+        throw err;
+      }
+      coll.remove({
+        'owner': userName
+      }, function(err, results) {
+        if (err) {
+          throw err;
+        }
+        db.close();
+        callback();
+      });
+    });
+  });
+
 }
 
 module.exports.createProfile = createProfile;
