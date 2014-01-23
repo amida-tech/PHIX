@@ -19,7 +19,7 @@ var supertest = require('supertest');
 var Profile = require('../../models/personal');
 var Account = require('../../models/account');
 var mongoose = require('mongoose');
-var config = require('../../config.js')
+var config = require('../../config.js');
 var deploymentLocation = 'http://' + config.server.url + ':' + config.server.port;
 var databaseLocation = 'mongodb://' + config.database.url + '/' + config.database.name;
 var api = supertest.agent(deploymentLocation);
@@ -27,54 +27,65 @@ var common = require('../common/commonFunctions');
 var providerJSON = require('../records/providers.json');
 
 if (mongoose.connection.readyState === 0) {
-    mongoose.connect(databaseLocation);
-};
+  mongoose.connect(databaseLocation);
+}
 
-describe('Provider Loading Test', function () {
-     
-    it('PUT Provider', function(done) {    
-        var iteration = 0;
-        for (var i=0;i<providerJSON.providers.length;i++) {
-          loadProviders(function() {
-            if (iteration === providerJSON.providers.length) {
-              done();   
-            }    
-          });
-        }
-        function loadProviders (callback) {
-          api.put('/providers')
-          .send(providerJSON.providers[i])
-          .expect(200)
-          .end(function(err, res) {
-                if (err) return done(err);
-                iteration = iteration + 1;
-                callback();
-           });
+describe('Provider Loading Test', function() {
+
+  it('PUT Provider', function(done) {
+    var iteration = 0;
+
+    function loadProviders(callback) {
+      api.put('/providers')
+        .send(providerJSON.providers[i])
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
           }
-    });
-    
+          iteration = iteration + 1;
+          callback();
+        });
+    }
+
+    function loadCallback() {
+      if (iteration === providerJSON.providers.length) {
+        done();
+      }
+    }
+
+    for (var i = 0; i < providerJSON.providers.length; i++) {
+      loadProviders(loadCallback);
+    }
+
+  });
+
 });
 
 describe('Provider GET Testing', function() {
-    
-   it('GET Providers', function(done) {
-       api.get('/providers')
-       .expect(200)
-       .end(function(err, res) {
-          if (err) return done(err);
-          done();
-       });
-   });
-    
+
+  it('GET Providers', function(done) {
+    api.get('/providers')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
+  });
+
 });
 
 describe('Cleanup providers', function() {
-    
-    it('Remove Providers', function(done) {
-     common.removeProviders(function(err) {
-      if (err) done(err);
+
+  it('Remove Providers', function(done) {
+    common.removeProviders(function(err) {
+      if (err) {
+        done(err);
+      }
       done();
-     });
     });
+  });
 
 });

@@ -25,8 +25,8 @@ var mongoose = require('mongoose');
 var common = require('../common/commonFunctions');
 
 if (mongoose.connection.readyState === 0) {
-    mongoose.connect(databaseLocation);
-};
+  mongoose.connect(databaseLocation);
+}
 
 /*Code block loads user for testing.*/
 /*===========================================================*/
@@ -35,38 +35,60 @@ var testName = 'storageUser';
 var testPass = 'test';
 var testEmail = 'test@demo.org';
 
-var testProfile = {firstname: 'Jane',middlename: 'Q',lastname: 'Public',birthdate: '06/19/1976',ssn: '123-45-6789',gender: 'male',address: '123 Fake Street',address2: 'Apt 6',city: 'Arlington',state: 'VA',zipcode: '12345',phone: '1-234-999-1234',phonetype: 'mobile'}
+var testProfile = {
+  firstname: 'Jane',
+  middlename: 'Q',
+  lastname: 'Public',
+  birthdate: '06/19/1976',
+  ssn: '123-45-6789',
+  gender: 'male',
+  address: '123 Fake Street',
+  address2: 'Apt 6',
+  city: 'Arlington',
+  state: 'VA',
+  zipcode: '12345',
+  phone: '1-234-999-1234',
+  phonetype: 'mobile'
+};
 
-describe('Create User', function () {
+describe('Create User', function() {
 
-    it('Create Account', function (done) {  
-        common.createAccount(api, testName, testPass, testEmail, function(err) {
-          if (err) return done(err);
-          common.loginAccount(api, testName, testPass, function(err) {
-            if (err) return done(err);  
-            done();
-          });
-        });
+  it('Create Account', function(done) {
+    common.createAccount(api, testName, testPass, testEmail, function(err) {
+      if (err) {
+        return done(err);
+      }
+      common.loginAccount(api, testName, testPass, function(err) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
     });
-    
-    it('Generate Profile', function(done) {
-     common.createProfile(api, testProfile, function(err) {
-      if (err) done(err);
+  });
+
+  it('Generate Profile', function(done) {
+    common.createProfile(api, testProfile, function(err) {
+      if (err) {
+        done(err);
+      }
       done();
-     });
     });
-    
+  });
+
 });
 
 
 
 
-describe('Storage API', function () {  
-      var sampleFile = '';
+describe('Storage API', function() {
+  var sampleFile = '';
 
   before(function(done) {
-    common.loadSampleRecord( function(err, file) {
-      if (err) done(err);
+    common.loadSampleRecord(function(err, file) {
+      if (err) {
+        done(err);
+      }
       sampleFile = file;
       done();
     });
@@ -74,115 +96,154 @@ describe('Storage API', function () {
 
   it('File Endpoint PUT Validation Empty', function(done) {
     api.put('/storage')
-    .send({})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) return done(err);
-      done();
-    });
+      .send({})
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
   });
 
   it('File Endpoint PUT Validation File Name Length', function(done) {
     api.put('/storage')
-    .send({filename: ''})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) return done(err);
-      done();
-    });
+      .send({
+        filename: ''
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
   });
 
   it('File Endpoint PUT Validation File Empty', function(done) {
     api.put('/storage')
-    .send({file: ''})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) return done(err);
-      done();
-    });
+      .send({
+        file: ''
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
   });
 
   it('File Endpoint PUT Correctly', function(done) {
     api.put('/storage')
-    .send({filename: 'testFile.xml', file: sampleFile})
-    .expect(200)
-    .end(function(err, res) {
-      if (err) return done(err);
-      done();
-    });
+      .send({
+        filename: 'testFile.xml',
+        file: sampleFile
+      })
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
   });
 
   it('File Endpoint GET', function(done) {
     api.get('/storage')
-    .expect(200)
-    .end(function(err, res) {
-      if (err) return done(err);
-      done();
-    });
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
   });
 
 
 
   it('File Endpoint Update POST Flag Test', function(done) {
     api.get('/storage')
-    .expect(200)
-    .end(function(err, res) {
-      if (err) return done(err);
-      api.post('/storage')
-      .send({identifier: res.body.files[0].identifier, parsedFlag: true})
       .expect(200)
-      .end(function (err, res) {
-        if (err) return done(err);
-        done();
+      .end(function(err, res) {
+        if (err) {
+          return done(err);
+        }
+        api.post('/storage')
+          .send({
+            identifier: res.body.files[0].identifier,
+            parsedFlag: true
+          })
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+            done();
+          });
       });
-    });
   });
-    
+
 });
 
-describe('Cleanup Test Account', function () {
-    
-    it('Logout Account', function(done) {
-       common.logoutAccount(api, function(err) {
-        if (err) done(err);
-        done();
-       });
-    });
-    
-    it('Remove Account', function(done) {
-     common.removeAccount(testName, function(err) {
-      if (err) done(err);
+describe('Cleanup Test Account', function() {
+
+  it('Logout Account', function(done) {
+    common.logoutAccount(api, function(err) {
+      if (err) {
+        done(err);
+      }
       done();
-     });
     });
-    
-    it('Remove Profile', function(done) {
-     common.removeProfile(testName, function(err) {
-      if (err) done(err);
+  });
+
+  it('Remove Account', function(done) {
+    common.removeAccount(testName, function(err) {
+      if (err) {
+        done(err);
+      }
       done();
-     });
     });
-    
-    it('Remove Sample Files from Grid', function(done) {
-      common.removeSampleRecords(testName, function(err) {
-        if (err) done(err);   
+  });
+
+  it('Remove Profile', function(done) {
+    common.removeProfile(testName, function(err) {
+      if (err) {
+        done(err);
+      }
+      done();
+    });
+  });
+
+  it('Remove Sample Files from Grid', function(done) {
+    common.removeSampleRecords(testName, function(err) {
+      if (err) {
+        done(err);
+      }
+      done();
+    });
+  });
+
+  it('Remove parsed records', function(done) {
+    var removalArray = ['allergies', 'demographics', 'encounters', 'immunizations', 'medications', 'problems', 'procedures', 'results', 'vitals'];
+    var iteration = 0;
+
+    function removeCollectionCallback(err) {
+      if (err) {
+        done(err);
+      }
+      iteration = iteration + 1;
+      if (iteration === removalArray.length) {
         done();
-      });
-    });
-    
-    it('Remove parsed records', function(done) {
-       var removalArray = ['allergies', 'demographics', 'encounters', 'immunizations', 'medications', 'problems', 'procedures', 'results', 'vitals'];
-       var iteration = 0;
-        for (var i=0;i<removalArray.length;i++) {
-           common.removeCollection(testName, removalArray[i], function(err) {
-             if (err) done(err);
-             iteration = iteration + 1;
-             if (iteration === removalArray.length) {
-               done();   
-             }
-           });
-        }
-    });
-    
-    
+      }
+
+    }
+
+
+    for (var i = 0; i < removalArray.length; i++) {
+      common.removeCollection(testName, removalArray[i], removeCollectionCallback);
+    }
+  });
+
+
 });
