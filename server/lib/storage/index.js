@@ -35,20 +35,29 @@ var db;
 
 // expects identifier in body
 app.get('/storage/record', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   var userName = req.user.username;
   var responseJSON = {};
 
   db.collection('storage.files', function(err, coll) {
-    if (err) {throw err;}
+    if (err) {
+      throw err;
+    }
     var objectID = new ObjectId(req.body.identifier);
-    coll.findOne({"_id": objectID, "metadata.owner": req.user.username}, function(err, results) {
-    if (err) {throw err;}
+    coll.findOne({
+      "_id": objectID,
+      "metadata.owner": req.user.username
+    }, function(err, results) {
+      if (err) {
+        throw err;
+      }
       if (results) {
         grid.get(objectID, function(err, data) {
-          if (err) {throw err;}
+          if (err) {
+            throw err;
+          }
           var returnFile = data.toString();
           responseJSON.file = returnFile;
           db.close();
@@ -61,26 +70,34 @@ app.get('/storage/record', auth.ensureAuthenticated, function(req, res) {
 });
 
 app.get('/storage/record/:identifier', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   var userName = req.user.username;
   var responseJSON = {};
 
   //Removed owner validation for demo purposes.
   db.collection('storage.files', function(err, coll) {
-    if (err) {throw err;}
+    if (err) {
+      throw err;
+    }
     var objectID = new ObjectId(req.params.identifier);
-    coll.findOne({"_id": objectID}, function(err, results) {
-    if (err) {throw err;}
+    coll.findOne({
+      "_id": objectID
+    }, function(err, results) {
+      if (err) {
+        throw err;
+      }
       if (results) {
         grid.get(objectID, function(err, data) {
-          if (err) {throw err;}
+          if (err) {
+            throw err;
+          }
           var returnFile = data.toString();
           //res.attachment();
           db.close();
           //grid.close();
-          res.setHeader('Content-disposition', 'attachment; filename='+results.filename);
+          res.setHeader('Content-disposition', 'attachment; filename=' + results.filename);
           res.send(returnFile);
         });
       }
@@ -91,19 +108,23 @@ app.get('/storage/record/:identifier', auth.ensureAuthenticated, function(req, r
 
 //Post raw record to storage.
 app.put('/storage', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   var user = req.user.username;
-  console.log("adding record to store for user: "+user);
+  console.log("adding record to store for user: " + user);
 
   // source - Inbox/Outbox/Upload
   // details - Some details about the file (doctor name (sender )for Inbox, user comments for Upload, doctor name (to whom it was sent) for Outbox)
-  var source='';
-  var details='';
+  var source = '';
+  var details = '';
 
-  if (req.body.source) {source=req.body.source;}
-  if (req.body.details) {details=req.body.details;}
+  if (req.body.source) {
+    source = req.body.source;
+  }
+  if (req.body.details) {
+    details = req.body.details;
+  }
 
   console.log("Storage PUT call");
   //console.log(req.body);
@@ -138,40 +159,56 @@ app.put('/storage', auth.ensureAuthenticated, function(req, res) {
     var bbMeta = bb.document();
 
     if (bbMeta.type === 'ccda') {
-      fileType="CCDA";
+      fileType = "CCDA";
     }
-  }
-  catch(e)
-  {
+  } catch (e) {
     //do nothing, keep original fileType
     console.log(e);
   }
 
   //TODO:  Fix once auth is implemented.
   var buffer = new Buffer(req.body.file);
-  grid.put(buffer, {metadata: {source: source, details: details,owner: req.user.username, parsedFlag: false}, 'filename': req.body.filename, 'content_type': fileType}, function(err, fileInfo) {
-    if(err) {throw err;}
+  grid.put(buffer, {
+    metadata: {
+      source: source,
+      details: details,
+      owner: req.user.username,
+      parsedFlag: false
+    },
+    'filename': req.body.filename,
+    'content_type': fileType
+  }, function(err, fileInfo) {
+    if (err) {
+      throw err;
+    }
     var recordId = fileInfo._id;
     //console.log("Record Stored in Gridfs: " + recordId);
     //console.log(fileInfo);
-    res.send({fileName: fileInfo.filename, identifier: fileInfo._id});
+    res.send({
+      fileName: fileInfo.filename,
+      identifier: fileInfo._id
+    });
     return;
   });
 });
 
 
 //Refactored out so can use internally.
-function storeFile (fileRequest, username, callback) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+function storeFile(fileRequest, username, callback) {
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
-   // source - Inbox/Outbox/Upload
+  // source - Inbox/Outbox/Upload
   // details - Some details about the file (doctor name (sender )for Inbox, user comments for Upload, doctor name (to whom it was sent) for Outbox)
-  var source='';
-  var details='';
+  var source = '';
+  var details = '';
 
-  if (fileRequest.source) {source=fileRequest.source;}
-  if (fileRequest.details) {details=fileRequest.details;}
+  if (fileRequest.source) {
+    source = fileRequest.source;
+  }
+  if (fileRequest.details) {
+    details = fileRequest.details;
+  }
 
   console.log("Storage PUT call");
   //console.log(fileRequest);
@@ -202,19 +239,28 @@ function storeFile (fileRequest, username, callback) {
     var bbMeta = bb.document();
 
     if (bbMeta.type === 'ccda') {
-      fileType="CCDA";
+      fileType = "CCDA";
     }
-  }
-  catch(e)
-  {
+  } catch (e) {
     //do nothing, keep original fileType
     console.log(e);
   }
 
   //TODO:  Fix once auth is implemented.
   var buffer = new Buffer(fileRequest.file);
-  grid.put(buffer, {metadata: {source: source, details: details,owner: username, parsedFlag: false}, 'filename': fileRequest.filename, 'content_type': fileType}, function(err, fileInfo) {
-    if(err) {throw err;}
+  grid.put(buffer, {
+    metadata: {
+      source: source,
+      details: details,
+      owner: username,
+      parsedFlag: false
+    },
+    'filename': fileRequest.filename,
+    'content_type': fileType
+  }, function(err, fileInfo) {
+    if (err) {
+      throw err;
+    }
     var recordId = fileInfo._id;
     //console.log("Record Stored in Gridfs: " + recordId);
     callback(err, fileInfo);
@@ -224,23 +270,32 @@ function storeFile (fileRequest, username, callback) {
 module.exports.storeFile = storeFile;
 
 app.del('/storage/:identifier', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   if (req.params.identifier) {
-    console.log("deleting record: "+req.params.identifier);
+    console.log("deleting record: " + req.params.identifier);
     db.collection('storage.files', function(err, coll) {
-      if (err) {throw err;}
+      if (err) {
+        throw err;
+      }
       var objectID = new ObjectId(req.params.identifier);
-      coll.findOne({"_id": objectID, "metadata.owner": req.user.username}, function(err, results) {
-        if (err) {throw err;}
-          if (results) {
-            grid['delete'](objectID, function(err, delres) {
-              if (err) {throw err;}
-              res.statusCode = 200;
-              res.end();
-            });
-          }
+      coll.findOne({
+        "_id": objectID,
+        "metadata.owner": req.user.username
+      }, function(err, results) {
+        if (err) {
+          throw err;
+        }
+        if (results) {
+          grid['delete'](objectID, function(err, delres) {
+            if (err) {
+              throw err;
+            }
+            res.statusCode = 200;
+            res.end();
+          });
+        }
       });
     });
   }
@@ -248,56 +303,60 @@ app.del('/storage/:identifier', auth.ensureAuthenticated, function(req, res) {
 
 //Pass me an identifier, I give you a preview object.
 app.post('/storage/preview', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   db.collection('storage.files', function(err, fileColl) {
-     if (err) {throw err;}
-      var objectID = new ObjectId(req.body.identifier);
-      fileColl.findOne({"_id": objectID}, function (err, results) {
-        //console.log("results: "+JSON.stringify(results));
-        grid.get(objectID, function(err, data) {
-              var inputFile = data.toString('utf8');
-              var bb = blueButton(inputFile);
-              var bbMeta = bb.document();
+    if (err) {
+      throw err;
+    }
+    var objectID = new ObjectId(req.body.identifier);
+    fileColl.findOne({
+      "_id": objectID
+    }, function(err, results) {
+      //console.log("results: "+JSON.stringify(results));
+      grid.get(objectID, function(err, data) {
+        var inputFile = data.toString('utf8');
+        var bb = blueButton(inputFile);
+        var bbMeta = bb.document();
 
-              if (bbMeta.type !== 'ccda') {
-                 res.send(200, 'preview unavailable');
-              } else {
-                var JSONResponse = {};
+        if (bbMeta.type !== 'ccda') {
+          res.send(200, 'preview unavailable');
+        } else {
+          var JSONResponse = {};
 
-                var bbAllergies = bb.allergies();
-                JSONResponse.allergies = bbAllergies;
+          var bbAllergies = bb.allergies();
+          JSONResponse.allergies = bbAllergies;
 
-                var bbDemographics = bb.demographics();
-                JSONResponse.demographics = [bbDemographics];
+          var bbDemographics = bb.demographics();
+          JSONResponse.demographics = [bbDemographics];
 
-                var bbEncounters = bb.encounters();
-                JSONResponse.encounters = bbEncounters;
+          var bbEncounters = bb.encounters();
+          JSONResponse.encounters = bbEncounters;
 
-                var bbImmunizations = bb.immunizations();
-                JSONResponse.immunizations = bbImmunizations;
+          var bbImmunizations = bb.immunizations();
+          JSONResponse.immunizations = bbImmunizations;
 
-                var bbResults = bb.labs();
-                JSONResponse.results = bbResults;
+          var bbResults = bb.labs();
+          JSONResponse.results = bbResults;
 
-                var bbMedications = bb.medications();
-                JSONResponse.medications = bbMedications;
+          var bbMedications = bb.medications();
+          JSONResponse.medications = bbMedications;
 
-                var bbProblems = bb.problems();
-                JSONResponse.problems = bbProblems;
+          var bbProblems = bb.problems();
+          JSONResponse.problems = bbProblems;
 
-                var bbProcedures = bb.procedures();
-                JSONResponse.procedures = bbProcedures;
+          var bbProcedures = bb.procedures();
+          JSONResponse.procedures = bbProcedures;
 
-                var bbVitals = bb.vitals();
-                JSONResponse.vitals = bbVitals;
+          var bbVitals = bb.vitals();
+          JSONResponse.vitals = bbVitals;
 
-                res.send(JSONResponse);
-              }
+          res.send(JSONResponse);
+        }
       });
+    });
   });
-});
 });
 
 
@@ -306,30 +365,45 @@ app.post('/storage/preview', auth.ensureAuthenticated, function(req, res) {
 //Update API, allows one to set the parsedFlag.
 // expects parsedFlag and identifier in body
 app.post('/storage', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   //Insert bb parsing logic.
   if (req.body.parsedFlag === true) {
     db.collection('storage.files', function(err, fileColl) {
-       if (err) {throw err;}
-        var objectID = new ObjectId(req.body.identifier);
-       fileColl.findOne({"_id": objectID}, function (err, results) {
-          console.log("results: "+JSON.stringify(results));
+      if (err) {
+        throw err;
+      }
+      var objectID = new ObjectId(req.body.identifier);
+      fileColl.findOne({
+        "_id": objectID
+      }, function(err, results) {
+        console.log("results: " + JSON.stringify(results));
 
 
-          if (err) {throw err;}
-           if (results.metadata.parsedFlag === false) {
-             //Need to SAVE update flag to be true.
-             results.metadata.parsedFlag = true;
-             var r=results;
-            fileColl.update({"_id": objectID, 'metadata.owner': req.user.username}, {$set: {'metadata.parsedFlag': true}}, function(err, index, results2) {
-              console.log("results1: "+JSON.stringify(results));
-              console.log("results2: "+JSON.stringify(results2));
+        if (err) {
+          throw err;
+        }
+        if (results.metadata.parsedFlag === false) {
+          //Need to SAVE update flag to be true.
+          results.metadata.parsedFlag = true;
+          var r = results;
+          fileColl.update({
+            "_id": objectID,
+            'metadata.owner': req.user.username
+          }, {
+            $set: {
+              'metadata.parsedFlag': true
+            }
+          }, function(err, index, results2) {
+            console.log("results1: " + JSON.stringify(results));
+            console.log("results2: " + JSON.stringify(results2));
 
-             if (err) {throw err;}
+            if (err) {
+              throw err;
+            }
 
-             grid.get(objectID, function(err, data) {
+            grid.get(objectID, function(err, data) {
               var inputFile = data.toString('utf8');
               //console.log("file: "+inputFile);
 
@@ -338,195 +412,225 @@ app.post('/storage', auth.ensureAuthenticated, function(req, res) {
               var bbMeta = bb.document();
 
               function bbStore() {
-                  //Counter for all async calls to complete.
-                  var persistCount = 0;
-                  var persistElements = 9;
+                //Counter for all async calls to complete.
+                var persistCount = 0;
+                var persistElements = 9;
 
-                  //Persist Demographics.
-                  db.collection('demographics', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.demographics();
-
-                    //console.log("demographics: "+JSON.stringify(bbDocument,null, 4));
-                    //console.log("demographics: "+JSON.stringify(bbDocument.ethnicity,null, 4));
-                    //console.log("demographics: "+bbDocument.ethnicity);
-
-
-                    //for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument.owner = results.metadata.owner;
-                      bbDocument.record_id = objectID;
-                      bbDocument.approved = false;
-                      bbDocument.archived = false;
-                      bbDocument.ignored = false;
-                      coll.insert(bbDocument, function (err, res) {
-                        if (err) {throw err;}
-                        persistCount = persistCount + 1;
-                        persistComplete();
-                      });
-                    //}
-                  });
-
-
-                  function persistDocument (err, res) {
-                    if (err) {throw err;}
-                    persistCount = persistCount + 1;
-                    persistComplete();  
+                //Persist Demographics.
+                db.collection('demographics', function(err, coll) {
+                  if (err) {
+                    throw err;
                   }
+                  var bbDocument = bb.demographics();
 
-                  //Persist Allergies.
-                  db.collection('allergies', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.allergies();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
+                  //console.log("demographics: "+JSON.stringify(bbDocument,null, 4));
+                  //console.log("demographics: "+JSON.stringify(bbDocument.ethnicity,null, 4));
+                  //console.log("demographics: "+bbDocument.ethnicity);
+
+
+                  //for (var i=0;i<bbDocument.length;i++) {
+                  bbDocument.owner = results.metadata.owner;
+                  bbDocument.record_id = objectID;
+                  bbDocument.approved = false;
+                  bbDocument.archived = false;
+                  bbDocument.ignored = false;
+                  coll.insert(bbDocument, function(err, res) {
+                    if (err) {
+                      throw err;
                     }
+                    persistCount = persistCount + 1;
+                    persistComplete();
                   });
+                  //}
+                });
 
-                  //Persist Encounters.
-                  db.collection('encounters', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.encounters();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
 
-                  //Persist Immunizations.
-                  db.collection('immunizations', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.immunizations();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                function persistDocument(err, res) {
+                  if (err) {
+                    throw err;
+                  }
+                  persistCount = persistCount + 1;
+                  persistComplete();
+                }
 
-                  //Persist Labs.
-                  db.collection('results', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.labs();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                //Persist Allergies.
+                db.collection('allergies', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.allergies();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
 
-                  //Persist Medications.
-                  db.collection('medications', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.medications();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                //Persist Encounters.
+                db.collection('encounters', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.encounters();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
 
-                  //Persist Problems.
-                  db.collection('problems', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.problems();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                //Persist Immunizations.
+                db.collection('immunizations', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.immunizations();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
 
-                  //Persist Procedures.
-                  db.collection('procedures', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.procedures();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                //Persist Labs.
+                db.collection('results', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.labs();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
 
-                  //Persist Vitals.
-                  db.collection('vitals', function(err, coll) {
-                    if (err) {throw err;}
-                    var bbDocument = bb.vitals();
-                    for (var i=0;i<bbDocument.length;i++) {
-                      bbDocument[i].owner = results.metadata.owner;
-                      bbDocument[i].record_id = objectID;
-                      bbDocument[i].approved = false;
-                      bbDocument[i].archived = false;
-                      bbDocument[i].ignored = false;
-                      coll.insert(bbDocument[i], persistDocument);
-                    }
-                  });
+                //Persist Medications.
+                db.collection('medications', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.medications();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
 
-                  function persistComplete() {
-                    if (persistCount === persistElements) {
-                      res.json({recieved: true});
-                    }
+                //Persist Problems.
+                db.collection('problems', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.problems();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
+
+                //Persist Procedures.
+                db.collection('procedures', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.procedures();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
+
+                //Persist Vitals.
+                db.collection('vitals', function(err, coll) {
+                  if (err) {
+                    throw err;
+                  }
+                  var bbDocument = bb.vitals();
+                  for (var i = 0; i < bbDocument.length; i++) {
+                    bbDocument[i].owner = results.metadata.owner;
+                    bbDocument[i].record_id = objectID;
+                    bbDocument[i].approved = false;
+                    bbDocument[i].archived = false;
+                    bbDocument[i].ignored = false;
+                    coll.insert(bbDocument[i], persistDocument);
+                  }
+                });
+
+                function persistComplete() {
+                  if (persistCount === persistElements) {
+                    res.json({
+                      recieved: true
+                    });
                   }
                 }
+              }
 
               if (bbMeta.type === 'ccda') {
 
-                  bbStore();
+                bbStore();
 
-                
+
               }
-             });
             });
-           } else {
-            res.statusCode = 200;
-            res.end();
-           }
-       });
+          });
+        } else {
+          res.statusCode = 200;
+          res.end();
+        }
+      });
     });
   } else {
-  res.statusCode = 400;
-  res.end();
+    res.statusCode = 400;
+    res.end();
   }
 });
 
 //Get user record list.
 app.get('/storage', auth.ensureAuthenticated, function(req, res) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+  db = app.get("db_conn");
+  grid = app.get("grid_conn");
 
   var userName = req.user.username;
   var responseJSON = {};
   var responseArray = [];
 
   db.collection('storage.files', function(err, coll) {
-    if (err) {throw err;}
-    coll.find({'metadata.owner': req.user.username}, function(err, results) {
-      if (err) {throw err;}
+    if (err) {
+      throw err;
+    }
+    coll.find({
+      'metadata.owner': req.user.username
+    }, function(err, results) {
+      if (err) {
+        throw err;
+      }
       results.toArray(function(err, docs) {
-        for (var i=0;i<docs.length;i++) {
+        for (var i = 0; i < docs.length; i++) {
           var documentJSON = {};
           documentJSON.fileName = docs[i].filename;
           documentJSON.contentType = docs[i].contentType;

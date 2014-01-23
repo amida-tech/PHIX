@@ -25,17 +25,16 @@ var Message = require('../../models/message'),
     Grid = mongo.Grid;
 
 exports.init = function(settings, callback) {
-    var conn_count=0;
-    var connections={};
+    var conn_count = 0;
+    var connections = {};
 
-    console.log("initializing DB connections: "+JSON.stringify(settings));
+    console.log("initializing DB connections: " + JSON.stringify(settings));
 
-    function done()
-    {
-        conn_count=conn_count+2;
-        if ((settings["direct"] && conn_count===2) ||
-            conn_count===4) {
-              callback(connections);
+    function done() {
+        conn_count = conn_count + 2;
+        if ((settings["direct"] && conn_count === 2) ||
+            conn_count === 4) {
+            callback(connections);
 
         }
 
@@ -43,7 +42,9 @@ exports.init = function(settings, callback) {
 
     function dbConn(done) {
         Db.connect('mongodb://localhost/' + settings["database"], function(err, dbase) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             connections["database"] = dbase;
             connections["grid"] = new Grid(dbase, 'storage');
             done();
@@ -52,7 +53,9 @@ exports.init = function(settings, callback) {
 
     function dbConn_other(done) {
         Db.connect('mongodb://localhost/' + settings["other_database"], function(err, dbase) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             connections["other_database"] = dbase;
             connections["other_grid"] = new Grid(dbase, 'storage');
 
@@ -63,9 +66,9 @@ exports.init = function(settings, callback) {
         });
     }
 
-    if (!settings["direct"]) {dbConn_other(done);}
+    if (!settings["direct"]) {
+        dbConn_other(done);
+    }
     dbConn(done);
 
 };
-
-

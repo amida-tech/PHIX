@@ -20,29 +20,31 @@ var Account = require('../../models/account'),
     app = module.exports = express();
 
 //Used to load sample providers.
-app.put('/providers', function(req, res){
+app.put('/providers', function(req, res) {
 
     var json = req.body;
-    
-    
+
+
     if (json.first_name && json.last_name && json.middle_name && json.credential) {
-        json.full_name = json.first_name + " " + json.middle_name.substring(0,1) + ". " + json.last_name + ", " + json.credential;
+        json.full_name = json.first_name + " " + json.middle_name.substring(0, 1) + ". " + json.last_name + ", " + json.credential;
     } else if (json.first_name && json.last_name && json.credential) {
         json.full_name = json.first_name + " " + json.last_name + ", " + json.credential;
     } else {
-        json.full_name = '';   
+        json.full_name = '';
     }
-    
+
     var provider = new Provider(json);
-    provider.save(function (err, saveResults) {
-      if (err) {throw err;}
-      res.send(200);
+    provider.save(function(err, saveResults) {
+        if (err) {
+            throw err;
+        }
+        res.send(200);
     });
 
 });
 
-app.get('/providers', function(req,res){
- 
+app.get('/providers', function(req, res) {
+
     Provider.find(function(err, results) {
         var resJSON = {};
         resJSON.providers = results;

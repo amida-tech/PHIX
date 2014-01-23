@@ -41,7 +41,7 @@ module.exports = function(grunt) {
     },
     watch: {
       all: {
-        files: ['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js', './test/api/*.js'],
+        files: ['./test/api/*.js', './lib/**/index.js', 'config.js', 'gruntFile.js', './test/api/*.js', './test/common/*.js'],
         tasks: ['default']
       }
     },

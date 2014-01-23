@@ -25,94 +25,153 @@ var storage = require('../../lib/storage');
 
 app.get('/access/pending', auth.ensureAuthenticated, function(req, res) {
 
-    var responseJSON = {};
-    console.log(req.user.username);
-    Request.find({'username': req.user.username, 'status': 'pending'}, function(err, queryResults) {
-        if (!queryResults || queryResults.length === 0) {
-          console.log(queryResults);
-          res.send(404, 'No results found.');
-        } else {
-          responseJSON.pendingRequests = queryResults;
-          res.send(responseJSON);
-        }
-    });
+  var responseJSON = {};
+  console.log(req.user.username);
+  Request.find({
+    'username': req.user.username,
+    'status': 'pending'
+  }, function(err, queryResults) {
+    if (!queryResults || queryResults.length === 0) {
+      console.log(queryResults);
+      res.send(404, 'No results found.');
+    } else {
+      responseJSON.pendingRequests = queryResults;
+      res.send(responseJSON);
+    }
+  });
 });
 
-app.del('/access/pending/:clinician', auth.ensureAuthenticated, function (req, res) {
+app.del('/access/pending/:clinician', auth.ensureAuthenticated, function(req, res) {
 
-    Request.update({'username': req.user.username, 'status': 'pending', 'clinician.clinicianID': req.params.clinician}, {'status': 'denied'}, {multi: true}, function (err, queryResults) {
-        if (!queryResults || queryResults.length === 0) {
-            res.send(404, 'No records found for update.');
-        } else {
-            res.send(200);
-        }
-    });
+  Request.update({
+    'username': req.user.username,
+    'status': 'pending',
+    'clinician.clinicianID': req.params.clinician
+  }, {
+    'status': 'denied'
+  }, {
+    multi: true
+  }, function(err, queryResults) {
+    if (!queryResults || queryResults.length === 0) {
+      res.send(404, 'No records found for update.');
+    } else {
+      res.send(200);
+    }
+  });
 });
 
 app.post('/access/pending/:clinician', auth.ensureAuthenticated, function(req, res) {
-    Request.update({'username': req.user.username, 'status': 'pending', 'clinician.clinicianID': req.params.clinician}, {'status': 'approved'}, {multi: true}, function(err, queryResults) {
-        if (!queryResults || queryResults.length === 0) {
-          res.send(404, 'No records found for update.');
-        } else {
-          //Need to call to build a message to doctor here.
-          Request.findOne({'username': req.user.username, 'status': 'approved', 'clinician.clinicianID': req.params.clinician}, function(err, requestResponse) {
-              var permissionRequest = requestResponse.permissions;
-              master.retrieveMasterFile(permissionRequest, req.user.username, function(masterRecord) {
-                  storage.storeFile({source: 'outbox', details: 'Generated in response to request.', filename: 'bluebutton.xml', file: masterRecord}, req.user.username, function(err, results) {
-                      var messageJSON = {username: req.user.username, sender: '', recipient:requestResponse.clinician.directemail, subject:'Records attached', contents: 'Please see attached.', attachments: [{fileName: results.filename, identifier: results._id.toString()}]};
-                      direct.sendMessage(messageJSON, function () {
-                        res.send(200);
-                      });
-                  });
-              });
+  Request.update({
+    'username': req.user.username,
+    'status': 'pending',
+    'clinician.clinicianID': req.params.clinician
+  }, {
+    'status': 'approved'
+  }, {
+    multi: true
+  }, function(err, queryResults) {
+    if (!queryResults || queryResults.length === 0) {
+      res.send(404, 'No records found for update.');
+    } else {
+      //Need to call to build a message to doctor here.
+      Request.findOne({
+        'username': req.user.username,
+        'status': 'approved',
+        'clinician.clinicianID': req.params.clinician
+      }, function(err, requestResponse) {
+        var permissionRequest = requestResponse.permissions;
+        master.retrieveMasterFile(permissionRequest, req.user.username, function(masterRecord) {
+          storage.storeFile({
+            source: 'outbox',
+            details: 'Generated in response to request.',
+            filename: 'bluebutton.xml',
+            file: masterRecord
+          }, req.user.username, function(err, results) {
+            var messageJSON = {
+              username: req.user.username,
+              sender: '',
+              recipient: requestResponse.clinician.directemail,
+              subject: 'Records attached',
+              contents: 'Please see attached.',
+              attachments: [{
+                fileName: results.filename,
+                identifier: results._id.toString()
+              }]
+            };
+            direct.sendMessage(messageJSON, function() {
               res.send(200);
+            });
           });
-        }
-    });
+        });
+        res.send(200);
+      });
+    }
+  });
 
 });
 
-app.get('/access', auth.ensureAuthenticated, function(req, res){
+app.get('/access', auth.ensureAuthenticated, function(req, res) {
 
-    var responseJSON = {};
+  var responseJSON = {};
 
-    Request.find({'username': req.user.username, 'status': 'approved'}, function(err, queryResults) {
-        if (!queryResults || queryResults.length === 0) {
-          res.send(404, 'No results found.');
-        } else {
-          responseJSON.approvedRequests = queryResults;
-          res.send(responseJSON);
-        }
-    });
+  Request.find({
+    'username': req.user.username,
+    'status': 'approved'
+  }, function(err, queryResults) {
+    if (!queryResults || queryResults.length === 0) {
+      res.send(404, 'No results found.');
+    } else {
+      responseJSON.approvedRequests = queryResults;
+      res.send(responseJSON);
+    }
+  });
 });
 
 //Delete user's access rule
-app.del('/access/:clinician', auth.ensureAuthenticated, function(req, res){
+app.del('/access/:clinician', auth.ensureAuthenticated, function(req, res) {
 
-    console.log(req.params.clinician);
+  console.log(req.params.clinician);
 
 
-    Request.update({'username': req.user.username, 'status': 'approved', 'clinician.clinicianID': req.params.clinician}, {'status': 'removed'}, {multi: true}, function(err, queryResults) {
-        if (!queryResults || queryResults.length === 0) {
-          res.send(404, 'No records found for update.');
-        } else {
-          res.send(200);
-        }
-    });
+  Request.update({
+    'username': req.user.username,
+    'status': 'approved',
+    'clinician.clinicianID': req.params.clinician
+  }, {
+    'status': 'removed'
+  }, {
+    multi: true
+  }, function(err, queryResults) {
+    if (!queryResults || queryResults.length === 0) {
+      res.send(404, 'No records found for update.');
+    } else {
+      res.send(200);
+    }
+  });
 });
 
 //Update user's access rule.
 app.post('/access/:clinician', auth.ensureAuthenticated, function(req, res) {
 
-    var updateJSON = req.body.permissions;
+  var updateJSON = req.body.permissions;
 
-    Request.update({'username': req.user.username, 'status': 'approved', 'clinician.clinicianID': req.params.clinician}, {'permissions': updateJSON}, {multi: true}, function(err, queryResults) {
-        if (err) {throw err;}
-        if (!queryResults || queryResults.length === 0) {
-          res.send(404, 'No records found for update.');
-        } else {
-          res.send(200);
-        }
-    });
+  Request.update({
+    'username': req.user.username,
+    'status': 'approved',
+    'clinician.clinicianID': req.params.clinician
+  }, {
+    'permissions': updateJSON
+  }, {
+    multi: true
+  }, function(err, queryResults) {
+    if (err) {
+      throw err;
+    }
+    if (!queryResults || queryResults.length === 0) {
+      res.send(404, 'No records found for update.');
+    } else {
+      res.send(200);
+    }
+  });
 
 });

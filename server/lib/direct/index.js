@@ -55,7 +55,9 @@ app.get('/direct/inbox', auth.ensureAuthenticated, function(req, res) {
         username: req.user.username
     }, 'directemail');
     getEmailQuery.exec(function(err, queryResults) {
-        if (err) {throw err;}
+        if (err) {
+            throw err;
+        }
         //Find all User Messages.
         var message = Message.find({
             recipient: queryResults.directemail,
@@ -63,7 +65,9 @@ app.get('/direct/inbox', auth.ensureAuthenticated, function(req, res) {
         });
         message.sort('-received');
         message.exec(function(err, messageResults) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             var responseJSON = {};
             responseJSON.messages = [];
             for (var i = 0; i < messageResults.length; i++) {
@@ -92,7 +96,9 @@ app.get('/direct/outbox', auth.ensureAuthenticated, function(req, res) {
         username: req.user.username
     }, 'directemail');
     getEmailQuery.exec(function(err, queryResults) {
-        if (err) {throw err;}
+        if (err) {
+            throw err;
+        }
         //Find all User Messages.
         var message = Message.find({
             sender: queryResults.directemail,
@@ -100,7 +106,9 @@ app.get('/direct/outbox', auth.ensureAuthenticated, function(req, res) {
         });
         message.sort('-received');
         message.exec(function(err, messageResults) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             var responseJSON = {};
             responseJSON.messages = [];
             for (var i = 0; i < messageResults.length; i++) {
@@ -135,11 +143,15 @@ app.post('/direct/message/:message_id', auth.ensureAuthenticated, function(req, 
         username: req.user.username
     }, 'directemail');
     getEmailQuery.exec(function(err, queryResults) {
-        if (err) {throw err;}
+        if (err) {
+            throw err;
+        }
         Message.update({
             _id: req.params.message_id
         }, updateJSON, function(err, updateResults) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             res.send(200);
         });
     });
@@ -154,12 +166,16 @@ app.del('/direct/message/:message_id', auth.ensureAuthenticated, function(req, r
         username: req.user.username
     }, 'directemail');
     getEmailQuery.exec(function(err, queryResults) {
-        if (err) {throw err;}
+        if (err) {
+            throw err;
+        }
         Message.update({
             _id: req.params.message_id
         }, updateJSON, function(err, updateResults) {
             console.log(updateResults);
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             res.send(200);
         });
     });
@@ -167,11 +183,11 @@ app.del('/direct/message/:message_id', auth.ensureAuthenticated, function(req, r
 
 //send message by writing to other app database
 function sendMessageLocal(requestJSON, callback) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
-    db_other=app.get("db_other_conn");
-    grid_other=app.get("grid_other_conn");
-    console.log("grid_other "+grid_other);
+    db = app.get("db_conn");
+    grid = app.get("grid_conn");
+    db_other = app.get("db_other_conn");
+    grid_other = app.get("grid_other_conn");
+    console.log("grid_other " + grid_other);
     //Message2=app.get("message2");
 
     var conn2 = mongoose.createConnection('mongodb://localhost/' + app.get("other_database"));
@@ -206,7 +222,9 @@ function sendMessageLocal(requestJSON, callback) {
         //saving outgoing message to database (outbox)
         var inputMessage = new Message(messageJSON);
         inputMessage.save(function(err, res) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             //Send the message out.
             //callback();
 
@@ -224,7 +242,9 @@ function sendMessageLocal(requestJSON, callback) {
                     console.log("saving message with all attachments");
                     var inputMessage2 = new Message2(messageJSON);
                     inputMessage2.save(function(err2, res2) {
-                        if (err2) {throw err2;}
+                        if (err2) {
+                            throw err2;
+                        }
                         //Send the message out.
                         callback();
                     });
@@ -233,47 +253,55 @@ function sendMessageLocal(requestJSON, callback) {
 
             }
 
-            function listAttachment (err, results) {
+            function listAttachment(err, results) {
 
-                if (err) {throw err;}
-                
+                if (err) {
+                    throw err;
+                }
+
                 if (results) {
                     grid.get(objectID, getAttachment);
-                    
+
                 }
             }
 
-            function getAttachmentCollection (err, coll) {
+            function getAttachmentCollection(err, coll) {
 
-                if (err) {throw err;}
-                coll.findOne({"_id": objectID}, listAttachment);
+                if (err) {
+                    throw err;
+                }
+                coll.findOne({
+                    "_id": objectID
+                }, listAttachment);
 
             }
 
-            function getAttachment (err, data) {
+            function getAttachment(err, data) {
 
-                                
-                                if (err) {throw err;}
-                                
-                                //attachment content fetched form Grid, save it to string
-                                var returnFile = data.toString();
 
-                                //TODO: need to determine filetype here
-                                var fileType="unknown";
+                if (err) {
+                    throw err;
+                }
 
-                                try {
-                                    var bb = blueButton(returnFile);
-                                    var bbMeta = bb.document();
+                //attachment content fetched form Grid, save it to string
+                var returnFile = data.toString();
 
-                                    if (bbMeta.type === 'ccda') {
-                                        fileType = "CCDA";
-                                    }
-                                } catch (e) {
-                                    //do nothing, keep original fileType
-                                    console.log(e);
-                                }
+                //TODO: need to determine filetype here
+                var fileType = "unknown";
 
-                                    /*
+                try {
+                    var bb = blueButton(returnFile);
+                    var bbMeta = bb.document();
+
+                    if (bbMeta.type === 'ccda') {
+                        fileType = "CCDA";
+                    }
+                } catch (e) {
+                    //do nothing, keep original fileType
+                    console.log(e);
+                }
+
+                /*
                                     //temporary squash while MM refactors on this branch.
                                     //now add this attachment to Grid2 and add to Message2 attachments list
                                     var buffer = new Buffer(returnFile);
@@ -306,9 +334,9 @@ function sendMessageLocal(requestJSON, callback) {
                                     });*/
 
 
-                                
 
-                    }
+
+            }
 
 
 
@@ -324,11 +352,11 @@ function sendMessageLocal(requestJSON, callback) {
                     var identifier = requestJSON.attachments[att].identifier;
                     var objectID = new ObjectId(identifier);
 
-                    
 
-                    
 
-                    
+
+
+
 
                     //load file content from storage.files
                     db.collection('storage.files', getAttachmentCollection);
@@ -337,7 +365,7 @@ function sendMessageLocal(requestJSON, callback) {
 
 
 
-            
+
 
 
         });
@@ -347,8 +375,8 @@ function sendMessageLocal(requestJSON, callback) {
 
 //send message with DIRECT
 function sendMessageDirect(requestJSON, callback) {
-    db=app.get("db_conn");
-    grid=app.get("grid_conn");
+    db = app.get("db_conn");
+    grid = app.get("grid_conn");
 
     var messageJSON = {};
     var getEmailQuery = Account.findOne({
@@ -376,12 +404,14 @@ function sendMessageDirect(requestJSON, callback) {
         //saving outgoing message to database (outbox)
         var inputMessage = new Message(messageJSON);
         inputMessage.save(function(err, res) {
-            if (err) {throw err;}
+            if (err) {
+                throw err;
+            }
             //Send the message out.
             //callback();
 
             //initiating SMTP client for DIRECT
-            var options={
+            var options = {
                 secureConnection: true,
                 auth: {
                     user: app.get("smtp_user"),
@@ -416,27 +446,35 @@ function sendMessageDirect(requestJSON, callback) {
                 var att_count = requestJSON.attachments.length;
                 var count = 0;
 
-                function findAttachment (err, coll) {
-                            if (err) {throw err;}
-                            var objectID = new ObjectId(identifier);
+                function findAttachment(err, coll) {
+                    if (err) {
+                        throw err;
+                    }
+                    var objectID = new ObjectId(identifier);
 
-                            function transmitAttachment (err, data) {
-                                if (err) {throw err;}
-                                        //attachment content fetched form Grid, save it to string
-                                        var returnFile = data.toString();
-                                        console.log("sendmail: " + filename);
-                                        sendmail(filename, returnFile);
-                            }
-
-                            function getAttachment (err, results) {
-                                if (err) {throw err;}
-                                if (results) {
-                                    grid.get(objectID, transmitAttachment);
-                                }    
-                            }
-
-                            coll.findOne({"_id": objectID}, getAttachment);    
+                    function transmitAttachment(err, data) {
+                        if (err) {
+                            throw err;
                         }
+                        //attachment content fetched form Grid, save it to string
+                        var returnFile = data.toString();
+                        console.log("sendmail: " + filename);
+                        sendmail(filename, returnFile);
+                    }
+
+                    function getAttachment(err, results) {
+                        if (err) {
+                            throw err;
+                        }
+                        if (results) {
+                            grid.get(objectID, transmitAttachment);
+                        }
+                    }
+
+                    coll.findOne({
+                        "_id": objectID
+                    }, getAttachment);
+                }
 
 
                 //just sending message if no attachments
@@ -454,7 +492,7 @@ function sendMessageDirect(requestJSON, callback) {
                         var filename = requestJSON.attachments[att].fileName;
                         var identifier = requestJSON.attachments[att].identifier;
 
-                        
+
 
 
                         //load file content from storage.files
@@ -516,4 +554,3 @@ app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
     });
 
 });
-
