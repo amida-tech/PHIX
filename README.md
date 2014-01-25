@@ -22,6 +22,8 @@ Go to PHIX directry:
 
     npm install
 
+Run MongoDB
+    mongod
 
 Open terminal/command line window and run PHIX app:
 
