@@ -1,55 +1,48 @@
-/*=======================================================================
-Copyright 2013 Amida Technology Solutions (http://amida-tech.com)
+module.exports = function (grunt) {
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+  //grunt.loadNpmTasks('grunt-contrib-concat');
+  //grunt.loadNpmTasks('grunt-contrib-jshint');
+  //grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  //grunt.loadNpmTasks('grunt-contrib-watch');
+  //grunt.loadNpmTasks('grunt-recess');
+  //grunt.loadNpmTasks('grunt-karma');
+  //grunt.loadNpmTasks('grunt-html2js');
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  // Default task.
+  grunt.registerTask('build', ['clean', 'copy:assets']);
+  //grunt.registerTask('default', ['jshint','build','karma:unit']);
+  //grunt.registerTask('build', ['clean','html2js','concat','recess:build','copy:assets']);
+  //grunt.registerTask('release', ['clean','html2js','uglify','jshint','karma:unit','concat:index', 'recess:min','copy:assets']);
+  //grunt.registerTask('test-watch', ['karma:watch']);
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-======================================================================*/
+  // Print a timestamp (useful for when watching)
+  grunt.registerTask('timestamp', function() {
+    grunt.log.subhead(Date());
+  });
 
-module.exports = function(grunt) {
-  env = grunt.option('NODE_ENV') || 'default';
-  deploymentLocation = '';
-  databaseLocation = '';
-    
-  console.log('Running for configuration: ' + env);
-    
-  if (env === 'phix.dev') {
-    deploymentLocation = 'http://localhost:3001';
-    databaseLocation = 'mongodb://localhost/portal';
-    testArray = ['test/api/access.js', 'test/api/account.js', 'test/api/delegation.js', 'test/api/direct.js', 'test/api/hie.js', 'test/api/identity.js', 'test/api/master.js', 'test/api/profile.js', 'test/api/provider.js', 'test/api/storage.js']
-  } else if (env === 'clinician.dev') {
-    deploymentLocation = 'http://localhost:3002';
-    databaseLocation = 'mongodb://localhost/portal_clinician';
-    testArray = ['test/api/account.js', 'test/api/delegation.js', 'test/api/direct.js', 'test/api/hie.js', 'test/api/identity.js', 'test/api/master.js', 'test/api/profile.js', 'test/api/provider.js', 'test/api/storage.js']
-  } else if (env === 'phix.prod') {
-    deploymentLocation = 'http://phix.amida-demo.com';
-    databaseLocation = 'mongodb://localhost/portal';
-    testArray = ['test/api/access.js', 'test/api/account.js', 'test/api/delegation.js', 'test/api/direct.js', 'test/api/hie.js', 'test/api/identity.js', 'test/api/master.js', 'test/api/profile.js', 'test/api/provider.js', 'test/api/storage.js']
-  } else if (env === 'clinician.prod') {
-    deploymentLocation = 'http://clinician.amida-demo.com';
-    databaseLocation = 'mongodb://localhost/portal_clinician';
-    testArray = ['test/api/account.js', 'test/api/delegation.js', 'test/api/direct.js', 'test/api/hie.js', 'test/api/identity.js', 'test/api/master.js', 'test/api/profile.js', 'test/api/provider.js', 'test/api/storage.js']
-  }
-    
+  //var karmaConfig = function(configFile, customOptions) {
+  //  var options = { configFile: configFile, keepalive: true };
+  //  var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
+  //  return grunt.util._.extend(options, customOptions, travisOptions);
+  //};
+
+  // Project configuration.
   grunt.initConfig({
-    mochaTest: {
-      test: {
-        options: {
-            reporter: 'spec',
-            timeout: '10000'
-        },
-       src:testArray
-        }
-    }  
-      });
-  grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.registerTask('default', 'mochaTest');
+    distdir: 'dist',
+    pkg: grunt.file.readJSON('package.json'),
+    banner:
+    '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+    '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
+    ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
+    ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
+    clean: ['<%= distdir %>/*'],
+    copy: {
+      assets: {
+        files: [{ dest: '<%= distdir %>', src : '**', expand: true, cwd: 'src/assets/' }]
+      }
+    }
+  });
+
 };
