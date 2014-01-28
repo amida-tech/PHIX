@@ -88,6 +88,8 @@ function prod_env(){
     app.set('hub_domain', 'hub.amida-demo.com');
     app.set('node_domain', 'node.amida-demo.com');
 
+    app.set('template_path', '/usr/share/nginx/www/PHIX');
+
     app.set('direct', true);
 }
 
@@ -100,6 +102,8 @@ function dev_env(){
 
     app.set('hub_domain', 'hub.amida-demo.com');
     app.set('node_domain', 'node.amida-demo.com');
+
+    app.set('template_path', '.');
 
     app.set('direct', false);
 }
