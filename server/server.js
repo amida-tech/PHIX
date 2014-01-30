@@ -32,17 +32,24 @@ if (config.client.enabled) {
   app.set('views', viewDir);
   app.set('view engine', 'jade');
   app.set('view options', {
-    layout: false
+    layout: false,
+    'no-debug': true
   });
 
   app.use(express.favicon(config.client.location + '/favicon.ico'));
   app.use(express.static(config.client.location));
   app.use(function(req, res, next) {
-    var viewPath = viewDir + req.path + '.jade';
+    var requestPath = '';
+    if (req.path.substring(req.path.length - 1) === '/') {
+      requestPath = req.path.substring(0, req.path.length - 1);
+    } else {
+      requestPath = req.path;
+    }
+    var viewPath = viewDir + requestPath + '.jade';
     console.log(viewPath);
     fs.exists(viewPath, function(exists) {
       if (exists) {
-        res.render(req.path.substr(1));
+        res.render(viewPath);
       } else {
         next();
       }

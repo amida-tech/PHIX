@@ -45,8 +45,6 @@ angular
     var nodeLocation="http://localhost:3000";
     //var serviceLocation="http://localhost:3001";
 
-    console.log('hit');
-
     var dev={phix_host:"localhost", phix_port:3000, clinician_host:"localhost", clinician_port:3000};
     var prod={phix_host:"phix.amida-demo.com", clinician_host:"clinician.amida-demo.com"};
 

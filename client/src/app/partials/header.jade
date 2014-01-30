@@ -18,10 +18,10 @@ div(ng-controller="NavbarCtrl")
     .container
       .navbar-header
         a.navbar-brand(href='#/{{username}}' ng-show="appConfig === 'phix'")
-          img(src="images/images/bb-logo-vector.png" width="27px" height="27px")
+          img(src="img/bb-logo-vector.png" width="27px" height="27px")
           | &nbsp; PHIX
         a.navbar-brand(href='#/{{username}}/mail/inbox' ng-show="appConfig === 'clinician'")
-          img(src="images/images/bb-logo-vector.png" width="27px" height="27px")
+          img(src="img/bb-logo-vector.png" width="27px" height="27px")
           | &nbsp; PHIX
       ul.nav.pull-right
         li(ng-class='tab == "validate" && "active"' ng-show="appConfig === 'clinician'")
@@ -45,11 +45,11 @@ div(ng-controller="NavbarCtrl")
             span.fui-mail
             span.hidden-lg Messages
             span.navbar-new(ng-hide='unreadCount === 0') {{unreadCount}}
-        li(ng-show='patient', ng-class='tab == "folder" && "active"' ng-show="verified && (appConfig === 'phix')")
+        li(ng-class='tab == "folder" && "active"' ng-show="verified && (appConfig === 'phix')")
           a(href='#/{{username}}/store')
             span.fui-list
             span.hidden-lg Stored Records
-        li(ng-show='patient', ng-class='tab == "lock" && "active"' ng-show="verified && (appConfig === 'phix')")
+        li(ng-class='tab == "lock" && "active"' ng-show="verified && (appConfig === 'phix')")
           a(href='#/{{username}}/rules')
             span.fui-lock
             span.hidden-lg Privacy
@@ -57,7 +57,7 @@ div(ng-controller="NavbarCtrl")
           a(data-toggle='modal',data-target='#requestModal',ng-click='result = null')
             span.fui-alert
             span.hidden-lg Request Records
-        li(ng-show='patient',ng-class='tab == "gear" && "active"'  ng-show="appConfig === 'phix'")
+        li(ng-class='tab == "gear" && "active"'  ng-show="appConfig === 'phix'")
           a(href='#/{{username}}/profile')
             span.fui-gear
             span.hidden-lg Profile

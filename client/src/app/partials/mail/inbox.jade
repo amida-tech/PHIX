@@ -114,7 +114,7 @@ ng-include(src="'partials/header'")
               form(ng-show='clinicianConfig')
                 .form-group.mtm(ng-show='clinicianConfig')
                   label(for='name') Attach File
-                  input#name.form-control(type='file', id="filename")
+                  input.form-control(type='file' id="filename")
               p(ng-show='attach == "result"')
                 strong Attached:
                 span(ng-repeat='attachments in outboundMessage.attachments') {{attachments.fileName}}

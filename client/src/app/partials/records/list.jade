@@ -33,11 +33,11 @@ ng-include(src='"partials/header"')
               form
                 .form-group()
                   label(for='name') Select File
-                  input#name.form-control(type='file', id="filename")
+                  input.form-control(type='file', id="filename")
 
                 .form-group()
                   label(for='details') Details
-                  input#name.form-control(type='text', id="details" ng-model="details")
+                  input.form-control(type='text', id="details" ng-model="details")
 
                 //- ng-include(src='"partials/merge"', ng-show='uploaded')
                 
