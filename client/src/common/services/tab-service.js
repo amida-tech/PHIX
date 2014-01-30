@@ -15,17 +15,19 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.tabService', [])
-  .service('TabService', ['$rootScope', function ($rootScope) {
-    var tab = '';
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
-      if (next && next.tab) {
-        tab = next.tab;
-      }
-    });
+  .service('TabService', ['$rootScope',
+    function($rootScope) {
+      var tab = '';
+      $rootScope.$on('$routeChangeStart', function(event, next, current) {
+        if (next && next.tab) {
+          tab = next.tab;
+        }
+      });
 
-    return {
-      currentTab: function () {
-        return tab;
-      }
-    };
-  }]);
+      return {
+        currentTab: function() {
+          return tab;
+        }
+      };
+    }
+  ]);

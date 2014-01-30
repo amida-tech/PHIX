@@ -15,10 +15,10 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.preventDefault', [])
-  .directive('phPrevent', function () {
-    return function (scope, elm, attr) {
-      elm.click(function (e) {
-        return false;
-      });
-    };
-  });
+	.directive('phPrevent', function() {
+		return function(scope, elm, attr) {
+			elm.click(function(e) {
+				return false;
+			});
+		};
+	});

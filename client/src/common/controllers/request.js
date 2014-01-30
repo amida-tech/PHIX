@@ -15,51 +15,45 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.requestCtrl', [])
-  .controller('RequestCtrl', ['$scope', '$element', function ($scope, $element) {
-    $scope.checked = [
-      {
-        name:'encounters',
+  .controller('RequestCtrl', ['$scope', '$element',
+    function($scope, $element) {
+      $scope.checked = [{
+        name: 'encounters',
         checked: false
-      },
-      {
+      }, {
         name: 'vitals',
         checked: false
-      },
-      {
-        name:'labs',
+      }, {
+        name: 'labs',
         checked: false
-      },
-      {
+      }, {
         name: 'medications',
         checked: false
-      },
-      {
+      }, {
         name: 'immunizations',
         checked: false
-      },
-      {
+      }, {
         name: 'allergies',
         checked: false
-      },
-      {
+      }, {
         name: 'problems',
         checked: false
-      },
-      {
+      }, {
         name: 'all',
         checked: false
       }];
-    $scope.request = function () {
-      if ($scope.pname === 'joe') {
-        $scope.result = 'found';
-      } else {
-        $scope.result = 'notfound';
-      }
-    };
+      $scope.request = function() {
+        if ($scope.pname === 'joe') {
+          $scope.result = 'found';
+        } else {
+          $scope.result = 'notfound';
+        }
+      };
 
-    $scope.reset = function () {
-      $element;
-      $scope.pname = '';
-      $scope.result = '';
+      $scope.reset = function() {
+        //$element;
+        $scope.pname = '';
+        $scope.result = '';
+      };
     }
-  }]);
+  ]);

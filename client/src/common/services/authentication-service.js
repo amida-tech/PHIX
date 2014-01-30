@@ -15,29 +15,31 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.authenticationService', [])
-  .factory('AuthenticationService', function ($http) {
-      
-    var endpoint="/";
+  .factory('AuthenticationService', function($http) {
+
+    var endpoint = "/";
     var userObject = {};
     var role;
-    
-    getUser();
-      
-    function getUser () {
-        $http.get(endpoint + 'account').success(function(data) {
-            userObject = data;
-        }).error(function(data) {
-            console.log(data);
-        });
+
+
+    function getUser() {
+      $http.get(endpoint + 'account').success(function(data) {
+        userObject = data;
+      }).error(function(data) {
+        console.log(data);
+      });
     }
 
+    getUser();
+
+
     return {
-      logout: function (callback) {
+      logout: function(callback) {
         $http.post(endpoint + 'logout').success(function(data) {
           auth = false;
           role = '';
           delegates = [];
-          name = ''
+          name = '';
           username = '';
           callback();
         }).error(function(data) {
@@ -45,16 +47,19 @@ angular.module('phix.authenticationService', [])
           callback();
         });
       },
-      login: function (user, pass, callback) {
-          $http.post(endpoint + 'login', {username: user, password: pass}).success(function(data) {
-            auth = true;
-            callback(null, data);
-          }).error(function(data) {
-            auth = false;
-            callback(data);
-          });
+      login: function(user, pass, callback) {
+        $http.post(endpoint + 'login', {
+          username: user,
+          password: pass
+        }).success(function(data) {
+          auth = true;
+          callback(null, data);
+        }).error(function(data) {
+          auth = false;
+          callback(data);
+        });
         // Original coding from Michael.
-       /* } else if (user == 'joe') {
+        /* } else if (user == 'joe') {
           auth = true;
           delegates = [];
           role = 'clinician';
@@ -81,46 +86,46 @@ angular.module('phix.authenticationService', [])
           role = 'patient';
         }*/
       },
-      clinician: function () {
-        return role == 'clinician';
+      clinician: function() {
+        return role === 'clinician';
       },
-      delegates: function (callback) {
+      delegates: function(callback) {
         $http.get(endpoint + 'delegation/recieved').success(function(data) {
-            callback(data);
-          }).error(function(data) {
-            callback(data);
-          });
+          callback(data);
+        }).error(function(data) {
+          callback(data);
+        });
       },
-      authenticated: function (callback) {
+      authenticated: function(callback) {
         $http.get(endpoint + 'loggedin').success(function(data) {
           auth = true;
           callback(auth);
         }).error(function(data) {
-          auth = false; 
+          auth = false;
           callback(auth);
         });
-          
+
       },
-      currentDelegate: function (username, callback) {
-        if (username !== undefined) { 
-           $http.get('/switch/' + username).success(function(data) {
-               callback(data);
-           }).error(function(data) {
-               callback(data);
-           });
+      currentDelegate: function(username, callback) {
+        if (username !== undefined) {
+          $http.get('/switch/' + username).success(function(data) {
+            callback(data);
+          }).error(function(data) {
+            callback(data);
+          });
         }
       },
-      currentUser: function (callback) {
-          if (userObject = {}) {
-             $http.get(endpoint + 'account').success(function(data) {
+      currentUser: function(callback) {
+        if (userObject = {}) {
+          $http.get(endpoint + 'account').success(function(data) {
             userObject = data;
             callback(userObject);
           }).error(function(data) {
             console.log(data);
-          }); 
-          } else {
-          callback(userObject)
-          }
+          });
+        } else {
+          callback(userObject);
+        }
       }
     };
   });

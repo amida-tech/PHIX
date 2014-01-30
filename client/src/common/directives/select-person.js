@@ -15,27 +15,27 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.selectPerson', ['bt.datepicker'])
-  .directive('phPerson', function () {
+  .directive('phPerson', function() {
     return {
       restrict: 'E',
       template: "<div ng-include='\"partials/select-person\"' onload='onload()'></div>",
       require: '?ngModel',
-      link: function (scope, elem, attr, ngModel) {
+      link: function(scope, elem, attr, ngModel) {
         scope.location = '';
 
         scope.locations = ['1234 olive st', '2344 wall st', '13344 sky way unit 3324'];
 
-        scope.selectLoc = function (loc) {
-          scope.location = loc; 
+        scope.selectLoc = function(loc) {
+          scope.location = loc;
           scope.done = true;
-        }
+        };
 
-        scope.$watch('pname', function () {
+        scope.$watch('pname', function() {
           elem.find('#name').val(attr.pname);
         });
 
-        scope.onload = function () {
-          elem.find('#name').change(function () {
+        scope.onload = function() {
+          elem.find('#name').change(function() {
             if (ngModel) {
               ngModel.$setViewValue(elem.find('#name').val());
             }

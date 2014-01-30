@@ -15,38 +15,44 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.selectClinitian', [])
-  .directive('phClinitian', function ($http) {
+  .directive('phClinitian', function($http) {
     return {
       restrict: 'E',
       template: "<div ng-include='\"partials/select-clinitian\"'></div>",
       replace: true,
-      link: function (scope, elem, attr) {
+      link: function(scope, elem, attr) {
         scope.selected = false;
         scope.allClinicians = [];
-          
-        var endpoint="/";
-        var providerArray = [];  
-          
-        scope.getClinicians = function () {
-            $http.get(endpoint + 'providers').success(function(data) {
-                for (var i=0; i<data.providers.length; i++) {
-                  var displayLocation = data.providers[i].practice_address.city + ', ' + data.providers[i].practice_address.state + ' ' + data.providers[i].practice_address.zip;
-                  providerArray.push({fullname: data.providers[i].full_name, location: displayLocation, direct_email: data.providers[i].direct_email});
-                    
-                }
-              scope.allClinicians = providerArray;    
-             }).error(function(data) {
-                console.log(data);
-             });
-        }
-          
-        scope.part = {value: 'none'}
-        scope.select = function (provider) {
-            scope.selection = provider;
-            scope.outboundMessage.recipient = provider.direct_email;
-            scope.part.value = 'done';
+
+        var endpoint = "/";
+        var providerArray = [];
+
+        scope.getClinicians = function() {
+          $http.get(endpoint + 'providers').success(function(data) {
+            for (var i = 0; i < data.providers.length; i++) {
+              var displayLocation = data.providers[i].practice_address.city + ', ' + data.providers[i].practice_address.state + ' ' + data.providers[i].practice_address.zip;
+              providerArray.push({
+                fullname: data.providers[i].full_name,
+                location: displayLocation,
+                direct_email: data.providers[i].direct_email
+              });
+
+            }
+            scope.allClinicians = providerArray;
+          }).error(function(data) {
+            console.log(data);
+          });
+        };
+
+        scope.part = {
+          value: 'none'
+        };
+        scope.select = function(provider) {
+          scope.selection = provider;
+          scope.outboundMessage.recipient = provider.direct_email;
+          scope.part.value = 'done';
           console.log(provider);
-        }
+        };
 
       }
     };

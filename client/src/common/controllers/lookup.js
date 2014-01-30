@@ -15,39 +15,41 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.lookupCtrl', [])
-  .controller('LookupCtrl', ['$scope', '$http', function ($scope, $http) {
-        
-      
-    var endpoint="/";
-      
-      $scope.dateformat=/^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/(19\d{2}|[2]\d{3})$/;
+  .controller('LookupCtrl', ['$scope', '$http',
+    function($scope, $http) {
+
+
+      var endpoint = "/";
+
+      $scope.dateformat = /^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/(19\d{2}|[2]\d{3})$/;
       $scope.user = {};
       $scope.verified = false;
-      
-      $scope.resetForm = function () {
+
+      $scope.resetForm = function() {
         $scope.toggleView = false;
-        $scope.user = {}; 
+        $scope.user = {};
         postJSON = {};
-      }
-      
-      $scope.verify = function () {
-          var postJSON = {};
-          postJSON.firstname = $scope.user.firstname;
-          postJSON.lastname = $scope.user.lastname;
-          postJSON.birthdate = $scope.user.birthdate;
-          postJSON.directemail = $scope.user.directemail;
-          
-          if ($scope.user.middlename) {
-            postJSON.middlename = $scope.user.middlename;   
-          }
-          
-         $http.post(endpoint + 'verify', postJSON).success(function(data) {
+      };
+
+      $scope.verify = function() {
+        var postJSON = {};
+        postJSON.firstname = $scope.user.firstname;
+        postJSON.lastname = $scope.user.lastname;
+        postJSON.birthdate = $scope.user.birthdate;
+        postJSON.directemail = $scope.user.directemail;
+
+        if ($scope.user.middlename) {
+          postJSON.middlename = $scope.user.middlename;
+        }
+
+        $http.post(endpoint + 'verify', postJSON).success(function(data) {
           $scope.verified = data.verified;
           $scope.toggleView = true;
-             
+
         }).error(function(data) {
           console.log(data);
-        });        
-      }
-      
-  }]);
+        });
+      };
+
+    }
+  ]);

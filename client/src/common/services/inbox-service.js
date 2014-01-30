@@ -15,41 +15,41 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.inboxService', [])
-  .factory('InboxService', function ($http) {
-      
-    var endpoint="/";
-    var inboxCount = 0; 
-  
-    getInboxCount();
-      
-    function getInboxCount () {
+  .factory('InboxService', function($http) {
+
+    var endpoint = "/";
+    var inboxCount = 0;
+
+    function getInboxCount() {
       $http.get(endpoint + 'direct/inbox').success(function(data) {
-           var inboxMessages = data.messages;
-           var inboxCount = 0;
-            for (var i=0;i<inboxMessages.length;i++) {
-              if (inboxMessages[i].read === false) {
-               inboxCount = inboxCount + 1;   
-              }
-            }
-     }).error(function(data) {
-     })  
+        var inboxMessages = data.messages;
+        var inboxCount = 0;
+        for (var i = 0; i < inboxMessages.length; i++) {
+          if (inboxMessages[i].read === false) {
+            inboxCount = inboxCount + 1;
+          }
+        }
+      }).error(function(data) {});
     }
-      
+
+    getInboxCount();
+
+
     return {
-      unreadCount: function (callback) {
+      unreadCount: function(callback) {
         $http.get(endpoint + 'direct/inbox').success(function(data) {
-               var inboxMessages = data.messages;
-               inboxCount = 0;
-                for (var i=0;i<inboxMessages.length;i++) {
-                  if (inboxMessages[i].read === false) {
-                   inboxCount = inboxCount + 1;   
-                  }
-                }
-              callback(inboxCount);
-         }).error(function(data) {
-              callback(data);
-         }) 
+          var inboxMessages = data.messages;
+          inboxCount = 0;
+          for (var i = 0; i < inboxMessages.length; i++) {
+            if (inboxMessages[i].read === false) {
+              inboxCount = inboxCount + 1;
+            }
+          }
+          callback(inboxCount);
+        }).error(function(data) {
+          callback(data);
+        });
       }
-    }
-   
+    };
+
   });

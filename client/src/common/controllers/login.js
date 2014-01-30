@@ -17,7 +17,7 @@ limitations under the License.
 angular.module('phix.loginCtrl', ['phix.authenticationService'])
   .controller('LoginCtrl', ['$scope', '$rootScope', '$http', '$location', 'AuthenticationService', function ($scope, $rootScope, $http, $location, AuthenticationService) {
       
-      console.log($rootScope.appConfiguration)
+      console.log($rootScope.appConfiguration);
     $scope.user = {};
     $scope.check = function () {
       AuthenticationService.login($scope.user.username, $scope.user.password, function(err, res) {
@@ -40,5 +40,5 @@ angular.module('phix.loginCtrl', ['phix.authenticationService'])
             }
         }
       });
-    }
+    };
   }]);

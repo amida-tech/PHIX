@@ -15,6 +15,8 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.previewCtrl', [])
-  .controller('PreviewCtrl', ['$scope', function ($scope) {
-    $scope.tab = 'encounters';
-  }]);
+	.controller('PreviewCtrl', ['$scope',
+		function($scope) {
+			$scope.tab = 'encounters';
+		}
+	]);

@@ -15,20 +15,22 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('bt.placeholder', [])
-  .directive('btPlaceholder', ['$parse', function ($parse) {
-    return {
-      restrict: 'E',
-      template: '<img />',
-      replace: true,
-      scope: {
-        size: '='
-      },
-      link: function (scope, elem, attr) {
-        var size = $parse(attr.size);
-        scope.$watch(size, function (val) {
-          elem.attr('data-src', 'holder.js/' + val);
-          Holder.run();
-        });
-      }
-    };
-  }]);
+  .directive('btPlaceholder', ['$parse',
+    function($parse) {
+      return {
+        restrict: 'E',
+        template: '<img />',
+        replace: true,
+        scope: {
+          size: '='
+        },
+        link: function(scope, elem, attr) {
+          var size = $parse(attr.size);
+          scope.$watch(size, function(val) {
+            elem.attr('data-src', 'holder.js/' + val);
+            Holder.run();
+          });
+        }
+      };
+    }
+  ]);

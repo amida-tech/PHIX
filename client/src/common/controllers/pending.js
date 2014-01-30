@@ -15,24 +15,46 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.pendingCtrl', [])
-  .controller('PendingCtrl', ['$scope', '$http', 'AuthenticationService', function ($scope, $http, AuthenticationService) {
-      
-    $scope.closest={address:{address:"3118 Washington Boulevard",
-              address2:"",
-              city:"Arlington",
-              state:"VA",
-              zipcode:"22201"},
-          lat:"38.885879", lng:"-77.09519"};
-    $scope.nearby={locations:[{address:'235 N Glebe Rd', city:'Arlington', state:'VA', zipcode:'22201'},
-          {address:'2200 N George Mason Dr', city:'Arlington', state:'VA', zipcode:'22201'},
-          {address:'1101 Wilson Blvd #1', city:'Arlington', state:'VA', zipcode:'22201'}]};
+  .controller('PendingCtrl', ['$scope', '$http', 'AuthenticationService',
+    function($scope, $http, AuthenticationService) {
 
-    $scope.token = '';
-      
-       $http.get('/account').success(function(data) {
-            $scope.token = data.token;
-          }).error(function(data) {
-            console.log(data);
-          });  
-      
-  }]);
+      $scope.closest = {
+        address: {
+          address: "3118 Washington Boulevard",
+          address2: "",
+          city: "Arlington",
+          state: "VA",
+          zipcode: "22201"
+        },
+        lat: "38.885879",
+        lng: "-77.09519"
+      };
+      $scope.nearby = {
+        locations: [{
+          address: '235 N Glebe Rd',
+          city: 'Arlington',
+          state: 'VA',
+          zipcode: '22201'
+        }, {
+          address: '2200 N George Mason Dr',
+          city: 'Arlington',
+          state: 'VA',
+          zipcode: '22201'
+        }, {
+          address: '1101 Wilson Blvd #1',
+          city: 'Arlington',
+          state: 'VA',
+          zipcode: '22201'
+        }]
+      };
+
+      $scope.token = '';
+
+      $http.get('/account').success(function(data) {
+        $scope.token = data.token;
+      }).error(function(data) {
+        console.log(data);
+      });
+
+    }
+  ]);

@@ -15,17 +15,17 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.outboxCtrl', [])
-  .controller('OutboxCtrl', ['$scope', function ($scope) {
-    $scope.fullname = 'Jane Public';
-    $scope.emailOut = 'jane@something.com';
+  .controller('OutboxCtrl', ['$scope',
+    function($scope) {
+      $scope.fullname = 'Jane Public';
+      $scope.emailOut = 'jane@something.com';
 
 
-      
-    $scope.logItems = [
-      {
+
+      $scope.logItems = [{
         recipient: 'joe@somethingelse.com',
         statusText: 'some status',
         delivered: new Date()
-      }
-    ];
-  }]);
+      }];
+    }
+  ]);

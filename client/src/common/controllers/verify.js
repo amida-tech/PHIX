@@ -15,70 +15,87 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.verifyCtrl', ['bt.forms'])
-  .controller('VerifyCtrl', ['$scope', '$http', function ($scope, $http) {
-    $scope.data={};
-    $scope.verified=null;
+  .controller('VerifyCtrl', ['$scope', '$http',
+    function($scope, $http) {
+      $scope.data = {};
+      $scope.verified = null;
 
 
-    $scope.verify = function () {
-      //Verify API call here
-      //alert('verification in process: '+$scope.codeHolder);
-      $http({method: 'GET', url: '/identity/account/'+$scope.codeHolder}).
+      $scope.verify = function() {
+        //Verify API call here
+        //alert('verification in process: '+$scope.codeHolder);
+        $http({
+          method: 'GET',
+          url: '/identity/account/' + $scope.codeHolder
+        }).
         success(function(data, status, headers, config) {
           // this callback will be called asynchronously
           // when the response is available
-          $scope.data=data;
-          $scope.verified="inprocess";
+          $scope.data = data;
+          $scope.verified = "inprocess";
         }).
         error(function(data, status, headers, config) {
           // called asynchronously if an error occurs
           // or server returns response with an error status.
-          $scope.data=data;
-          $scope.verified='invalid';
+          $scope.data = data;
+          $scope.verified = 'invalid';
         });
 
-    };
+      };
 
 
-    $scope.approve = function () {
-      $http.defaults.headers.post["Content-Type"] = "application/json";
-      $http({method: 'PUT', url: '/identity/validate/'+$scope.codeHolder, data:{verified:true}}).
+      $scope.approve = function() {
+        $http.defaults.headers.post["Content-Type"] = "application/json";
+        $http({
+          method: 'PUT',
+          url: '/identity/validate/' + $scope.codeHolder,
+          data: {
+            verified: true
+          }
+        }).
         success(function(data, status, headers, config) {
           // this callback will be called asynchronously
           // when the response is available
-          $scope.data=data;
-          $scope.verified='approved';
-          $scope.codeHolder="";
+          $scope.data = data;
+          $scope.verified = 'approved';
+          $scope.codeHolder = "";
         }).
         error(function(data, status, headers, config) {
           // called asynchronously if an error occurs
           // or server returns response with an error status.
-          $scope.data=data;
-          $scope.verified='approved';
-          $scope.codeHolder="";
+          $scope.data = data;
+          $scope.verified = 'approved';
+          $scope.codeHolder = "";
         });
 
-    };
+      };
 
-    $scope.reject = function () {
-      $http.defaults.headers.post["Content-Type"] = "application/json";
-      $http({method: 'PUT', url: '/identity/validate/'+$scope.codeHolder, data:{verified:false}}).
+      $scope.reject = function() {
+        $http.defaults.headers.post["Content-Type"] = "application/json";
+        $http({
+          method: 'PUT',
+          url: '/identity/validate/' + $scope.codeHolder,
+          data: {
+            verified: false
+          }
+        }).
         success(function(data, status, headers, config) {
           // this callback will be called asynchronously
           // when the response is available
-          $scope.data=data;
-          $scope.verified='rejected';
-          $scope.codeHolder="";
+          $scope.data = data;
+          $scope.verified = 'rejected';
+          $scope.codeHolder = "";
         }).
         error(function(data, status, headers, config) {
           // called asynchronously if an error occurs
           // or server returns response with an error status.
-          $scope.data=data;
-          $scope.verified='rejected';
-          $scope.codeHolder="";
+          $scope.data = data;
+          $scope.verified = 'rejected';
+          $scope.codeHolder = "";
         });
 
-    };
+      };
 
 
-  }]);
+    }
+  ]);

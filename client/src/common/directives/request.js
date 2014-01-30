@@ -28,5 +28,5 @@ angular.module('phix.request', ['phix.requestCtrl'])
           });
         });
       }
-    }
+    };
   }]);

@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  //grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   //grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -11,6 +11,8 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('grunt-html2js');
 
   // Default task.
+
+  grunt.registerTask('default', ['jshint', 'build']);
   grunt.registerTask('build', ['clean', 'copy:assets', 'copy:less', 'copy:partials', 'concat']);
   //grunt.registerTask('default', ['jshint','build','karma:unit']);
   //grunt.registerTask('build', ['clean','html2js','concat','recess:build','copy:assets']);
@@ -69,12 +71,12 @@ module.exports = function(grunt) {
       }
     },
     concat: {
-      dist:{
+      dist: {
         options: {
           banner: "<%= banner %>"
         },
-        src:['<%= src.js %>'],
-        dest:'<%= distdir %>/<%= pkg.name %>.js'
+        src: ['<%= src.js %>'],
+        dest: '<%= distdir %>/<%= pkg.name %>.js'
       },
       index: {
         src: ['src/index.html'],
@@ -103,7 +105,21 @@ module.exports = function(grunt) {
         src: ['vendor/less/*.js'],
         dest: '<%= distdir %>/less.js'
       }
-
+    },
+    jshint: {
+      files: ['gruntFile.js', 'package.json', '<%= src.js %>'],
+      options: {
+        curly: true,
+        eqeqeq: true,
+        immed: true,
+        latedef: true,
+        newcap: true,
+        noarg: true,
+        sub: true,
+        boss: true,
+        eqnull: true,
+        globals: {}
+      }
     }
   });
 

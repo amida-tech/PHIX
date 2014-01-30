@@ -15,16 +15,22 @@ limitations under the License.
 ======================================================================*/
 
 angular.module('phix.signupCtrl', ['phix.authenticationService'])
-  .controller('SignupCtrl', ['$scope', '$location', '$http', 'AuthenticationService', function ($scope, $location, $http, AuthenticationService) {
-    $scope.create = function () {
-    //TODO, fix form greyout so messages don't generate on server side.
-        
-    $http.put('/account', {username: $scope.user.username, password: $scope.user.password, email: $scope.user.email}).success(function (data) {
-      AuthenticationService.login($scope.user.username, $scope.user.password, function() {
-        $location.path('/' + $scope.user.username + '/enroll');
-      })
-    }).error(function (data) {
-      $scope.signup.serverError = data;
-    });
+  .controller('SignupCtrl', ['$scope', '$location', '$http', 'AuthenticationService',
+    function($scope, $location, $http, AuthenticationService) {
+      $scope.create = function() {
+        //TODO, fix form greyout so messages don't generate on server side.
+
+        $http.put('/account', {
+          username: $scope.user.username,
+          password: $scope.user.password,
+          email: $scope.user.email
+        }).success(function(data) {
+          AuthenticationService.login($scope.user.username, $scope.user.password, function() {
+            $location.path('/' + $scope.user.username + '/enroll');
+          });
+        }).error(function(data) {
+          $scope.signup.serverError = data;
+        });
+      };
     }
-  }]);
+  ]);
