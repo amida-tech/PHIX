@@ -21,7 +21,7 @@ limitations under the License.
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Loading Bootstrap -->
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
 
     <!-- Loading Flat UI -->
     <link rel="stylesheet/less" type="text/css" href="less/app.less" />
@@ -33,31 +33,25 @@ limitations under the License.
       <script src="js/vendor/html5shiv.js"></script>
     <![endif]-->
 
-    <script src="js/vendor/less-1.4.1.min.js"></script>
+    <script src="less.js"></script>
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   </head>
   <body>
     <div ng-view>
+    Hello {{'World'}}!
     </div>
+
+
     <!-- /.container -->
 
     <!-- Load vendor JS -->
-    <script src="js/vendor/jquery-1.8.3.min.js"></script>
-    <script src="js/vendor/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="js/vendor/jquery.ui.touch-punch.min.js"></script>
-    <script src="js/vendor/bootstrap.min.js"></script>
-    <script src="js/vendor/bootstrap-select.js"></script>
-    <script src="js/vendor/bootstrap-switch.js"></script>
-    <script src="bootstrap/js/holder.js"></script>
-    <script src="js/vendor/flatui-checkbox.js"></script>
-    <script src="js/vendor/flatui-radio.js"></script>
-    <script src="js/vendor/jquery.tagsinput.js"></script>
-    <script src="js/vendor/jquery.placeholder.js"></script>
-    <script src="js/vendor/angular.js"></script>
-    <script src="js/vendor/angular-route.js"></script>
-
+    <script src="jquery.js"></script>
+    <script src="bootstrap.js"></script>
+    <script src="flatui.js"></script>
+    <script src="angular.js"></script>
+    <script src="PHIX.js"></script>
     <!-- Load applicaiton JS -->
-    <script src="js/services/authentication-service.js"></script>
+    <!--<script src="js/services/authentication-service.js"></script>
     <script src="js/services/tab-service.js"></script>
     <script src="js/services/inbox-service.js"></script>
 
@@ -89,7 +83,7 @@ limitations under the License.
     <script src="js/controllers/signup.js"></script>
     <script src="js/controllers/exchange.js"></script>
     <script src="js/controllers/lookup.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app.js"></script>-->
 
   </body>
 </html>

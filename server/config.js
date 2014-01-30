@@ -32,6 +32,8 @@ module.exports = {
     name: 'portal'  // Name of the database.
   },
   client: {
+    enabled: true ,  //Whether or not the local client is enabled.  Should be true for development.
+    location: path.resolve(__dirname, '../client/dist') ,  //Folder location of the client.
     url: 'localhost'  ,  // The URL of the server where the browser-based client is located.  Typically localhost for development.
     port: 3001 // The port on which the client is located.  Must be different than server for development.
   },

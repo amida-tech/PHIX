@@ -42,13 +42,15 @@ angular
   .run(['$rootScope', '$location', 'AuthenticationService', 'TabService', 'InboxService', function ($rootScope, $location, AuthenticationService) {
 
     var configuration="phix";
-    var nodeLocation="http://localhost:3001";
+    var nodeLocation="http://localhost:3000";
     //var serviceLocation="http://localhost:3001";
 
-    var dev={phix_host:"localhost", phix_port:3001, clinician_host:"localhost", clinician_port:3002};
+    console.log('hit');
+
+    var dev={phix_host:"localhost", phix_port:3000, clinician_host:"localhost", clinician_port:3000};
     var prod={phix_host:"phix.amida-demo.com", clinician_host:"clinician.amida-demo.com"};
 
-    if ($location.host()===dev.phix_host && $location.port()===dev.phix_port) {
+    /*if ($location.host()===dev.phix_host && $location.port()===dev.phix_port) {
         configuration="phix";
         nodeLocation="http://"+dev.phix_host+":"+dev.phix_port;
         //serviceLocation="http://"+dev.phix_host+":"+dev.phix_port;
@@ -64,7 +66,7 @@ angular
         configuration="clinician";
         nodeLocation="http://"+prod.clinician_host;
         //serviceLocation="http://"+prod.clinician_host;
-    }
+    }*/
 
     $rootScope.appConfiguration = {
         //serviceLocation: serviceLocation,

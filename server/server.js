@@ -22,8 +22,33 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var jsdom = require('jsdom');
 var config = require('./config.js');
-
 var app = express();
+
+//Start local client if enabled.
+if (config.client.enabled) {
+
+  var viewDir = config.client.location;
+
+  app.set('views', viewDir);
+  app.set('view engine', 'jade');
+  app.set('view options', {
+    layout: false
+  });
+
+  app.use(express.favicon(config.client.location + '/favicon.ico'));
+  app.use(express.static(config.client.location));
+  app.use(function(req, res, next) {
+    var viewPath = viewDir + req.path + '.jade';
+    console.log(viewPath);
+    fs.exists(viewPath, function(exists) {
+      if (exists) {
+        res.render(req.path.substr(1));
+      } else {
+        next();
+      }
+    });
+  });
+}
 
 app.use(express.logger());
 app.use(express.bodyParser());
