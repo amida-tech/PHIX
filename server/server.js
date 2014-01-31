@@ -17,12 +17,31 @@ limitations under the License.
 var express = require('express');
 var fs = require('fs');
 var http = require('http');
+var https = require('https');
 var path = require('path');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var jsdom = require('jsdom');
 var config = require('./config.js');
 var app = express();
+
+//Optionally enable ssl.
+if (config.server.ssl.enabled) {
+  var privateKey  = fs.readFileSync(config.server.ssl.privateKey).toString();
+  var certificate = fs.readFileSync(config.server.ssl.certificate).toString();
+  var credentials = {key: privateKey, cert: certificate};
+  var server = https.createServer(credentials, app);
+  var redirectServer = http.createServer(function(req, res){
+    res.writeHead(301, {
+      "Content-Type": "text/plain",
+      "Location": "https://" + config.server.url + ":" + config.server.port,
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+    });
+    res.end("Redirect to secure server");
+  }).listen(config.server.redirectPort);
+} else {
+  var server = http.createServer(app);
+}
 
 //Start local client if enabled.
 if (config.client.enabled) {
@@ -49,6 +68,7 @@ if (config.client.enabled) {
     console.log(viewPath);
     fs.exists(viewPath, function(exists) {
       if (exists) {
+        res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         res.render(viewPath);
       } else {
         next();
@@ -71,10 +91,19 @@ app.all("/*", function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
+  res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   return next();
 });
 
+function requireHTTPS(req, res, next) {
+    if (!req.secure) {
+        //FYI this should work for local development as well
+        return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+}
 
+app.use(requireHTTPS);
 
 
 //app.set('phix_path','http://' + config.server.url + ':' + config.server.port);
@@ -113,9 +142,6 @@ app.use(profile);
 app.use(delegation);
 app.use(provider);
 
-
-//app.listen(config.server.port);
-
 //This is code used to override the need of a second database.
 var db_settings = {database: 'portal',
                    other_database: 'portal',
@@ -133,8 +159,7 @@ require('./lib/db').init(db_settings, function(connections) {
         app.set("grid_other_conn",connections["other_grid"]);
         app.set("message2",connections["message2"]);
     }
-
-    app.listen(config.server.port);
-    console.log("listening on port "+ config.server.port);
+    server.listen(config.server.port);
+    console.log("Server listening on port "+ config.server.port);
 });
 
