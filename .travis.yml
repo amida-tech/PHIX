@@ -5,15 +5,16 @@ node_js:
 
 before_script:
  - npm install -g grunt-cli@0.1.x
- - cd server
- - npm install --quiet
- - node server.js &
- - cd ..
  - cd client
  - npm install --quiet
- - grunt build
+ - cd ../server
+ - npm install --quiet
+ - node server.js &
 
 services:
   - mongodb
 
-script: grunt commit
+script:
+  - grunt commit
+  - cd ../client
+  - grunt
