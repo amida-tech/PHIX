@@ -8,6 +8,10 @@ before_script:
  - cd server
  - npm install --quiet
  - node server.js &
+ - cd ..
+ - cd client
+ - npm install --quiet
+ - grunt build
 
 services:
   - mongodb
