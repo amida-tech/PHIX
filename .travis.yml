@@ -16,6 +16,6 @@ services:
   - mongodb
 
 script:
-  - grunt commit
-  - cd ../client
   - grunt
+  - cd ../server
+  - grunt commit
