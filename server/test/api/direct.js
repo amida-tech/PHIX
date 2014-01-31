@@ -22,7 +22,11 @@ var Message = require('../../models/message');
 var Delegation = require('../../models/delegation');
 var mongoose = require('mongoose');
 var config = require('../../config.js');
-var deploymentLocation = 'http://' + config.server.url + ':' + config.server.port;
+if (config.server.ssl.enabled) {
+  var deploymentLocation = 'https://' + config.server.url + ':' + config.server.port;
+} else {
+  var deploymentLocation = 'http://' + config.server.url + ':' + config.server.port;
+}
 var databaseLocation = 'mongodb://' + config.database.url + '/' + config.database.name;
 var api = supertest.agent(deploymentLocation);
 var common = require('../common/commonFunctions');

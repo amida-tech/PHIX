@@ -50,6 +50,10 @@ Test user:
 
 ### Testing Instructions
 
+Note:  If testing with SSL enabled, the tests will fail as node by default refuses self signed certs.  To overcome this, set the the environmental variable NODE_TLS_REJECT_UNAUTHORIZED=0.  Never do this in production.  On bash, this would be:
+
+    export NODE_TLS_REJECT_UNAUTHORIZED=0
+
 Running tests on client:
 
     cd client

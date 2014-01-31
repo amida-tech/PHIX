@@ -4,6 +4,7 @@ node_js:
   - "0.8"
 
 before_script:
+ - export NODE_TLS_REJECT_UNAUTHORIZED=0
  - npm install -g grunt-cli@0.1.x
  - cd server
  - npm install --quiet
