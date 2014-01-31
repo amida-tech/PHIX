@@ -3,6 +3,8 @@ PHIX
 
 PHIX - Personal Health Record eXchange
 
+[![Build Status](https://travis-ci.org/amida-tech/PHIX.png?branch=build-refactoring)](https://travis-ci.org/amida-tech/PHIX)
+
 ### PHIX User Guide
 See description of PHIX functionality here [https://github.com/amida-tech/PHIX/blob/master/docs/user_guide/user_guide.md](https://github.com/amida-tech/PHIX/blob/master/docs/user_guide/user_guide.md)
 
@@ -14,63 +16,49 @@ Prerequisites:
 - NPM [Instructions](https://npmjs.org/doc/README.html)
 - MongoDB [Instructions](http://docs.mongodb.org/manual/installation/)
 
+Start MongoDB:
+
+On Windows, execute mongod.exe.  On OSX/Linux, bring up the terminal, type 'mongod', and hit enter.
+
 Get PHIX code:
 
     git clone git@github.com:amida-tech/PHIX.git
 
-Go to PHIX directry:
+The client must be compiled, to build the client:
 
-    npm install
+    cd client
+    grunt
 
+Navigate to the server directory and start the server:
 
-Open terminal/command line window and run PHIX app:
+    cd ../server
+    node server.js
 
-    NODE_ENV=phix.dev node app.js
-
-Open another terminal/command line window and run Clinician Front-end app:
-
-    NODE_ENV=clinician.dev node app.js
-
-Bootstrap test users:
+Bootstrap test user:
 
     cd /test/bootstrap
     mocha -R spec demoPHIX.js -t 10000
-    mocha -R spec demoClinicians.js -t 10000
 
 You are ready to go!
 
 - [PHIX Portal](http://localhost:3001)
 - [Internal Verification App](http://localhost:3001/#/verification)
-- [Clinician Fornt-end](http://localhost:3002)
 
-Test users:
+Test user:
 
 - PHIX - janedoe/test (birthdate: 06/19/1976, name: Jane F. Doe, DIRECT email janedoe@hub.amida-demo.com)
-- Clinician front end - dr.house/test and dr.henry/test
 
-### More Instructions
+### Testing Instructions
 
-To run (Node.js and MongoDB are required):
+Running tests on client:
 
-    npm install
-    NODE_ENV=[env] node app.js
+    cd client
+    grunt test
 
-[env] can be: phix.dev, clinician.dev, phix.prod, clinician.prod
+Running tests on server:
 
-You can also set environment variable on linux/mac os this way:
-
-    export NODE_ENV=[env]
-    node app.sj
-
-Set environment variable on windows that way:
-
-    set NODE_ENV=[env]
-    node app.js
-
-Running tests:
-
-    grunt --NODE_ENV='phix.dev'
-    grunt --NODE_ENV='clinician.dev'
+    cd server
+    grunt test
 
 ### Deployment of PHIX
 For automated deployment of PHIX/DIRECT on Amazon EC2 cloud using Ansible scripts see: 
