@@ -6,9 +6,9 @@ node_js:
 before_script:
  - export NODE_TLS_REJECT_UNAUTHORIZED=0
  - npm install -g grunt-cli@0.1.x
- - cd server
+ - cd client
  - npm install --quiet
- - cd ../client
+ - cd ../server
  - npm install --quiet
  - node server.js &
  - sleep 3
@@ -17,6 +17,4 @@ services:
   - mongodb
 
 script:
-  - grunt
-  - cd ../server
   - grunt commit
