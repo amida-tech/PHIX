@@ -3,6 +3,8 @@ PHIX
 
 PHIX - Personal Health Record eXchange
 
+[![Build Status](https://travis-ci.org/amida-tech/PHIX.png?branch=build-refactoring)](https://travis-ci.org/amida-tech/PHIX)
+
 ### PHIX User Guide
 See description of PHIX functionality here [https://github.com/amida-tech/PHIX/blob/master/docs/user_guide/user_guide.md](https://github.com/amida-tech/PHIX/blob/master/docs/user_guide/user_guide.md)
 
@@ -14,66 +16,59 @@ Prerequisites:
 - NPM [Instructions](https://npmjs.org/doc/README.html)
 - MongoDB [Instructions](http://docs.mongodb.org/manual/installation/)
 
+Start MongoDB:
+
+On Windows, execute mongod.exe.  On OSX/Linux, bring up the terminal, type 'mongod', and hit enter.
+
 Get PHIX code:
 
-    git clone git@github.com:amida-tech/PHIX.git
-
-Go to PHIX directry:
-
-    npm install
-
+<<<<<<< HEAD
 Run MongoDB
     
     mongod
+=======
+    git clone git@github.com:amida-tech/PHIX.git
+>>>>>>> build-refactoring
 
-Open terminal/command line window and run PHIX app:
+The client must be compiled, to build the client:
 
-    NODE_ENV=phix.dev node app.js
+    cd client
+    grunt
 
-Open another terminal/command line window and run Clinician Front-end app:
+Navigate to the server directory and start the server:
 
-    NODE_ENV=clinician.dev node app.js
+    cd ../server
+    node server.js
 
-Bootstrap test users:
+Bootstrap test user:
 
     cd /test/bootstrap
     mocha -R spec demoPHIX.js -t 10000
-    mocha -R spec demoClinicians.js -t 10000
 
 You are ready to go!
 
 - [PHIX Portal](http://localhost:3001)
 - [Internal Verification App](http://localhost:3001/#/verification)
-- [Clinician Fornt-end](http://localhost:3002)
 
-Test users:
+Test user:
 
 - PHIX - janedoe/test (birthdate: 06/19/1976, name: Jane F. Doe, DIRECT email janedoe@hub.amida-demo.com)
-- Clinician front end - dr.house/test and dr.henry/test
 
-### More Instructions
+### Testing Instructions
 
-To run (Node.js and MongoDB are required):
+Note:  If testing with SSL enabled, the tests will fail as node by default refuses self signed certs.  To overcome this, set the the environmental variable NODE_TLS_REJECT_UNAUTHORIZED=0.  Never do this in production.  On bash, this would be:
 
-    npm install
-    NODE_ENV=[env] node app.js
+    export NODE_TLS_REJECT_UNAUTHORIZED=0
 
-[env] can be: phix.dev, clinician.dev, phix.prod, clinician.prod
+Running tests on client:
 
-You can also set environment variable on linux/mac os this way:
+    cd client
+    grunt test
 
-    export NODE_ENV=[env]
-    node app.sj
+Running tests on server:
 
-Set environment variable on windows that way:
-
-    set NODE_ENV=[env]
-    node app.js
-
-Running tests:
-
-    grunt --NODE_ENV='phix.dev'
-    grunt --NODE_ENV='clinician.dev'
+    cd server
+    grunt test
 
 ### Deployment of PHIX
 For automated deployment of PHIX/DIRECT on Amazon EC2 cloud using Ansible scripts see: 
