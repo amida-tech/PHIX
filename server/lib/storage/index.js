@@ -60,7 +60,7 @@ app.get('/storage/record', auth.ensureAuthenticated, function(req, res) {
           }
           var returnFile = data.toString();
           responseJSON.file = returnFile;
-          db.close();
+          //db.close();
           //grid.close();
           res.send(responseJSON);
         });
@@ -95,7 +95,7 @@ app.get('/storage/record/:identifier', auth.ensureAuthenticated, function(req, r
           }
           var returnFile = data.toString();
           //res.attachment();
-          db.close();
+          //db.close();
           //grid.close();
           res.setHeader('Content-disposition', 'attachment; filename=' + results.filename);
           res.send(returnFile);

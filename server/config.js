@@ -49,5 +49,8 @@ module.exports = {
     port: 465, // The port on which the SMTP server is listenting.
     username: 'test', // The username the SMTP server requires for login.
     password: 'test' // The password associated with the username to login to the SMTP server.
+  },
+  template: {
+    path: '.' //The path to the template.  For server deployment, may need to be hard coded.
   }
 };

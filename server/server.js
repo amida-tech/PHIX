@@ -84,6 +84,7 @@ app.use(express.cookieParser());
 app.use(express.session({ secret: config.server.session.key, key: config.server.session.name }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.set('template_path', config.template.path);
 
 //Allow CORS requests fix for cross-domain requests.
 //TODO:  Need to limit origin to app url.
