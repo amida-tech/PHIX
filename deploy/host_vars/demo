@@ -1,0 +1,58 @@
+---
+
+blah_param: something
+
+prod_phix_path: http://phix.amida-demo.com
+prod_clinician_path: http://clinician.amida-demo.com
+prod_ip: 127.0.0.1
+
+prod_smtp_host: localhost
+prod_smtp_port: 465
+prod_smtp_user: catchall
+prod_smtp_password: password
+prod_smtp_debug: true
+
+prod_hub_domain: hub.amida-demo.com
+prod_node_domain: node.amida-demo.com
+
+prod_template_path: /usr/share/nginx/www/PHIX
+
+prod_direct: true
+
+dev_phix_path: http://phix-patient.amida-demo.com
+dev_clinician_path: http://phix-clinician.amida-demo.com
+dev_ip: 0.0.0.0
+
+dev_hub_domain: phix-patient.amida-demo.com
+dev_node_domain: phix-clinician.amida-demo.com
+
+dev_template_path: /usr/share/nginx/www/PHIX
+
+dev_direct: false
+
+phix_database: portal
+phix_other_database: portal_clinician
+
+phix_role: phix
+phix_port: 3001
+
+phix_sender_host: phix-patient.amida-demo.com
+phix_receiver_host: phix-clinician.amida-demo.com
+
+clinician_database: {{phix_other_database}}
+clinician_other_database: {{phix_database}}
+
+clinician_role: clinician
+clinician_port: 3002
+
+clinician_sender_host: {{phix_receiver_host}}
+clinician_receiver_host: {{phix_sender_host}}
+
+
+angular_dev_phix_host: phix-patient.amida-demo.com
+angular_dev_clinician_host: phix-clinician.amida-demo.com
+angular_dev_phix_port: 80
+angular_dev_clinician_port: 80
+
+angular_prod_phix_host: phix.amida-demo.com
+angular_prod_clinician_host: clinician.amida-demo.com

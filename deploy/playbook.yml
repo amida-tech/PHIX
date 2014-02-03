@@ -1,0 +1,122 @@
+---
+- hosts: all
+  vars:
+    email: "dmitry@amida-tech.com"
+    repo_path: "{{ansible_env.HOME}}/repos/PHIX"
+
+  tasks:
+    - name: install prerequisites for node.js
+      apt: pkg=python-software-properties,python,g++,make state=present
+      sudo: true
+
+    - name: add new apt repo with node.js available
+      apt_repository: repo=ppa:chris-lea/node.js state=present
+      sudo: true
+
+    - name: apt-get update with new repo attached
+      apt: update_cache=yes
+      sudo: true
+
+    - name: install node.js
+      apt: pkg=nodejs state=present
+      sudo: true
+
+    - name: install git
+      apt: pkg=git-core state=present
+      sudo: true
+
+    - name: Install nginx
+      action: apt pkg=nginx state=latest
+      sudo: true
+
+    - name: Copy mongo install script
+      template: src=files/mongo_install.bash dest={{ansible_env.HOME}}
+      sudo: yes
+
+    - name: Run mongo install script
+      shell: bash ./mongo_install.bash chdir={{ansible_env.HOME}}
+      sudo: yes
+
+    - name: Start MongoDB service
+      action: service name=mongodb state=started
+      sudo: yes
+
+    - name: clone PHIX repo from GitHub
+      git: repo=https://github.com/amida-tech/PHIX.git dest={{repo_path}}
+
+    - name: install all NPM packages required by PHIX
+      npm: path={{repo_path}}
+
+    - name: Remove PHIX code
+      action: command rm -r /usr/share/nginx/www/PHIX/ removes=/usr/share/nginx/www/PHIX/
+      sudo: yes
+
+    - name: Deploy PHIX code
+      action: command cp -r PHIX/ /usr/share/nginx/www/ chdir={{ansible_env.HOME}}/repos
+      sudo: yes
+
+    #need to restart phix and clinician services after this
+    - name: Update node app configuration
+      template: src=files/app_node.js dest=/usr/share/nginx/www/PHIX/app.js
+      sudo: yes
+
+    #need to restart phix and clinician services after this
+    - name: Update angular app configuration
+      template: src=files/app_angular.js dest=/usr/share/nginx/www/PHIX/public/js/app.js
+      sudo: yes
+
+    - name: Update phix app configuration
+      template: src=files/phix.conf dest=/etc/init/phix.conf
+      sudo: yes
+
+    - name: Start PHIX service
+      action: service name=phix state=started
+      sudo: yes
+
+    - name: Update clinician app configuration
+      template: src=files/clinician.conf dest=/etc/init/clinician.conf
+      sudo: yes
+
+    - name: Start Clinician service
+      action: service name=clinician state=started
+      sudo: yes
+
+    - name: Update NGINX configuration
+      template: src=files/nginx.conf dest=/etc/nginx/sites-available/default
+      sudo: yes
+
+    - name: Start NGINX service
+      action: service name=nginx state=started
+      sudo: yes
+
+    #reset database
+    - name: Drop PHIX database
+      command: mongo {{ phix_database }} --eval "db.dropDatabase()"
+
+    - name: Drop Clinician database
+      command: mongo {{ phix_other_database }} --eval "db.dropDatabase()"
+
+    #run bootstrap mocha scrips 
+    - name: Init PHIX database
+      command: /usr/share/nginx/www/PHIX/node_modules/mocha/bin/mocha -R spec demoPHIX.js -t 10000 chdir=/usr/share/nginx/www/PHIX/test/bootstrap 
+
+    - name: Init Clinician database
+      command: /usr/share/nginx/www/PHIX/node_modules/mocha/bin/mocha -R spec demoClinicians.js -t 10000 chdir=/usr/share/nginx/www/PHIX/test/bootstrap 
+
+  handlers:
+
+    - name: restart nginx
+      service:  name=nginx state=restarted
+      sudo: yes
+
+    - name: restart mongodb
+      service:  name=mongodb state=restarted
+      sudo: yes   
+
+    - name: restart phix
+      service:  name=phix state=restarted
+      sudo: yes
+
+    - name: restart clinician
+      service:  name=clinician state=restarted
+      sudo: yes
