@@ -22,13 +22,11 @@ On Windows, execute mongod.exe.  On OSX/Linux, bring up the terminal, type 'mong
 
 Get PHIX code:
 
-<<<<<<< HEAD
 Run MongoDB
     
     mongod
 =======
     git clone git@github.com:amida-tech/PHIX.git
->>>>>>> build-refactoring
 
 The client must be compiled, to build the client:
 
