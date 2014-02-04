@@ -52,5 +52,11 @@ module.exports = {
   },
   template: {
     path: '.' //The path to the template.  For server deployment, may need to be hard coded.
+  },
+  redis: {
+    enabled: true, //Whether or not redis is enabled.  Can be turned off for local testing, but should be enabled in production.
+    url: 'localhost',  //The URL of the redis instance for session management.
+    port: '6379',  //The port of the redis instance for session management.
+    db: 0  //The db index in redis to use.
   }
 };

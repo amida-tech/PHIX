@@ -23,6 +23,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var jsdom = require('jsdom');
 var config = require('./config.js');
+var redisStore = require('connect-redis')(express);
 var app = express();
 
 //Optionally enable ssl.
@@ -77,11 +78,29 @@ if (config.client.enabled) {
   });
 }
 
+
 app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser());
-app.use(express.session({ secret: config.server.session.key, key: config.server.session.name }));
+
+if (config.redis.enabled) {
+  var redisConnection = new redisStore({
+    host: config.redis.url,
+    port: config.redis.port,
+    db: config.redis.db
+  });
+  app.use(express.session({
+    secret: config.server.session.key,
+    key: config.server.session.name,
+    store: redisConnection
+  }));
+} else {
+  app.use(express.session({
+    secret: config.server.session.key,
+    key: config.server.session.name,
+  }));
+}
 app.use(passport.initialize());
 app.use(passport.session());
 app.set('template_path', config.template.path);
