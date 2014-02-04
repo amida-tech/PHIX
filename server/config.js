@@ -44,9 +44,10 @@ module.exports = {
     port: 3001 // The port on which the client is located.  Must be different than server for development.
   },
   smtp: {
-    enabled: true, // Enables or disables the SMTP server.
-    url: 'localhost', // The URL of the SMTP server used to transmit DIRECT messages.
-    port: 465, // The port on which the SMTP server is listenting.
+    enabled: true, // Enables or disables the SMTP server.  If disabled, will still persist message to db without sending.
+    debug: true, //Whether or not the SMTP server will be run in debug mode.
+    url: '127.0.0.1', // The URL of the SMTP server used to transmit DIRECT messages.
+    port: 2500, // The port on which the SMTP server is listenting.
     username: 'test', // The username the SMTP server requires for login.
     password: 'test' // The password associated with the username to login to the SMTP server.
   },

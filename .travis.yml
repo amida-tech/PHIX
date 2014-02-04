@@ -9,7 +9,10 @@ before_script:
  - npm install --quiet
  - node server.js &
  - sleep 3 
- - cd ../client
+ - cd test/smtp
+ - node server.js &
+ - sleep 3
+ - cd ../../../client
  - npm install --quiet
 
 services:

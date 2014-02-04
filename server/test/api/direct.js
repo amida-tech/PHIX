@@ -145,7 +145,7 @@ describe('Create Test Message', function() {
 
     testOutboxMessage = {
       sender: directEmail,
-      recipient: 'somedoc@somewhere.com',
+      recipient: 'testDoc@localhost',
       received: Date.now(),
       subject: 'Medical Records',
       contents: 'Here you go.',
@@ -323,7 +323,7 @@ describe('Send Message', function() {
 
   it('PUT Message', function(done) {
     api.put('/direct/message')
-      .send(testInboxMessage)
+      .send(testOutboxMessage)
       .expect(200)
       .end(function(err, res) {
         if (err) {

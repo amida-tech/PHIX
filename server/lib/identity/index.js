@@ -90,15 +90,7 @@ app.put('/identity/validate/:token', function(req, res) {
             console.log("PUT body: " + JSON.stringify(req.body));
 
             if (account.verified) {
-                var domain = "";
-                if (app.get("role") === "phix") {
-                    domain = app.get("hub_domain");
-                }
-                if (app.get("role") === "clinician") {
-                    domain = app.get("node_domain");
-                }
-
-                account.directemail = account.username + "@" + domain;
+                account.directemail = account.username + "@" + app.get("domain");
                 account.token = "";
             } else {
                 account.directemail = "";
