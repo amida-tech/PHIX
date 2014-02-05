@@ -86,6 +86,16 @@ describe('Create User', function() {
     });
   });
 
+  it('Test unverified', function(done) {
+    api.put('/direct/message')
+    .send({'doesnt': 'matter'})
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {done(err)};
+      done();
+    })
+  })
+
   it('Verify Account', function(done) {
     api.get('/account')
       .expect(200)

@@ -344,7 +344,7 @@ app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
 
     if (!req.user.verified) {
         res.send(401, 'Unverified users cannot transmit messages.');
-    };
+    } else {
 
     var requestJSON = {};
     requestJSON.owner = req.user._id;
@@ -360,5 +360,7 @@ app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
     sendMessage(requestJSON, function() {
         res.send(200);
     });
+
+}
 
 });
