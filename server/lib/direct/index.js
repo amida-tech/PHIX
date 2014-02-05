@@ -181,228 +181,22 @@ app.del('/direct/message/:message_id', auth.ensureAuthenticated, function(req, r
     });
 });
 
-//send message by writing to other app database
-function sendMessageLocal(requestJSON, callback) {
-    db = app.get("db_conn");
-    grid = app.get("grid_conn");
-    db_other = app.get("db_other_conn");
-    grid_other = app.get("grid_other_conn");
-    console.log("grid_other " + grid_other);
-    //Message2=app.get("message2");
-
-    var conn2 = mongoose.createConnection('mongodb://localhost/' + app.get("other_database"));
-    Message2 = conn2.model('Message', Message.msg);
-
-
-    var messageJSON = {};
-    var getEmailQuery = Account.findOne({
-        username: requestJSON.username
-    }, 'directemail');
-
-    //fetching user's direct email
-    getEmailQuery.exec(function(err, queryResults) {
-        messageJSON.sender = queryResults.directemail;
-        messageJSON.recipient = requestJSON.recipient;
-        messageJSON.received = new Date();
-        messageJSON.subject = requestJSON.subject;
-        messageJSON.contents = requestJSON.contents;
-        messageJSON.read = true;
-        messageJSON.archived = false;
-        messageJSON.attachments = requestJSON.attachments;
-
-        //substitute internal web app domains to direct domains
-        //(e.g. hub.amida-demo.com = > test1.amida-demo.com)
-        var to = requestJSON.recipient.split("@")[0] + "@" + app.get("receiver_host");
-        var from = queryResults.directemail.split("@")[0] + "@" + app.get("sender_host");
-        console.log("to: " + to + ", from: " + from);
-
-        //username of recepient of message (in other app)
-        var username2 = requestJSON.recipient.split("@")[0];
-
-        //saving outgoing message to database (outbox)
-        var inputMessage = new Message(messageJSON);
-        inputMessage.save(function(err, res) {
-            if (err) {
-                throw err;
-            }
-            //Send the message out.
-            //callback();
-
-            //creating message in other database (inbox)
-
-            var messageJSON2 = messageJSON;
-            messageJSON2.attachments = [];
-
-            var count = 0;
-            var att_count = requestJSON.attachments.length;
-
-
-            function done() {
-                if (count === att_count) {
-                    console.log("saving message with all attachments");
-                    var inputMessage2 = new Message2(messageJSON);
-                    inputMessage2.save(function(err2, res2) {
-                        if (err2) {
-                            throw err2;
-                        }
-                        //Send the message out.
-                        callback();
-                    });
-
-                }
-
-            }
-
-            function listAttachment(err, results) {
-
-                if (err) {
-                    throw err;
-                }
-
-                if (results) {
-                    grid.get(objectID, getAttachment);
-
-                }
-            }
-
-            function getAttachmentCollection(err, coll) {
-
-                if (err) {
-                    throw err;
-                }
-                coll.findOne({
-                    "_id": objectID
-                }, listAttachment);
-
-            }
-
-            function getAttachment(err, data) {
-
-
-                if (err) {
-                    throw err;
-                }
-
-                //attachment content fetched form Grid, save it to string
-                var returnFile = data.toString();
-
-                //TODO: need to determine filetype here
-                var fileType = "unknown";
-
-                try {
-                    var bb = blueButton(returnFile);
-                    var bbMeta = bb.document();
-
-                    if (bbMeta.type === 'ccda') {
-                        fileType = "CCDA";
-                    }
-                } catch (e) {
-                    //do nothing, keep original fileType
-                    console.log(e);
-                }
-
-                /*
-                                    //temporary squash while MM refactors on this branch.
-                                    //now add this attachment to Grid2 and add to Message2 attachments list
-                                    var buffer = new Buffer(returnFile);
-                                    grid_other.put(buffer, {
-                                        metadata: {
-                                            source: "inbox",
-                                            details: requestJSON.subject,
-                                            owner: username2,
-                                            parsedFlag: false
-                                        },
-                                        'filename': filename,
-                                        'content_type': fileType
-                                    }, function(err, fileInfo) {
-                                        if (err) {throw err;}
-                                        var recordId = fileInfo._id
-                                        //console.log("Record Stored in Gridfs: " + recordId);
-                                        //console.log(fileInfo);
-
-                                        identifier = fileInfo._id;
-
-                                        //res.send({fileName: fileInfo.filename, identifier: fileInfo._id});
-                                        messageJSON2.attachments.push({
-                                            fileName: filename,
-                                            identifier: identifier
-                                        });
-                                        count = count + 1;
-
-                                        done();
-
-                                    });*/
-
-
-
-
-            }
-
-
-
-            //just sending message if no attachments
-            if (att_count === 0) {
-                console.log("done (no attachments)");
-                done();
-            }
-            //processing attachements first
-            else {
-                for (var att in requestJSON.attachments) {
-                    var filename = requestJSON.attachments[att].fileName;
-                    var identifier = requestJSON.attachments[att].identifier;
-                    var objectID = new ObjectId(identifier);
-
-
-
-
-
-
-
-                    //load file content from storage.files
-                    db.collection('storage.files', getAttachmentCollection);
-                }
-            }
-
-
-
-
-
-
-        });
-        //callback();
-    });
-}
-
 //send message with DIRECT
 function sendMessageDirect(requestJSON, callback) {
     db = app.get("db_conn");
     grid = app.get("grid_conn");
 
-    var messageJSON = {};
-    var getEmailQuery = Account.findOne({
-        username: requestJSON.username
-    }, 'directemail');
-
-    //fetching user's direct email
-    getEmailQuery.exec(function(err, queryResults) {
-        messageJSON.sender = queryResults.directemail;
-
-        messageJSON.recipient = requestJSON.recipient;
-        messageJSON.received = new Date();
-        messageJSON.subject = requestJSON.subject;
-        messageJSON.contents = requestJSON.contents;
-        messageJSON.read = true;
-        messageJSON.archived = false;
-        messageJSON.attachments = requestJSON.attachments;
 
         //substitute internal web app domains to direct domains
         //(e.g. hub.amida-demo.com = > test1.amida-demo.com)
-        var to = requestJSON.recipient.split("@")[0] + "@" + app.get("receiver_host");
-        var from = queryResults.directemail.split("@")[0] + "@" + app.get("sender_host");
-        console.log("to: " + to + ", from: " + from);
+        var to = requestJSON.recipient;
+        var from = requestJSON.sender;
+
+        //console.log(messageJSON);
 
         //saving outgoing message to database (outbox)
-        var inputMessage = new Message(messageJSON);
+        var inputMessage = new Message(requestJSON);
+        console.log(inputMessage);
         inputMessage.save(function(err, res) {
             if (err) {
                 throw err;
@@ -411,6 +205,9 @@ function sendMessageDirect(requestJSON, callback) {
             //callback();
 
             //initiating SMTP client for DIRECT
+
+        if (app.get('smtp_enabled')) {
+
             var options = {
                 secureConnection: true,
                 auth: {
@@ -527,27 +324,38 @@ function sendMessageDirect(requestJSON, callback) {
                 }
             });
 
+        } else {
+            callback();
+        }
+
             //callback();
         });
-    });
+}
+
+
+function sendMessage(requestJSON, callback) {
+        sendMessageDirect(requestJSON, callback);
 }
 
 //Need to export to function for use to trigger automatic messages.
-function sendMessage(requestJSON, callback) {
-    if (app.get("direct")) {
-        sendMessageDirect(requestJSON, callback);
-    } else {
-        sendMessageLocal(requestJSON, callback);
-    }
-}
-
 module.exports.sendMessage = sendMessage;
 
 app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
 
-    var requestJSON = req.body;
-    requestJSON.username = req.user.username;
-    var messageJSON = {};
+    if (!req.user.verified) {
+        res.send(401, 'Unverified users cannot transmit messages.');
+    };
+
+    var requestJSON = {};
+    requestJSON.owner = req.user._id;
+    requestJSON.sender = req.user.directemail;
+    requestJSON.recipient = req.body.recipient;
+    requestJSON.received = new Date();
+    requestJSON.subject = req.body.subject;
+    requestJSON.contents = req.body.contents;
+    requestJSON.attachments = req.body.attachments;
+    requestJSON.read = true;
+    requestJSON.archived = false;
 
     sendMessage(requestJSON, function() {
         res.send(200);

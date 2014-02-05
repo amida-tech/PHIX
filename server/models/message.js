@@ -24,7 +24,7 @@ var Attachments = new Schema({
 });
 
 var Message = new Schema({
-    user: String,
+    owner: Schema.ObjectId,
     sender: String,
     recipient: String,
     received: Date,
