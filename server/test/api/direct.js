@@ -91,10 +91,10 @@ describe('Create User', function() {
     .send({'doesnt': 'matter'})
     .expect(401)
     .end(function(err, res) {
-      if (err) {done(err)};
+      if (err) {done(err);}
       done();
-    })
-  })
+    });
+  });
 
   it('Verify Account', function(done) {
     api.get('/account')
