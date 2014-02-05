@@ -343,7 +343,7 @@ module.exports.sendMessage = sendMessage;
 app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
 
     if (!req.user.verified) {
-        res.send(401, 'Unverified users cannot transmit messages.');
+        res.send(403, 'Unverified users cannot transmit messages.');
     } else {
 
     var requestJSON = {};

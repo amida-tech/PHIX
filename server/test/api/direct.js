@@ -21,6 +21,7 @@ var Account = require('../../models/account');
 var Message = require('../../models/message');
 var Delegation = require('../../models/delegation');
 var mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
 var config = require('../../config.js');
 if (config.server.ssl.enabled) {
   var deploymentLocation = 'https://' + config.server.url + ':' + config.server.port;
@@ -88,12 +89,16 @@ describe('Create User', function() {
 
   it('Test unverified', function(done) {
     api.put('/direct/message')
-    .send({'doesnt': 'matter'})
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {done(err);}
-      done();
-    });
+      .send({
+        'doesnt': 'matter'
+      })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        }
+        done();
+      });
   });
 
   it('Verify Account', function(done) {
@@ -128,48 +133,67 @@ describe('Create Test Message', function() {
 
 
 
-
-
   it('Generate Test Inbox Message', function(done) {
 
-    testInboxMessage = {
-      sender: 'doctor@node.amida-demo.com',
-      recipient: directEmail,
-      received: Date.now(),
-      subject: 'Your recent visit.',
-      contents: 'Your medical records are attached',
-      attachments: []
-    };
-
-    var sampleMessage = new Message(testInboxMessage);
-    sampleMessage.save(function(err, res) {
-      testInboxMessage.message_id = res._id;
+    Account.findOne({
+      username: testName
+    }, function(err, res) {
       if (err) {
         done(err);
       }
-      done();
+
+      testInboxMessage = {
+        owner: res._id,
+        sender: 'doctor@node.amida-demo.com',
+        recipient: directEmail,
+        received: Date.now(),
+        subject: 'Your recent visit.',
+        contents: 'Your medical records are attached',
+        attachments: []
+      };
+
+      var sampleMessage = new Message(testInboxMessage);
+      sampleMessage.save(function(err, res) {
+        if (err) {
+          done(err);
+        }
+        testInboxMessage.message_id = res._id;
+        done();
+      });
+
+
     });
   });
 
   it('Generate Test Outbox Message', function(done) {
 
-    testOutboxMessage = {
-      sender: directEmail,
-      recipient: 'testDoc@localhost',
-      received: Date.now(),
-      subject: 'Medical Records',
-      contents: 'Here you go.',
-      attachments: []
-    };
-
-    var sampleMessage = new Message(testOutboxMessage);
-    sampleMessage.save(function(err, res) {
-      testOutboxMessage.message_id = res._id;
+    Account.findOne({
+      username: testName
+    }, function(err, res) {
       if (err) {
         done(err);
       }
-      done();
+
+      testOutboxMessage = {
+        owner: res._id,
+        sender: directEmail,
+        recipient: 'testDoc@localhost',
+        received: Date.now(),
+        subject: 'Medical Records',
+        contents: 'Here you go.',
+        attachments: []
+      };
+
+      var sampleMessage = new Message(testOutboxMessage);
+      sampleMessage.save(function(err, res) {
+        testOutboxMessage.message_id = res._id;
+        if (err) {
+          done(err);
+        }
+        done();
+      });
     });
+
   });
 
 });

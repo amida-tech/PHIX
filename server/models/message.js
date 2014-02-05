@@ -21,10 +21,10 @@ var mongoose = require('mongoose'),
 var Attachments = new Schema({
     fileName: String, //filename of file.
     identifier: String //identifier pointing to grid record.
-});
+}, {autoIndex: false});
 
 var Message = new Schema({
-    owner: Schema.ObjectId,
+    owner: {type: Schema.ObjectId, required: true },
     sender: String,
     recipient: String,
     received: Date,
@@ -39,7 +39,7 @@ var Message = new Schema({
         "default": false
     },
     attachments: [Attachments]
-});
+}, {autoIndex: false});
 
 module.exports = mongoose.model('Message', Message);
 module.exports.msg = Message;
