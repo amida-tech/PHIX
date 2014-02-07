@@ -281,11 +281,9 @@ describe('Create Test Messages', function() {
 
       var testInboxMessage = {
         owner: res._id,
-        type: true,
+        inbox: true,
         sender: 'doctor@node.amida-demo.com',
-        recipient: directEmail,
-        sent: null,
-        received: Date.now(),
+        stored: Date.now(),
         subject: 'Your recent visit.',
         contents: 'Your medical records are attached',
         read: false,
@@ -314,11 +312,9 @@ describe('Create Test Messages', function() {
 
       testOutboxMessage = {
         owner: res._id,
-        type: false,
-        sender: directEmail,
+        outbox: true,
         recipient: 'testDoc@localhost',
-        sent: Date.now(),
-        received: null,
+        stored: Date.now(),
         subject: 'Medical Records',
         contents: 'Here you go.',
         attachments: []
@@ -513,7 +509,7 @@ describe('Verified: Messages', function() {
 
 });
 
-xdescribe('Cleanup Test Account', function() {
+describe('Cleanup Test Account', function() {
 
   it('Logout Account', function(done) {
     common.logoutAccount(api, function(err) {

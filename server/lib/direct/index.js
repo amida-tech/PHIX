@@ -53,22 +53,22 @@ function getMailMeta(user_id, callback) {
         callback('Error: No user id found.');
     } else {
     var mailboxMeta = {};
-    Message.count({owner: user_id, type: true}, function(err, count) {
+    Message.count({owner: user_id, inbox: true}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.inbox = count;
         done();
     });
-    Message.count({owner: user_id, type: true, read: false}, function(err, count) {
+    Message.count({owner: user_id, inbox: true, read: false}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.inboxUnread = count;
         done();
     });
-    Message.count({owner: user_id, type: false}, function(err, count) {
+    Message.count({owner: user_id, outbox: true}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.outbox = count;
         done();
     });
-    Message.count({owner: user_id, archived: true}, function(err, count) {
+    Message.count({owner: user_id, inbox: false, outbox: false}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.archived = count;
         done();
@@ -84,7 +84,7 @@ function getMailMeta(user_id, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailInbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, type: true}, 'sender received subject contents attachments archived read', {sort: {'received': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, inbox: true}, 'sender stored subject contents attachments read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var inboxJSON = {};
         inboxJSON.messages = results;
         if (err) {
@@ -97,7 +97,7 @@ function getMailInbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailOutbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, type: false}, 'recipient sent subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, outbox: true}, 'recipient stored subject contents attachments', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var outboxJSON = {};
         outboxJSON.messages = results;
         if (err) {
@@ -110,7 +110,7 @@ function getMailOutbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailArchive(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, archived: true}, 'recipient sent subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, inbox: false, outbox: false}, 'recipient sender stored subject contents attachments read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var archiveJSON = {};
         archiveJSON.messages = results;
         if (err) {
@@ -123,7 +123,7 @@ function getMailArchive(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailAll(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id}, 'sender recipient sent received subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id}, 'sender recipient stored subject contents attachments read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var allJSON = {};
         allJSON.messages = results;
         if (err) {

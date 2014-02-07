@@ -25,18 +25,14 @@ var Attachments = new Schema({
 
 var Message = new Schema({
     owner: {type: Schema.ObjectId, required: true },
-    type: Boolean,  //true means inbox, false means outbox.
+    inbox: Boolean,  //Flagged to true if it is an inbox record.
+    outbox: Boolean, //Flagged to true if it is an outbox record.
+    stored: Date,
     sender: String,
     recipient: String,
-    sent: Date,
-    received: Date,
     subject: String,
     contents: String,
     read: {
-        type: Boolean,
-        "default": false
-    },
-    archived: {
         type: Boolean,
         "default": false
     },

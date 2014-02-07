@@ -62,7 +62,7 @@ var testProfile = {
   phonetype: 'mobile'
 };
 
-describe('Create User', function() {
+xdescribe('Create User', function() {
 
   it('Create Account', function(done) {
     common.createAccount(api, testName, testPass, testEmail, function(err) {
@@ -129,7 +129,7 @@ describe('Create User', function() {
 
 /*Code block creates a sample message.
 /*===========================================================*/
-describe('Create Test Message', function() {
+xdescribe('Create Test Message', function() {
 
 
 
@@ -200,7 +200,7 @@ describe('Create Test Message', function() {
 
 /*===========================================================*/
 
-describe('GET Messages', function() {
+xdescribe('GET Messages', function() {
 
   it('Get Inbox', function(done) {
     api.get('/direct/inbox')
@@ -225,7 +225,7 @@ describe('GET Messages', function() {
   });
 });
 
-describe('Update Message', function() {
+xdescribe('Update Message', function() {
 
   it('POST Message Read', function(done) {
     api.post('/direct/message/' + testInboxMessage.message_id)
@@ -353,7 +353,7 @@ describe('Update Message', function() {
   });
 });
 
-describe('Send Message', function() {
+xdescribe('Send Message', function() {
 
   it('PUT Message', function(done) {
     api.put('/direct/message')
