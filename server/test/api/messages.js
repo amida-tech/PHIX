@@ -62,6 +62,72 @@ var testProfile = {
   phonetype: 'mobile'
 };
 
+describe('Pre Authentication Tests', function () {
+
+  it('Get Messages Unauthenticated', function(done) {
+    api.get('/messages/meta')
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Inbox Unauthenticated', function(done) {
+    api.get('/messages/inbox')
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Outbox Unauthenticated', function(done) {
+    api.get('/messages/outbox')
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Archive Unauthenticated', function(done) {
+    api.get('/messages/archive')
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get All Unauthenticated', function(done) {
+    api.get('/messages/all')
+    .expect(401)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+});
+
+
+
 describe('Create User', function() {
 
   it('Create Account', function(done) {
@@ -92,7 +158,55 @@ describe('Create User', function() {
 describe('Pre-Verification Testing', function() {
 
   it('Get Messages Unverified', function(done) {
-    api.get('/messages')
+    api.get('/messages/meta')
+    .expect(403)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Inbox Unverified', function(done) {
+    api.get('/messages/inbox')
+    .expect(403)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Outbox Unverified', function(done) {
+    api.get('/messages/outbox')
+    .expect(403)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get Archived Unverified', function(done) {
+    api.get('/messages/archive')
+    .expect(403)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+     })
+  });
+
+  it('Get All Unverified', function(done) {
+    api.get('/messages/all')
     .expect(403)
     .end(function(err, res) {
       if (err) {
@@ -137,7 +251,7 @@ describe('Verification', function() {
 describe('Verified: 0 Messages', function() {
 
   it('Test Meta API', function(done) {
-    api.get('/messages')
+    api.get('/messages/meta')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -145,6 +259,8 @@ describe('Verified: 0 Messages', function() {
         } else {
         res.body.inbox.should.equal(0);
         res.body.outbox.should.equal(0);
+        res.body.inboxUnread.should.equal(0);
+        res.body.archived.should.equal(0);
         done();
       }
       });
@@ -172,6 +288,7 @@ describe('Create Test Messages', function() {
         received: Date.now(),
         subject: 'Your recent visit.',
         contents: 'Your medical records are attached',
+        read: false,
         attachments: []
       };
 
@@ -224,7 +341,7 @@ describe('Create Test Messages', function() {
 describe('Verified: Messages', function() {
 
   it('Test Meta API', function(done) {
-    api.get('/messages')
+    api.get('/messages/meta')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -232,14 +349,78 @@ describe('Verified: Messages', function() {
         } else {
         res.body.inbox.should.equal(1);
         res.body.outbox.should.equal(1);
+        res.body.inboxUnread.should.equal(1);
+        res.body.archived.should.equal(0);
+        done();
+      }
+      });
+  });
+
+  it('Test Inbox API', function(done) {
+    api.get('/messages/inbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          console.log(res.body);
+        done();
+      }
+      });
+  });
+
+  it('Test Outbox API', function(done) {
+    api.get('/messages/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          console.log(res.body);
+        done();
+      }
+      });
+  });
+
+  it('Test Archive API', function(done) {
+    api.get('/messages/archive')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          console.log(res.body);
+        done();
+      }
+      });
+  });
+
+  it('Test All API', function(done) {
+    api.get('/messages/all')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          console.log(res.body);
+        done();
+      }
+      });
+  });
+
+    it('Test Bad API', function(done) {
+    api.get('/messages/fail')
+      .expect(404)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
         done();
       }
       });
   });
 
 });
-
-
 
 describe('Cleanup Test Account', function() {
 

@@ -49,38 +49,92 @@ var db_other;
 var Message2;
 
 function getMailMeta(user_id, callback) {
+    if (!user_id) {
+        callback('Error: No user id found.');
+    } else {
     var mailboxMeta = {};
-
-    Message.count({type: true}, function(err, count) {
+    Message.count({owner: user_id, type: true}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.inbox = count;
         done();
     });
-
-    Message.count({type: false}, function(err, count) {
+    Message.count({owner: user_id, type: true, read: false}, function(err, count) {
+        if (err) {done(err);}
+        mailboxMeta.inboxUnread = count;
+        done();
+    });
+    Message.count({owner: user_id, type: false}, function(err, count) {
         if (err) {done(err);}
         mailboxMeta.outbox = count;
         done();
     });
-
-    Message.count({type: true, read: false}, function(err, count) {
+    Message.count({owner: user_id, archived: true}, function(err, count) {
         if (err) {done(err);}
-        mailboxMeta.inboxUnread = count;
+        mailboxMeta.archived = count;
         done();
-
-    });
-
+    })
     function done(err) {
         if (err) {callback(err);}
-        if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0)) {
+        if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0) && (mailboxMeta.archived >= 0)) {
             callback(null, mailboxMeta);
         }
     };
-
+    }
 }
 
+//TODO:  Evaluate if sort applies before or after query.
+function getMailInbox(user_id, response_start, response_end, callback) {
+    Message.find({owner: user_id, type: true}, 'sender received subject contents attachments archived read', {sort: {'received': -1}, skip: response_start, limit: response_end}, function(err, results) {
+        var inboxJSON = {};
+        inboxJSON.messages = results;
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, inboxJSON);
+        }
+    });
+}
 
-app.get('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+//TODO:  Evaluate if sort applies before or after query.
+function getMailOutbox(user_id, response_start, response_end, callback) {
+    Message.find({owner: user_id, type: false}, 'recipient sent subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+        var outboxJSON = {};
+        outboxJSON.messages = results;
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, outboxJSON);
+        }
+    });
+}
+
+//TODO:  Evaluate if sort applies before or after query.
+function getMailArchive(user_id, response_start, response_end, callback) {
+    Message.find({owner: user_id, archived: true}, 'recipient sent subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+        var archiveJSON = {};
+        archiveJSON.messages = results;
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, archiveJSON);
+        }
+    });
+}
+
+//TODO:  Evaluate if sort applies before or after query.
+function getMailAll(user_id, response_start, response_end, callback) {
+    Message.find({owner: user_id}, 'sender recipient sent received subject contents attachments archived read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+        var allJSON = {};
+        allJSON.messages = results;
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, allJSON);
+        }
+    });
+}
+
+app.get('/messages/meta', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
     getMailMeta(req.user._id, function(err, metaData) {
         if (err) {
             console.log(err);
@@ -89,6 +143,59 @@ app.get('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req
             res.send(metaData);
         }
     });
+});
+
+
+app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+    var starting_limit = 0;
+    var ending_limit = 50;
+    if (req.query.start && (isNaN(req.query.start) === false)) {
+        starting_limit = req.query.start;
+    }
+    if (req.query.end && (isNan(req.query.end) === false) && req.query.end <= 100) {
+        ending_limit = req.query.end;
+    }
+
+    if (req.params.box === 'inbox') {
+        getMailInbox(req.user._id, starting_limit, ending_limit, function(err, inboxResponse) {
+            if (err) {
+                console.log(err);
+                res.send(500);
+            } else {
+                res.send(inboxResponse);
+            }
+        });
+    } else if (req.params.box === 'outbox') {
+        getMailOutbox(req.user._id, starting_limit, ending_limit, function(err, outboxResponse) {
+            if (err) {
+                console.log(err);
+                res.send(500);
+            } else {
+                res.send(outboxResponse);
+            }
+        });
+    } else if (req.params.box === 'archive') {
+        getMailArchive(req.user._id, starting_limit, ending_limit, function(err, archiveResponse) {
+            if (err) {
+                console.log(err);
+                res.send(500);
+            } else {
+                res.send(archiveResponse);
+            }
+        });
+    } else if (req.params.box === 'all') {
+        getMailAll(req.user._id, starting_limit, ending_limit, function(err, allResponse) {
+            if (err) {
+                console.log(err);
+                res.send(500);
+            } else {
+                res.send(allResponse);
+            }
+        });
+    } else {
+        res.send(404);
+    }
+    
 });
 
 

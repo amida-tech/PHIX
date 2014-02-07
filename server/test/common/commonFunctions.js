@@ -120,8 +120,8 @@ function createMessage(message, done) {
     received: new Date(),
     subject: message.subject,
     contents: message.contents,
-    archived: false,
-    read: false,
+    archived: message.archived,
+    read: message.read,
     attachments: message.attachments
   });
   myMessage.save(function(err, res) {
