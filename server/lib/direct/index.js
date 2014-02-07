@@ -48,6 +48,50 @@ var grid_other;
 var db_other;
 var Message2;
 
+function getMailMeta(user_id, callback) {
+    var mailboxMeta = {};
+
+    Message.count({type: true}, function(err, count) {
+        if (err) {done(err);}
+        mailboxMeta.inbox = count;
+        done();
+    });
+
+    Message.count({type: false}, function(err, count) {
+        if (err) {done(err);}
+        mailboxMeta.outbox = count;
+        done();
+    });
+
+    Message.count({type: true, read: false}, function(err, count) {
+        if (err) {done(err);}
+        mailboxMeta.inboxUnread = count;
+        done();
+
+    });
+
+    function done(err) {
+        if (err) {callback(err);}
+        if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0)) {
+            callback(null, mailboxMeta);
+        }
+    };
+
+}
+
+
+app.get('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+    getMailMeta(req.user._id, function(err, metaData) {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        } else {
+            res.send(metaData);
+        }
+    });
+});
+
+
 //get list of incoming emails
 app.get('/direct/inbox', auth.ensureAuthenticated, function(req, res) {
     //Lookup DIRECT email address for recipient filtering.

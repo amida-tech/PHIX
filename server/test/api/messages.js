@@ -87,19 +87,26 @@ describe('Create User', function() {
     });
   });
 
-  it('Test unverified', function(done) {
-    api.put('/direct/message')
-      .send({
-        'doesnt': 'matter'
-      })
-      .expect(403)
-      .end(function(err, res) {
-        if (err) {
-          done(err);
-        }
+});
+
+describe('Pre-Verification Testing', function() {
+
+  it('Get Messages Unverified', function(done) {
+    api.get('/messages')
+    .expect(403)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
         done();
-      });
+      }
+     })
   });
+
+});
+
+
+describe('Verification', function() {
 
   it('Verify Account', function(done) {
     api.get('/account')
@@ -124,14 +131,28 @@ describe('Create User', function() {
         });
       });
   });
+});
+
+
+describe('Verified: 0 Messages', function() {
+
+  it('Test Meta API', function(done) {
+    api.get('/messages')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+        res.body.inbox.should.equal(0);
+        res.body.outbox.should.equal(0);
+        done();
+      }
+      });
+  });
 
 });
 
-/*Code block creates a sample message.
-/*===========================================================*/
-describe('Create Test Message', function() {
-
-
+describe('Create Test Messages', function() {
 
   it('Generate Test Inbox Message', function(done) {
 
@@ -142,10 +163,12 @@ describe('Create Test Message', function() {
         done(err);
       }
 
-      testInboxMessage = {
+      var testInboxMessage = {
         owner: res._id,
+        type: true,
         sender: 'doctor@node.amida-demo.com',
         recipient: directEmail,
+        sent: null,
         received: Date.now(),
         subject: 'Your recent visit.',
         contents: 'Your medical records are attached',
@@ -160,8 +183,6 @@ describe('Create Test Message', function() {
         testInboxMessage.message_id = res._id;
         done();
       });
-
-
     });
   });
 
@@ -176,9 +197,11 @@ describe('Create Test Message', function() {
 
       testOutboxMessage = {
         owner: res._id,
+        type: false,
         sender: directEmail,
         recipient: 'testDoc@localhost',
-        received: Date.now(),
+        sent: Date.now(),
+        received: null,
         subject: 'Medical Records',
         contents: 'Here you go.',
         attachments: []
@@ -198,178 +221,27 @@ describe('Create Test Message', function() {
 
 });
 
-/*===========================================================*/
+describe('Verified: Messages', function() {
 
-describe('GET Messages', function() {
-
-  it('Get Inbox', function(done) {
-    api.get('/direct/inbox')
+  it('Test Meta API', function(done) {
+    api.get('/messages')
       .expect(200)
       .end(function(err, res) {
         if (err) {
-          return done(err);
-        }
+          done(err);
+        } else {
+        res.body.inbox.should.equal(1);
+        res.body.outbox.should.equal(1);
         done();
-      });
-  });
-
-  it('Get Outbox', function(done) {
-    api.get('/direct/outbox')
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        done();
-      });
-  });
-});
-
-describe('Update Message', function() {
-
-  it('POST Message Read', function(done) {
-    api.post('/direct/message/' + testInboxMessage.message_id)
-      .send({
-        read: true
-      })
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        api.get('/direct/inbox')
-          .expect(200)
-          .end(function(err, res) {
-            if (err) {
-              return done(err);
-            }
-            for (var i = 0; i < res.body.messages.length; i++) {
-              if (String(res.body.messages[i].message_id) === String(testInboxMessage.message_id)) {
-                res.body.messages[i].read.should.equal(true);
-                done();
-              }
-            }
-          });
-      });
-  });
-
-  it('POST Message Archived', function(done) {
-    api.post('/direct/message/' + testInboxMessage.message_id)
-      .send({
-        archived: true
-      })
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        api.get('/direct/inbox')
-          .expect(200)
-          .end(function(err, res) {
-            if (err) {
-              return done(err);
-            }
-            for (var i = 0; i < res.body.messages.length; i++) {
-              if (res.body.messages[i].message_id === testInboxMessage.message_id) {
-                return done('Should not be part of return message');
-              }
-            }
-            done();
-          });
-      });
-  });
-
-  it('POST Message Un-archive', function(done) {
-    api.post('/direct/message/' + testInboxMessage.message_id)
-      .send({
-        archived: false
-      })
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        api.get('/direct/inbox')
-          .expect(200)
-          .end(function(err, res) {
-            if (err) {
-              return done(err);
-            }
-            for (var i = 0; i < res.body.messages.length; i++) {
-              if (String(res.body.messages[i].message_id) === String(testInboxMessage.message_id)) {
-                done();
-              }
-            }
-          });
-      });
-  });
-
-  it('DELETE Message', function(done) {
-    api.del('/direct/message/' + testInboxMessage.message_id)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        api.get('/direct/inbox')
-          .expect(200)
-          .end(function(err, res) {
-            if (err) {
-              return done(err);
-            }
-            for (var i = 0; i < res.body.messages.length; i++) {
-              if (res.body.messages[i].message_id === testInboxMessage.message_id) {
-                return done('Should not be part of return message');
-              }
-            }
-            done();
-          });
-      });
-  });
-
-  it('POST Message Un-archive', function(done) {
-    api.post('/direct/message/' + testInboxMessage.message_id)
-      .send({
-        archived: false
-      })
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        api.get('/direct/inbox')
-          .expect(200)
-          .end(function(err, res) {
-            if (err) {
-              return done(err);
-            }
-            for (var i = 0; i < res.body.messages.length; i++) {
-              if (String(res.body.messages[i].message_id) === String(testInboxMessage.message_id)) {
-                done();
-              }
-            }
-          });
-      });
-  });
-});
-
-describe('Send Message', function() {
-
-  it('PUT Message', function(done) {
-    api.put('/direct/message')
-      .send(testOutboxMessage)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        done();
+      }
       });
   });
 
 });
 
-xdescribe('Cleanup Test Account', function() {
+
+
+describe('Cleanup Test Account', function() {
 
   it('Logout Account', function(done) {
     common.logoutAccount(api, function(err) {
