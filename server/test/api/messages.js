@@ -340,7 +340,7 @@ describe('Create Test Messages', function() {
 
 describe('Verified: Messages', function() {
 
-  it('Test Meta API', function(done) {
+  it('GET Meta API', function(done) {
     api.get('/messages/meta')
       .expect(200)
       .end(function(err, res) {
@@ -356,59 +356,59 @@ describe('Verified: Messages', function() {
       });
   });
 
-  it('Test Inbox API', function(done) {
+  it('GET Inbox API', function(done) {
     api.get('/messages/inbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {
           done(err);
         } else {
-          console.log(res.body);
+          //console.log(res.body);
         done();
       }
       });
   });
 
-  it('Test Outbox API', function(done) {
+  it('GET Outbox API', function(done) {
     api.get('/messages/outbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {
           done(err);
         } else {
-          console.log(res.body);
+          //console.log(res.body);
         done();
       }
       });
   });
 
-  it('Test Archive API', function(done) {
+  it('GET Archive API', function(done) {
     api.get('/messages/archive')
       .expect(200)
       .end(function(err, res) {
         if (err) {
           done(err);
         } else {
-          console.log(res.body);
+          //console.log(res.body);
         done();
       }
       });
   });
 
-  it('Test All API', function(done) {
+  it('GET All API', function(done) {
     api.get('/messages/all')
       .expect(200)
       .end(function(err, res) {
         if (err) {
           done(err);
         } else {
-          console.log(res.body);
+          //console.log(res.body);
         done();
       }
       });
   });
 
-    it('Test Bad API', function(done) {
+    it('GET Bad API', function(done) {
     api.get('/messages/fail')
       .expect(404)
       .end(function(err, res) {
@@ -420,9 +420,100 @@ describe('Verified: Messages', function() {
       });
   });
 
+  it('POST Messages API ', function(done) {
+    api.post('/messages')
+    .send({'recipient':'test@amida-tech.com', 'contents': 'Test Message', 'subject': 'Hey There!'})
+    .expect(201)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Too long Subject', function(done) {
+    api.post('/messages')
+    .send({'subject':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Missing Recipient', function(done) {
+    api.post('/messages')
+    .send({'body':'fail'})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Empty Recipient', function(done) {
+    api.post('/messages')
+    .send({'recipient':''})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Bad Recipient', function(done) {
+    api.post('/messages')
+    .send({'recipient':'IM NOT AN EMAIL'})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Too Long Recipient', function(done) {
+    api.post('/messages')
+    .send({'recipient':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@fake.com'})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
+  it('POST Messages API - Too Long Message', function(done) {
+    api.post('/messages')
+    .send({'recipient':'test@fake.com', 'subject': 'test message', 'contents':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'})
+    .expect(400)
+    .end(function(err, res) {
+      if (err) {
+        done(err);
+      } else {
+        done();
+      }
+    });
+  });
+
 });
 
-describe('Cleanup Test Account', function() {
+xdescribe('Cleanup Test Account', function() {
 
   it('Logout Account', function(done) {
     common.logoutAccount(api, function(err) {

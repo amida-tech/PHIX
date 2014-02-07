@@ -198,6 +198,81 @@ app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, functio
     
 });
 
+function checkMessage (message, callback) {
+    checkArray = [];
+    //RFC 2822 Suggests 78 Char subject limit.  Subject not required.
+    if (message.subject) {
+        if (message.subject.length > 77) {checkArray.push('Message subject must be under 78 characters in length.');}
+    }
+    //Recipient Required, must be under 255 characters in length, and must match email regex.
+    if (message.recipient === undefined || !message.recipient) {checkArray.push('Message must have a recipient.');}
+    if (message.recipient) {
+        if (message.recipient.length === 0 || message.recipient === null) {checkArray.push('Message must have a recipient');}
+        var emailPattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (emailPattern.test(message.recipient) === false) {checkArray.push('Incorrectly formatted email recipient.');}
+        if(message.recipient.length > 254) {checkArray.push('Recipient must be under 255 characters in length.');}
+    }
+    //Max message length set to 1000.
+    if (message.contents) {
+        if (message.contents.length > 1000) {checkArray.push('Message Body too long.');}
+    }
+    //Need to do some attachment validation.
+    callback(checkArray);
+}
+
+function saveMessage(user_id, message, callback) {
+    var messageJSON = {};
+    messageJSON.owner = user_id;
+    messageJSON.sent = new Date();
+    messageJSON.type = false;
+    if (message.subject) {
+    messageJSON.subject = message.subject;}
+    if (message.recipient) {
+    messageJSON.recipient = message.recipient;}
+    if (messageJSON.contents) {
+    messageJSON.contents = message.contents;}
+    if (messageJSON.attachments) {messageJSON.attachments = message.attachments;}
+
+    var saveMessage = new Message(messageJSON);
+    saveMessage.save(function(err, res) {
+        if (err) {callback(err);} else { callback();}
+    });
+}
+
+
+app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+
+    checkMessage(req.body, function(err) {
+        if (err.length > 0) {
+            errorJSON = {};
+            errorJSON.errors = err;
+            res.send(400, errorJSON);
+        } else {
+            saveMessage(req.user._id, req.body, function(err) {
+                if (err) {
+                    console.log(err);
+                    res.send(500);
+                } else {
+            res.send(201);                    
+                }
+            })
+        }
+
+    });
+
+    //Body has a maximum line length, but no maximum defined message size.  We should set one to keep storage limits down.  Suggest limiting to 1000 for now.
+    //Maximum Message size should be set, will do at 10MB for now (hotmail).
+
+
+    //recipient, subject, body, attachments
+    
+
+
+});
+
+
+
+//Everything below this line going away...
 
 //get list of incoming emails
 app.get('/direct/inbox', auth.ensureAuthenticated, function(req, res) {
