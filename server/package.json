@@ -35,7 +35,10 @@
     "archiver": "0.5.x",
     "jsdom": "0.8.x",
     "ejs": "0.8.x",
-    "request": "2.33.x"
+    "request": "2.33.x",
+    "hiredis": "0.1.x",
+    "redis": "0.10.x",
+    "connect-redis": "1.4.x"
   },
   "devDependencies": {
     "should": "3.1.x",
