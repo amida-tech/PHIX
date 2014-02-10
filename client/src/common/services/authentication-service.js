@@ -49,7 +49,7 @@ angular.module('phix.authenticationService', [])
         });
       },
       login: function(user, pass, callback) {
-        $http.post(endpoint + 'login', {withCredentials : false,
+        $http.post(endpoint + 'login', {
           username: user,
           password: pass
         }).success(function(data) {

@@ -29,8 +29,6 @@ passport.deserializeUser(Account.deserializeUser());
 
 
 function ensureAuthenticated(req, res, next) {
-  console.log(req.cookies);
-  
   if (req.isAuthenticated()) {
     return next();
   }
