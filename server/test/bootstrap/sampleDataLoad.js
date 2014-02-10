@@ -21,7 +21,7 @@ var should = require('chai').should(),
   common = require('../common/commonFunctions');
 
 
-var outboxMessages = require('./outboxMessages.json');
+var outboxMessages = require('../records/outboxMessages.json');
 
 if (mongoose.connection.readyState === 0) {
   mongoose.connect('mongodb://localhost/portal');

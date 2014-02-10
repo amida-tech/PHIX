@@ -51,7 +51,9 @@ var Message2;
 function getMailMeta(user_id, callback) {
 
     function done(err) {
-        if (err) {callback(err);}
+        if (err) {
+            callback(err);
+        }
         if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0) && (mailboxMeta.archived >= 0)) {
             callback(null, mailboxMeta);
         }
@@ -60,33 +62,64 @@ function getMailMeta(user_id, callback) {
     if (!user_id) {
         callback('Error: No user id found.');
     } else {
-    var mailboxMeta = {};
-    Message.count({owner: user_id, inbox: true}, function(err, count) {
-        if (err) {done(err);}
-        mailboxMeta.inbox = count;
-        done();
-    });
-    Message.count({owner: user_id, inbox: true, read: false}, function(err, count) {
-        if (err) {done(err);}
-        mailboxMeta.inboxUnread = count;
-        done();
-    });
-    Message.count({owner: user_id, outbox: true}, function(err, count) {
-        if (err) {done(err);}
-        mailboxMeta.outbox = count;
-        done();
-    });
-    Message.count({owner: user_id, inbox: false, outbox: false}, function(err, count) {
-        if (err) {done(err);}
-        mailboxMeta.archived = count;
-        done();
-    });
+        var mailboxMeta = {};
+        Message.count({
+            owner: user_id,
+            inbox: true
+        }, function(err, count) {
+            if (err) {
+                done(err);
+            }
+            mailboxMeta.inbox = count;
+            done();
+        });
+        Message.count({
+            owner: user_id,
+            inbox: true,
+            read: false
+        }, function(err, count) {
+            if (err) {
+                done(err);
+            }
+            mailboxMeta.inboxUnread = count;
+            done();
+        });
+        Message.count({
+            owner: user_id,
+            outbox: true
+        }, function(err, count) {
+            if (err) {
+                done(err);
+            }
+            mailboxMeta.outbox = count;
+            done();
+        });
+        Message.count({
+            owner: user_id,
+            inbox: false,
+            outbox: false
+        }, function(err, count) {
+            if (err) {
+                done(err);
+            }
+            mailboxMeta.archived = count;
+            done();
+        });
     }
 }
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailInbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, inbox: true}, 'sender stored subject read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({
+        owner: user_id,
+        inbox: true
+    }, 'sender stored subject read', {
+        sort: {
+            'stored': -1
+        },
+        skip: response_start,
+        limit: response_end
+    }, function(err, results) {
         var inboxJSON = {};
         inboxJSON.messages = results;
         if (err) {
@@ -99,7 +132,16 @@ function getMailInbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailOutbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, outbox: true}, 'recipient stored subject', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({
+        owner: user_id,
+        outbox: true
+    }, 'recipient stored subject', {
+        sort: {
+            'stored': -1
+        },
+        skip: response_start,
+        limit: response_end
+    }, function(err, results) {
         var outboxJSON = {};
         outboxJSON.messages = results;
         if (err) {
@@ -112,7 +154,17 @@ function getMailOutbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailArchive(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, inbox: false, outbox: false}, 'recipient sender stored subject read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({
+        owner: user_id,
+        inbox: false,
+        outbox: false
+    }, 'recipient sender stored subject read', {
+        sort: {
+            'stored': -1
+        },
+        skip: response_start,
+        limit: response_end
+    }, function(err, results) {
         var archiveJSON = {};
         archiveJSON.messages = results;
         if (err) {
@@ -125,7 +177,15 @@ function getMailArchive(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailAll(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id}, 'sender recipient stored subject read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({
+        owner: user_id
+    }, 'sender recipient stored subject read', {
+        sort: {
+            'sent': -1
+        },
+        skip: response_start,
+        limit: response_end
+    }, function(err, results) {
         var allJSON = {};
         allJSON.messages = results;
         if (err) {
@@ -136,23 +196,47 @@ function getMailAll(user_id, response_start, response_end, callback) {
     });
 }
 
-function checkMessage (message, callback) {
+function getMailMessage(user_id, message_id, callback) {
+    Message.findOne({
+        owner: user_id
+    }, 'sender recipient stored subject contents attachments', function(err, results) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+function checkMessage(message, callback) {
     var checkArray = [];
     //RFC 2822 Suggests 78 Char subject limit.  Subject not required.
     if (message.subject) {
-        if (message.subject.length > 77) {checkArray.push('Message subject must be under 78 characters in length.');}
+        if (message.subject.length > 77) {
+            checkArray.push('Message subject must be under 78 characters in length.');
+        }
     }
     //Recipient Required, must be under 255 characters in length, and must match email regex.
-    if (message.recipient === undefined || !message.recipient) {checkArray.push('Message must have a recipient.');}
+    if (message.recipient === undefined || !message.recipient) {
+        checkArray.push('Message must have a recipient.');
+    }
     if (message.recipient) {
-        if (message.recipient.length === 0 || message.recipient === null) {checkArray.push('Message must have a recipient');}
+        if (message.recipient.length === 0 || message.recipient === null) {
+            checkArray.push('Message must have a recipient');
+        }
         var emailPattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        if (emailPattern.test(message.recipient) === false) {checkArray.push('Incorrectly formatted email recipient.');}
-        if(message.recipient.length > 254) {checkArray.push('Recipient must be under 255 characters in length.');}
+        if (emailPattern.test(message.recipient) === false) {
+            checkArray.push('Incorrectly formatted email recipient.');
+        }
+        if (message.recipient.length > 254) {
+            checkArray.push('Recipient must be under 255 characters in length.');
+        }
     }
     //Max message length set to 1000.
     if (message.contents) {
-        if (message.contents.length > 1000) {checkArray.push('Message Body too long.');}
+        if (message.contents.length > 1000) {
+            checkArray.push('Message Body too long.');
+        }
     }
     //Need to do some attachment validation.
     callback(checkArray);
@@ -164,16 +248,25 @@ function saveMessage(user_id, message, callback) {
     messageJSON.stored = new Date();
     messageJSON.outbox = true;
     if (message.subject) {
-    messageJSON.subject = message.subject;}
+        messageJSON.subject = message.subject;
+    }
     if (message.recipient) {
-    messageJSON.recipient = message.recipient;}
+        messageJSON.recipient = message.recipient;
+    }
     if (message.contents) {
-    messageJSON.contents = message.contents;}
-    if (message.attachments) {messageJSON.attachments = message.attachments;}
+        messageJSON.contents = message.contents;
+    }
+    if (message.attachments) {
+        messageJSON.attachments = message.attachments;
+    }
 
     var persistMessage = new Message(messageJSON);
     persistMessage.save(function(err, res) {
-        if (err) {callback(err);} else { callback();}
+        if (err) {
+            callback(err);
+        } else {
+            callback();
+        }
     });
 }
 
@@ -188,15 +281,31 @@ app.get('/messages/meta', auth.ensureAuthenticated, auth.ensureVerified, functio
     });
 });
 
+app.get('/messages/message/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+
+    getMailMessage(req.user._id, req.params.message_id, function(err, mailMessage) {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        } else {
+            res.send(mailMessage);
+        }
+
+    });
+
+});
+
 app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
     var starting_limit = 0;
     var ending_limit = 50;
-    if (req.query.start && (isNaN(req.query.start) === false)) {
+    if (req.query.start && (isNaN(req.query.start) === false) && req.query.start > 0) {
+        console.log(req.query.start);
         starting_limit = req.query.start;
     }
-    if (req.query.end && (isNaN(req.query.end) === false) && req.query.end <= 100) {
-        ending_limit = req.query.end;
+    if (req.query.limit && (isNaN(req.query.limit) === false) && req.query.limit <= 50 && req.query.limit > 0) {
+        ending_limit = req.query.limit;
     }
+
 
     if (req.params.box === 'inbox') {
         getMailInbox(req.user._id, starting_limit, ending_limit, function(err, inboxResponse) {
@@ -237,7 +346,7 @@ app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, functio
     } else {
         res.send(404);
     }
-    
+
 });
 
 app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
@@ -253,7 +362,7 @@ app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(re
                     console.log(err);
                     res.send(500);
                 } else {
-            res.send(201);                    
+                    res.send(201);
                 }
             });
         }
@@ -263,6 +372,7 @@ app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(re
     //Maximum Message size should be set, will do at 10MB for now (hotmail).
 });
 
+//todo:  add patch and del routes.
 
 
 //Everything below this line going away...
@@ -406,24 +516,24 @@ function sendMessageDirect(requestJSON, callback) {
     grid = app.get("grid_conn");
 
 
-        //substitute internal web app domains to direct domains
-        //(e.g. hub.amida-demo.com = > test1.amida-demo.com)
-        var to = requestJSON.recipient;
-        var from = requestJSON.sender;
+    //substitute internal web app domains to direct domains
+    //(e.g. hub.amida-demo.com = > test1.amida-demo.com)
+    var to = requestJSON.recipient;
+    var from = requestJSON.sender;
 
-        //console.log(messageJSON);
+    //console.log(messageJSON);
 
-        //saving outgoing message to database (outbox)
-        var inputMessage = new Message(requestJSON);
-        console.log(inputMessage);
-        inputMessage.save(function(err, res) {
-            if (err) {
-                throw err;
-            }
-            //Send the message out.
-            //callback();
+    //saving outgoing message to database (outbox)
+    var inputMessage = new Message(requestJSON);
+    console.log(inputMessage);
+    inputMessage.save(function(err, res) {
+        if (err) {
+            throw err;
+        }
+        //Send the message out.
+        //callback();
 
-            //initiating SMTP client for DIRECT
+        //initiating SMTP client for DIRECT
 
         if (app.get('smtp_enabled')) {
 
@@ -510,7 +620,6 @@ function sendMessageDirect(requestJSON, callback) {
 
 
 
-
                         //load file content from storage.files
                         db.collection('storage.files', findAttachment);
                     }
@@ -547,13 +656,13 @@ function sendMessageDirect(requestJSON, callback) {
             callback();
         }
 
-            //callback();
-        });
+        //callback();
+    });
 }
 
 
 function sendMessage(requestJSON, callback) {
-        sendMessageDirect(requestJSON, callback);
+    sendMessageDirect(requestJSON, callback);
 }
 
 //Need to export to function for use to trigger automatic messages.
@@ -565,21 +674,21 @@ app.put('/direct/message', auth.ensureAuthenticated, function(req, res) {
         res.send(403, 'Unverified users cannot transmit messages.');
     } else {
 
-    var requestJSON = {};
-    requestJSON.owner = req.user._id;
-    requestJSON.sender = req.user.directemail;
-    requestJSON.recipient = req.body.recipient;
-    requestJSON.received = new Date();
-    requestJSON.subject = req.body.subject;
-    requestJSON.contents = req.body.contents;
-    requestJSON.attachments = req.body.attachments;
-    requestJSON.read = true;
-    requestJSON.archived = false;
+        var requestJSON = {};
+        requestJSON.owner = req.user._id;
+        requestJSON.sender = req.user.directemail;
+        requestJSON.recipient = req.body.recipient;
+        requestJSON.received = new Date();
+        requestJSON.subject = req.body.subject;
+        requestJSON.contents = req.body.contents;
+        requestJSON.attachments = req.body.attachments;
+        requestJSON.read = true;
+        requestJSON.archived = false;
 
-    sendMessage(requestJSON, function() {
-        res.send(200);
-    });
+        sendMessage(requestJSON, function() {
+            res.send(200);
+        });
 
-}
+    }
 
 });

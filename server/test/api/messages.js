@@ -22,6 +22,8 @@ var Message = require('../../models/message');
 var Delegation = require('../../models/delegation');
 var mongoose = require('mongoose');
 var ObjectId = require('mongodb').ObjectID;
+var outboxMessages = require('../records/outboxMessages.json');
+
 var config = require('../../config.js');
 if (config.server.ssl.enabled) {
   var deploymentLocation = 'https://' + config.server.url + ':' + config.server.port;
@@ -62,66 +64,78 @@ var testProfile = {
   phonetype: 'mobile'
 };
 
-describe('Pre Authentication Tests', function () {
+describe('Pre Authentication Tests', function() {
 
   it('Get Messages Unauthenticated', function(done) {
     api.get('/messages/meta')
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
+  });
+
+  it('Get Message Unauthenticated', function(done) {
+    api.get('/messages/message/123')
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Inbox Unauthenticated', function(done) {
     api.get('/messages/inbox')
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Outbox Unauthenticated', function(done) {
     api.get('/messages/outbox')
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Archive Unauthenticated', function(done) {
     api.get('/messages/archive')
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get All Unauthenticated', function(done) {
     api.get('/messages/all')
-    .expect(401)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(401)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
 });
@@ -159,62 +173,74 @@ describe('Pre-Verification Testing', function() {
 
   it('Get Messages Unverified', function(done) {
     api.get('/messages/meta')
-    .expect(403)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
+  });
+
+  it('Get Message Unverified', function(done) {
+    api.get('/messages/message/123')
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Inbox Unverified', function(done) {
     api.get('/messages/inbox')
-    .expect(403)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Outbox Unverified', function(done) {
     api.get('/messages/outbox')
-    .expect(403)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get Archived Unverified', function(done) {
     api.get('/messages/archive')
-    .expect(403)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('Get All Unverified', function(done) {
     api.get('/messages/all')
-    .expect(403)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-     })
+      .expect(403)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
 });
@@ -257,12 +283,12 @@ describe('Verified: 0 Messages', function() {
         if (err) {
           done(err);
         } else {
-        res.body.inbox.should.equal(0);
-        res.body.outbox.should.equal(0);
-        res.body.inboxUnread.should.equal(0);
-        res.body.archived.should.equal(0);
-        done();
-      }
+          res.body.inbox.should.equal(0);
+          res.body.outbox.should.equal(0);
+          res.body.inboxUnread.should.equal(0);
+          res.body.archived.should.equal(0);
+          done();
+        }
       });
   });
 
@@ -301,38 +327,32 @@ describe('Create Test Messages', function() {
     });
   });
 
-  it('Generate Test Outbox Message', function(done) {
+});
 
-    Account.findOne({
-      username: testName
-    }, function(err, res) {
-      if (err) {
-        done(err);
-      }
+describe('Create Messages', function() {
 
-      testOutboxMessage = {
-        owner: res._id,
-        outbox: true,
-        recipient: 'testDoc@localhost',
-        stored: Date.now(),
-        subject: 'Medical Records',
-        contents: 'Here you go.',
-        attachments: []
-      };
+  it('Load Sample Outbox Messages', function(done) {
 
-      var sampleMessage = new Message(testOutboxMessage);
-      sampleMessage.save(function(err, res) {
-        testOutboxMessage.message_id = res._id;
-        if (err) {
-          done(err);
-        }
-        done();
-      });
-    });
+    function postMessages(iteration, outboxMessage) {
+      api.post('/messages')
+        .send(outboxMessage)
+        .expect(201)
+        .end(function(err, res) {
+          if (err) {done(err);}
+          if (iteration === (outboxMessages.messages.length - 1)) {
+            done();
+          }
+        });
+    }
 
+    for (var i = 0; i < outboxMessages.messages.length; i++) {
+
+      postMessages(i, outboxMessages.messages[i]);
+    }
   });
 
 });
+
 
 describe('Verified: Messages', function() {
 
@@ -343,12 +363,12 @@ describe('Verified: Messages', function() {
         if (err) {
           done(err);
         } else {
-        res.body.inbox.should.equal(1);
-        res.body.outbox.should.equal(1);
-        res.body.inboxUnread.should.equal(1);
-        res.body.archived.should.equal(0);
-        done();
-      }
+          res.body.inbox.should.equal(1);
+          res.body.outbox.should.equal(100);
+          res.body.inboxUnread.should.equal(1);
+          res.body.archived.should.equal(0);
+          done();
+        }
       });
   });
 
@@ -360,8 +380,8 @@ describe('Verified: Messages', function() {
           done(err);
         } else {
           //console.log(res.body);
-        done();
-      }
+          done();
+        }
       });
   });
 
@@ -373,8 +393,8 @@ describe('Verified: Messages', function() {
           done(err);
         } else {
           //console.log(res.body);
-        done();
-      }
+          done();
+        }
       });
   });
 
@@ -386,8 +406,8 @@ describe('Verified: Messages', function() {
           done(err);
         } else {
           //console.log(res.body);
-        done();
-      }
+          done();
+        }
       });
   });
 
@@ -399,112 +419,303 @@ describe('Verified: Messages', function() {
           done(err);
         } else {
           //console.log(res.body);
-        done();
-      }
+          done();
+        }
       });
   });
 
-    it('GET Bad API', function(done) {
+  it('GET Bad API', function(done) {
     api.get('/messages/fail')
       .expect(404)
       .end(function(err, res) {
         if (err) {
           done(err);
         } else {
-        done();
-      }
+          done();
+        }
+      });
+
+  });
+
+  it('GET Outbox - Limit Pagination test', function(done) {
+    api.get('/messages/outbox?limit=20')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(20);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Max Limit Pagination test', function(done) {
+    api.get('/messages/outbox?limit=2000')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Negative Limit Pagination test', function(done) {
+    api.get('/messages/outbox?limit=-200')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Alpha Limit Pagination test', function(done) {
+    api.get('/messages/outbox?limit=yousuck!!!')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Start Pagination test', function(done) {
+    api.get('/messages/outbox?start=70')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(30);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Negative Start Pagination test', function(done) {
+    api.get('/messages/outbox?start=-200')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Too long Start Pagination test', function(done) {
+    api.get('/messages/outbox?start=2000')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(0);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Alpha Start Pagination test', function(done) {
+    api.get('/messages/outbox?start=yousuck!!!')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Combined Pagination test 1', function(done) {
+    api.get('/messages/outbox?start=70&limit=40')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(30);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Combined Pagination test 1', function(done) {
+    api.get('/messages/outbox?start=yousuck!!&limit=400')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(50);
+          done();
+        }
+      });
+  });
+
+  it('GET Outbox - Combined Pagination test 1', function(done) {
+    api.get('/messages/outbox?start=10&limit=5')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(5);
+          done();
+        }
+      });
+  });
+
+  it('GET Valid Outbox Message', function(done) {
+    api.get('/messages/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        function getMessage(iteration, message) {
+          api.get('/messages/message/' + message._id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {
+                done(err);
+              } else {
+                if ((iteration + 1) === (messageLength)) {
+                  done();
+                }
+              }
+
+            });
+        }
+        if (err) {
+          done(err);
+        } else {
+          var messageLength = res.body.messages.length;
+          for (var i = 0; i < messageLength; i++) {
+            getMessage(i, res.body.messages[i]);
+          }
+        }
       });
   });
 
   it('POST Messages API ', function(done) {
     api.post('/messages')
-    .send({'recipient':'test@amida-tech.com', 'contents': 'Test Message', 'subject': 'Hey There!'})
-    .expect(201)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'recipient': 'test@amida-tech.com',
+        'contents': 'Test Message',
+        'subject': 'Hey There!'
+      })
+      .expect(201)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Too long Subject', function(done) {
     api.post('/messages')
-    .send({'subject':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'subject': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Missing Recipient', function(done) {
     api.post('/messages')
-    .send({'body':'fail'})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'body': 'fail'
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Empty Recipient', function(done) {
     api.post('/messages')
-    .send({'recipient':''})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'recipient': ''
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Bad Recipient', function(done) {
     api.post('/messages')
-    .send({'recipient':'IM NOT AN EMAIL'})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'recipient': 'IM NOT AN EMAIL'
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Too Long Recipient', function(done) {
     api.post('/messages')
-    .send({'recipient':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@fake.com'})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'recipient': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@fake.com'
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
   it('POST Messages API - Too Long Message', function(done) {
     api.post('/messages')
-    .send({'recipient':'test@fake.com', 'subject': 'test message', 'contents':'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'})
-    .expect(400)
-    .end(function(err, res) {
-      if (err) {
-        done(err);
-      } else {
-        done();
-      }
-    });
+      .send({
+        'recipient': 'test@fake.com',
+        'subject': 'test message',
+        'contents': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+      })
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          done();
+        }
+      });
   });
 
 });

@@ -140,7 +140,7 @@ function createMessageOutbox(api, message, done) {
       done(err);
     }
     done();
-  })
+  });
 }
 
 function createRequest(api, request, done) {
