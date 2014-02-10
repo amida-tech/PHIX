@@ -49,6 +49,14 @@ var db_other;
 var Message2;
 
 function getMailMeta(user_id, callback) {
+
+    function done(err) {
+        if (err) {callback(err);}
+        if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0) && (mailboxMeta.archived >= 0)) {
+            callback(null, mailboxMeta);
+        }
+    }
+
     if (!user_id) {
         callback('Error: No user id found.');
     } else {
@@ -72,19 +80,13 @@ function getMailMeta(user_id, callback) {
         if (err) {done(err);}
         mailboxMeta.archived = count;
         done();
-    })
-    function done(err) {
-        if (err) {callback(err);}
-        if ((mailboxMeta.inbox >= 0) && (mailboxMeta.outbox >= 0) && (mailboxMeta.inboxUnread >= 0) && (mailboxMeta.archived >= 0)) {
-            callback(null, mailboxMeta);
-        }
-    };
+    });
     }
 }
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailInbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, inbox: true}, 'sender stored subject contents attachments read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, inbox: true}, 'sender stored subject read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var inboxJSON = {};
         inboxJSON.messages = results;
         if (err) {
@@ -97,7 +99,7 @@ function getMailInbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailOutbox(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, outbox: true}, 'recipient stored subject contents attachments', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, outbox: true}, 'recipient stored subject', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var outboxJSON = {};
         outboxJSON.messages = results;
         if (err) {
@@ -110,7 +112,7 @@ function getMailOutbox(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailArchive(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id, inbox: false, outbox: false}, 'recipient sender stored subject contents attachments read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id, inbox: false, outbox: false}, 'recipient sender stored subject read', {sort: {'stored': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var archiveJSON = {};
         archiveJSON.messages = results;
         if (err) {
@@ -123,7 +125,7 @@ function getMailArchive(user_id, response_start, response_end, callback) {
 
 //TODO:  Evaluate if sort applies before or after query.
 function getMailAll(user_id, response_start, response_end, callback) {
-    Message.find({owner: user_id}, 'sender recipient stored subject contents attachments read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
+    Message.find({owner: user_id}, 'sender recipient stored subject read', {sort: {'sent': -1}, skip: response_start, limit: response_end}, function(err, results) {
         var allJSON = {};
         allJSON.messages = results;
         if (err) {
@@ -131,6 +133,47 @@ function getMailAll(user_id, response_start, response_end, callback) {
         } else {
             callback(null, allJSON);
         }
+    });
+}
+
+function checkMessage (message, callback) {
+    var checkArray = [];
+    //RFC 2822 Suggests 78 Char subject limit.  Subject not required.
+    if (message.subject) {
+        if (message.subject.length > 77) {checkArray.push('Message subject must be under 78 characters in length.');}
+    }
+    //Recipient Required, must be under 255 characters in length, and must match email regex.
+    if (message.recipient === undefined || !message.recipient) {checkArray.push('Message must have a recipient.');}
+    if (message.recipient) {
+        if (message.recipient.length === 0 || message.recipient === null) {checkArray.push('Message must have a recipient');}
+        var emailPattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (emailPattern.test(message.recipient) === false) {checkArray.push('Incorrectly formatted email recipient.');}
+        if(message.recipient.length > 254) {checkArray.push('Recipient must be under 255 characters in length.');}
+    }
+    //Max message length set to 1000.
+    if (message.contents) {
+        if (message.contents.length > 1000) {checkArray.push('Message Body too long.');}
+    }
+    //Need to do some attachment validation.
+    callback(checkArray);
+}
+
+function saveMessage(user_id, message, callback) {
+    var messageJSON = {};
+    messageJSON.owner = user_id;
+    messageJSON.stored = new Date();
+    messageJSON.outbox = true;
+    if (message.subject) {
+    messageJSON.subject = message.subject;}
+    if (message.recipient) {
+    messageJSON.recipient = message.recipient;}
+    if (message.contents) {
+    messageJSON.contents = message.contents;}
+    if (message.attachments) {messageJSON.attachments = message.attachments;}
+
+    var persistMessage = new Message(messageJSON);
+    persistMessage.save(function(err, res) {
+        if (err) {callback(err);} else { callback();}
     });
 }
 
@@ -145,14 +188,13 @@ app.get('/messages/meta', auth.ensureAuthenticated, auth.ensureVerified, functio
     });
 });
 
-
 app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
     var starting_limit = 0;
     var ending_limit = 50;
     if (req.query.start && (isNaN(req.query.start) === false)) {
         starting_limit = req.query.start;
     }
-    if (req.query.end && (isNan(req.query.end) === false) && req.query.end <= 100) {
+    if (req.query.end && (isNaN(req.query.end) === false) && req.query.end <= 100) {
         ending_limit = req.query.end;
     }
 
@@ -198,53 +240,11 @@ app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, functio
     
 });
 
-function checkMessage (message, callback) {
-    checkArray = [];
-    //RFC 2822 Suggests 78 Char subject limit.  Subject not required.
-    if (message.subject) {
-        if (message.subject.length > 77) {checkArray.push('Message subject must be under 78 characters in length.');}
-    }
-    //Recipient Required, must be under 255 characters in length, and must match email regex.
-    if (message.recipient === undefined || !message.recipient) {checkArray.push('Message must have a recipient.');}
-    if (message.recipient) {
-        if (message.recipient.length === 0 || message.recipient === null) {checkArray.push('Message must have a recipient');}
-        var emailPattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        if (emailPattern.test(message.recipient) === false) {checkArray.push('Incorrectly formatted email recipient.');}
-        if(message.recipient.length > 254) {checkArray.push('Recipient must be under 255 characters in length.');}
-    }
-    //Max message length set to 1000.
-    if (message.contents) {
-        if (message.contents.length > 1000) {checkArray.push('Message Body too long.');}
-    }
-    //Need to do some attachment validation.
-    callback(checkArray);
-}
-
-function saveMessage(user_id, message, callback) {
-    var messageJSON = {};
-    messageJSON.owner = user_id;
-    messageJSON.sent = new Date();
-    messageJSON.type = false;
-    if (message.subject) {
-    messageJSON.subject = message.subject;}
-    if (message.recipient) {
-    messageJSON.recipient = message.recipient;}
-    if (messageJSON.contents) {
-    messageJSON.contents = message.contents;}
-    if (messageJSON.attachments) {messageJSON.attachments = message.attachments;}
-
-    var saveMessage = new Message(messageJSON);
-    saveMessage.save(function(err, res) {
-        if (err) {callback(err);} else { callback();}
-    });
-}
-
-
 app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
 
     checkMessage(req.body, function(err) {
         if (err.length > 0) {
-            errorJSON = {};
+            var errorJSON = {};
             errorJSON.errors = err;
             res.send(400, errorJSON);
         } else {
@@ -255,19 +255,12 @@ app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(re
                 } else {
             res.send(201);                    
                 }
-            })
+            });
         }
-
     });
 
     //Body has a maximum line length, but no maximum defined message size.  We should set one to keep storage limits down.  Suggest limiting to 1000 for now.
     //Maximum Message size should be set, will do at 10MB for now (hotmail).
-
-
-    //recipient, subject, body, attachments
-    
-
-
 });
 
 

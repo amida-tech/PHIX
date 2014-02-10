@@ -132,6 +132,17 @@ function createMessage(message, done) {
   });
 }
 
+function createMessageOutbox(api, message, done) {
+  api.post('/message')
+  .expect(200)
+  .end(function(err, res) {
+    if (err) {
+      done(err);
+    }
+    done();
+  })
+}
+
 function createRequest(api, request, done) {
   api.put('/hie/' + request.clinician.clinicianID)
     .send({
