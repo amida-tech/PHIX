@@ -17,7 +17,7 @@ limitations under the License.
 angular.module('phix.inboxService', [])
   .factory('InboxService', function($http) {
 
-    var endpoint = "/";
+    var endpoint = "https://localhost:3000/";
     var inboxCount = 0;
 
     function getInboxCount() {

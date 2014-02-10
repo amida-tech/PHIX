@@ -18,7 +18,7 @@ angular.module('phix.selectClinitian', [])
   .directive('phClinitian', function($http) {
     return {
       restrict: 'E',
-      template: "<div ng-include='\"partials/select-clinitian\"'></div>",
+      template: "<div ng-include='\"partials/select-clinitian.html\"'></div>",
       replace: true,
       link: function(scope, elem, attr) {
         scope.selected = false;

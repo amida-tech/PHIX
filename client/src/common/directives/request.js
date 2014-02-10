@@ -18,7 +18,7 @@ angular.module('phix.request', ['phix.requestCtrl'])
   .directive('phRequest', [function () {
     return {
       restrict: 'E',
-      templateUrl: 'partials/request',
+      templateUrl: 'partials/request.html',
       controller: 'RequestCtrl',
       scope: true,
       link: function (scope, elem, attrs) {

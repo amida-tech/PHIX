@@ -18,7 +18,7 @@ angular.module('phix.selectPerson', ['bt.datepicker'])
   .directive('phPerson', function() {
     return {
       restrict: 'E',
-      template: "<div ng-include='\"partials/select-person\"' onload='onload()'></div>",
+      template: "<div ng-include='\"partials/select-person.html\"' onload='onload()'></div>",
       require: '?ngModel',
       link: function(scope, elem, attr, ngModel) {
         scope.location = '';

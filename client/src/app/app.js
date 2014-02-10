@@ -88,74 +88,74 @@ angular
   .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: '/partials/landing',
+        templateUrl: '/partials/landing.html',
         controller: 'LandingCtrl'
       })
       .when('/login', {
-        templateUrl: '/partials/login',
+        templateUrl: '/partials/login.html',
         controller: 'LoginCtrl'
       })
       .when('/lookup', {
-        templateUrl: '/partials/lookup',
+        templateUrl: '/partials/lookup.html',
         controller: 'LookupCtrl'
       })
       .when('/signup', {
-        templateUrl: '/partials/signup',
+        templateUrl: '/partials/signup.html',
         controller: 'SignupCtrl'
       })
       .when('/verification', {
-        templateUrl: '/partials/verify',
+        templateUrl: '/partials/verify.html',
         controller: 'VerifyCtrl'
       })
       .when('/:user', {
-        templateUrl: '/partials/record',
+        templateUrl: '/partials/record.html',
         controller: 'RecordCtrl',
         tab: 'user',
         roles: ['patient']
       })
       .when('/:user/enroll', {
-        templateUrl: '/partials/enroll',
+        templateUrl: '/partials/enroll.html',
         controller: 'EnrollCtrl',
         roles: ['patient', 'clinician']
       })
       .when('/:user/mail/inbox', {
-        templateUrl: '/partials/mail/inbox',
+        templateUrl: '/partials/mail/inbox.html',
         controller: 'InboxCtrl',
         tab: 'mail',
         roles: ['patient', 'clinician']
       })
       .when('/:user/mail/outbox', {
-        templateUrl: '/partials/mail/outbox',
+        templateUrl: '/partials/mail/outbox.html',
         controller: 'OutboxCtrl',
         tab: 'mail',
         roles: ['patient', 'clinician']
       })
       .when('/:user/pending', {
-        templateUrl: '/partials/confirmation',
+        templateUrl: '/partials/confirmation.html',
         controller: 'PendingCtrl',
         tab: 'pending',
         roles: ['patient', 'clinician']
       })
       .when('/:user/profile', {
-        templateUrl: '/partials/profile',
+        templateUrl: '/partials/profile.html',
         controller: 'ProfileCtrl',
         tab: 'gear',
         roles: ['patient']
       })
       .when('/:user/rules', {
-        templateUrl: '/partials/rules/list',
+        templateUrl: '/partials/rules/list.html',
         controller: 'ListRulesCtrl',
         tab: 'lock',
         roles: ['patient']
       })
       .when('/:user/store', {
-        templateUrl: '/partials/records/list',
+        templateUrl: '/partials/records/list.html',
         controller: 'ListRecordsCtrl',
         tab: 'folder',
         roles: ['patient']
       })
       .when('/:user/exchange', {
-        templateUrl: '/partials/exchange',
+        templateUrl: '/partials/exchange.html',
         controller: 'ExchangeCtrl',
         tab: 'exchange',
         roles: ['patient']

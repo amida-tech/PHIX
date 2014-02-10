@@ -17,11 +17,12 @@ limitations under the License.
 angular.module('phix.authenticationService', [])
   .factory('AuthenticationService', function($http) {
 
-    var endpoint = "/";
+    var endpoint = "https://localhost:3000/";
     var userObject = {};
     var role;
 
-
+    $http.defaults.withCredentials = true;
+    
     function getUser() {
       $http.get(endpoint + 'account').success(function(data) {
         userObject = data;
@@ -48,14 +49,18 @@ angular.module('phix.authenticationService', [])
         });
       },
       login: function(user, pass, callback) {
-        $http.post(endpoint + 'login', {
+        $http.post(endpoint + 'login', {withCredentials : false,
           username: user,
           password: pass
         }).success(function(data) {
           auth = true;
           callback(null, data);
-        }).error(function(data) {
+        }).error(function(data, status, headers, config) {
           auth = false;
+        console.log(data);
+        console.log(status);
+        console.log(headers);
+        console.log(config);          
           callback(data);
         });
         // Original coding from Michael.

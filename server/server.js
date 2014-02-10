@@ -65,9 +65,10 @@ if (config.client.enabled) {
       requestPath = req.path;
     }
     var viewPath = viewDir + requestPath + '.jade';
-    console.log(viewPath);
+    console.log("viewPath "+viewPath);
     fs.exists(viewPath, function(exists) {
       if (exists) {
+        console.log("exists");
         res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         res.render(viewPath);
       } else {
@@ -88,13 +89,36 @@ app.set('template_path', config.template.path);
 
 //Allow CORS requests fix for cross-domain requests.
 //TODO:  Need to limit origin to app url.
-app.all("/*", function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
-  res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
-  res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-  return next();
-});
+//app.all("/*", function(req, res, next) {
+//  res.header("Access-Control-Allow-Origin", "*");
+//  res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
+//  res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
+//  res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+//  return next();
+//});
+
+app.use(express.methodOverride());
+ 
+// ## CORS middleware
+//
+// see: http://stackoverflow.com/questions/7067966/how-to-allow-cors-in-express-nodejs
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'http://dist.dev');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Accept, Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', true);
+  // intercept OPTIONS method
+  if ('OPTIONS' == req.method) {
+    console.log("preflight");
+    res.send(200);
+  }
+  else {
+    console.log("next");    
+    next();
+  }
+};
+
+app.use(allowCrossDomain);
 
 function requireHTTPS(req, res, next) {
     if (!req.secure) {

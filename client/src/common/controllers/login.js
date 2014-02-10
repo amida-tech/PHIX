@@ -25,7 +25,7 @@ angular.module('phix.loginCtrl', ['phix.authenticationService'])
             $scope.login.serverError = 'Incorrect Username/Password.';
         } else {
             $scope.login.serverError = '';
-            if (res.substring(0,7) === 'Profile') {
+            if (res && res.substring(0,7) === 'Profile') {
                 $location.path('/' + $scope.user.username + '/enroll');
             } else {
               if ($rootScope.appConfiguration.configuration === 'clinician') {

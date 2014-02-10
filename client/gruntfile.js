@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-jade');
   //grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -13,7 +14,7 @@ module.exports = function(grunt) {
   // Default task.
 
   grunt.registerTask('default', ['jshint', 'build']);
-  grunt.registerTask('build', ['clean', 'copy:assets', 'copy:less', 'copy:partials', 'concat']);
+  grunt.registerTask('build', ['clean', 'copy:assets', 'copy:less', 'concat', 'jade']);
   //grunt.registerTask('default', ['jshint','build','karma:unit']);
   //grunt.registerTask('build', ['clean','html2js','concat','recess:build','copy:assets']);
   //grunt.registerTask('release', ['clean','html2js','uglify','jshint','karma:unit','concat:index', 'recess:min','copy:assets']);
@@ -60,15 +61,7 @@ module.exports = function(grunt) {
           cwd: 'src/less/'
         }]
       },
-      partials: {
-        files: [{
-          dest: '<%= distdir %>/partials',
-          src: '**',
-          expand: true,
-          cwd: 'src/app/partials/'
-        }]
 
-      }
     },
     concat: {
       dist: {
@@ -106,6 +99,22 @@ module.exports = function(grunt) {
         dest: '<%= distdir %>/less.js'
       }
     },
+    jade: {
+        compile: {
+            options: {
+                client: false,
+                pretty: true
+            },
+            files: [ {
+              cwd: "src/app/partials/",
+              src: "**/*.jade",
+              dest: "<%= distdir %>/partials",
+              expand: true,
+              ext: '.html'
+              //rename: function(dest, src){ return dest + '/'+src.replace('.jade', '') },
+            } ]
+        }
+    },    
     jshint: {
       files: ['gruntFile.js', 'package.json', '<%= src.js %>'],
       options: {

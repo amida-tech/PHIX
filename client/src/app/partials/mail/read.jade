@@ -35,11 +35,11 @@ div.modal.fade(id='myModal' tabindex="-1" role="dialog" aria-labelledby="myModal
       div.modal-header(ng-show='read.state != null && !conflict')
         h4 {{read.state}}
       div.modal-body(ng-show='read.state != null && !conflict')
-        ng-include(src='"partials/preview"')
+        ng-include(src='"partials/preview.html"')
       div.modal-footer(ng-show='read.state != null && !conflict')
         button.btn.btn-default(type='button',ng-click='read.state = null') Back
         button.btn.btn-primary(type='button',ng-click='conflict = true',ng-show='patient') Import
       div.modal-header(ng-show='conflict')
       div.modal-body(ng-show='conflict')
-        ng-include(src='"partials/merge"')
+        ng-include(src='"partials/merge.html"')
       div.modal-footer(ng-show='conflict')

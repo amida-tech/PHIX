@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // =======================================================================
-ng-include(src='"partials/header"')
+ng-include(src='"partials/header.html"')
 
 .container
   .row
@@ -39,7 +39,7 @@ ng-include(src='"partials/header"')
                   label(for='details') Details
                   input.form-control(type='text', id="details" ng-model="details")
 
-                //- ng-include(src='"partials/merge"', ng-show='uploaded')
+                //- ng-include(src='"partials/merge.html"', ng-show='uploaded')
                 
                 button.btn.btn-primary(type='submit',ng-click='upload()', data-dismiss='modal') upload
 
@@ -65,4 +65,4 @@ ng-include(src='"partials/header"')
             td(data-toggle='modal',data-target='#myModal') 
               span.glyphicon.glyphicon-check(ng-show='record.parsedFlag && record.contentType==="CCDA"')
 
-ng-include(src='"partials/records/merge"')
+ng-include(src='"partials/records/merge.html"')
