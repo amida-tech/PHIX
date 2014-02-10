@@ -41,6 +41,8 @@ if (mongoose.connection.readyState === 0) {
 var testInboxMessage;
 var testOutboxMessage;
 
+var generatedDateArray = [];
+
 /*Code block loads user for testing.*/
 /*===========================================================*/
 
@@ -355,18 +357,19 @@ describe('Create Messages', function() {
 
   it('Scramble Dates to test sorting.', function(done) {
 
-    Message.find(function(err, res) {
+    Message.find({'outbox': true}, function(err, res) {
 
       var messageArray = res;
 
       function changeDate(iteration, message_id) {
         var myDate = new Date();
-        if (iteration % 2 === 0) {
+        if (iteration % 2 !== 0) {
           myDate.setDate(myDate.getDate() - iteration);
+          generatedDateArray.push(myDate);
         } else {
           myDate.setDate(myDate.getDate() + iteration);
+          generatedDateArray.push(myDate);
         }
-        console.log(myDate);
         Message.findByIdAndUpdate(message_id, {
           'stored': myDate
         }, function(err, res) {
@@ -614,6 +617,29 @@ describe('Verified: Messages', function() {
       });
   });
 
+  it('GET Outbox - Sorting Test', function(done) {
+    api.get('/messages/outbox?start=0&limit=30')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        } else {
+          res.body.messages.length.should.equal(30);
+          var sortedArray = generatedDateArray.sort(function(date1, date2) {
+            if (date1 > date2) return -1;
+            if (date1 < date2) return 1;
+            return 0;
+          })
+          for (var i = 0; i < res.body.messages.length; i++) {
+          //console.log('Array:  ' + sortedArray[i].toISOString());
+          //console.log('Server: ' + res.body.messages[i].stored);
+            sortedArray[i].toISOString().should.equal(res.body.messages[i].stored);
+          }
+          done();
+        }
+      });
+  });
+
   it('GET Valid Outbox Message', function(done) {
     api.get('/messages/outbox')
       .expect(200)
@@ -642,6 +668,8 @@ describe('Verified: Messages', function() {
         }
       });
   });
+
+
 
   it('POST Messages API ', function(done) {
     api.post('/messages')
