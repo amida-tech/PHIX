@@ -338,7 +338,9 @@ describe('Create Messages', function() {
         .send(outboxMessage)
         .expect(201)
         .end(function(err, res) {
-          if (err) {done(err);}
+          if (err) {
+            done(err);
+          }
           if (iteration === (outboxMessages.messages.length - 1)) {
             done();
           }
@@ -351,8 +353,40 @@ describe('Create Messages', function() {
     }
   });
 
-});
+  it('Scramble Dates to test sorting.', function(done) {
 
+    Message.find(function(err, res) {
+
+      var messageArray = res;
+
+      function changeDate(iteration, message_id) {
+        var myDate = new Date();
+        if (iteration % 2 === 0) {
+          myDate.setDate(myDate.getDate() - iteration);
+        } else {
+          myDate.setDate(myDate.getDate() + iteration);
+        }
+        console.log(myDate);
+        Message.findByIdAndUpdate(message_id, {
+          'stored': myDate
+        }, function(err, res) {
+          if (err) {
+            done(err);
+          }
+          if (iteration === (messageArray.length - 1)) {
+            done();
+          }
+        })
+      }
+
+      for (var i = 0; i < messageArray.length; i++) {
+        changeDate(i, messageArray[i]._id);
+      }
+    });
+
+  });
+
+});
 
 describe('Verified: Messages', function() {
 
