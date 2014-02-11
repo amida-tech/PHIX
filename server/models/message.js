@@ -36,6 +36,10 @@ var Message = new Schema({
         type: Boolean,
         "default": false
     },
+    archived: {
+        type: Boolean,
+        "default": false
+    },
     attachments: [Attachments]
 }, {autoIndex: false});
 

@@ -112,7 +112,8 @@ function getMailMeta(user_id, callback) {
 function getMailInbox(user_id, response_start, response_end, callback) {
     Message.find({
         owner: user_id,
-        inbox: true
+        inbox: true,
+        archived: false
     }, 'sender stored subject read', {
         sort: {
             'stored': -1
@@ -134,7 +135,8 @@ function getMailInbox(user_id, response_start, response_end, callback) {
 function getMailOutbox(user_id, response_start, response_end, callback) {
     Message.find({
         owner: user_id,
-        outbox: true
+        outbox: true,
+        archived: false
     }, 'recipient stored subject', {
         sort: {
             'stored': -1
@@ -156,8 +158,7 @@ function getMailOutbox(user_id, response_start, response_end, callback) {
 function getMailArchive(user_id, response_start, response_end, callback) {
     Message.find({
         owner: user_id,
-        inbox: false,
-        outbox: false
+        archived: true
     }, 'recipient sender stored subject read', {
         sort: {
             'stored': -1
@@ -198,8 +199,9 @@ function getMailAll(user_id, response_start, response_end, callback) {
 
 function getMailMessage(user_id, message_id, callback) {
     Message.findOne({
-        owner: user_id
-    }, 'sender recipient stored subject contents attachments', function(err, results) {
+        owner: user_id,
+        _id: message_id
+    }, 'sender recipient stored subject contents attachments archived read', function(err, results) {
         if (err) {
             callback(err);
         } else {
@@ -270,7 +272,7 @@ function saveMessage(user_id, message, callback) {
     });
 }
 
-app.get('/messages/meta', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+app.get('/mail/info', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
     getMailMeta(req.user._id, function(err, metaData) {
         if (err) {
             console.log(err);
@@ -281,7 +283,7 @@ app.get('/messages/meta', auth.ensureAuthenticated, auth.ensureVerified, functio
     });
 });
 
-app.get('/messages/message/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+app.get('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
 
     getMailMessage(req.user._id, req.params.message_id, function(err, mailMessage) {
         if (err) {
@@ -295,7 +297,69 @@ app.get('/messages/message/:message_id', auth.ensureAuthenticated, auth.ensureVe
 
 });
 
-app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+app.post('/mail/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+
+    checkMessage(req.body, function(err) {
+        if (err.length > 0) {
+            var errorJSON = {};
+            errorJSON.errors = err;
+            res.send(400, errorJSON);
+        } else {
+            saveMessage(req.user._id, req.body, function(err) {
+                if (err) {
+                    console.log(err);
+                    res.send(500);
+                } else {
+                    res.send(201);
+                }
+            });
+        }
+    });
+
+    //Body has a maximum line length, but no maximum defined message size.  We should set one to keep storage limits down.  Suggest limiting to 1000 for now.
+    //Maximum Message size should be set, will do at 10MB for now (hotmail).
+});
+
+function updateMessage(user_id, message_id, update_json, callback) {
+    query_json = {};
+    if (update_json.archived) {
+        if (update_json.archived === true || update_json.archived === false) {
+            query_json.archived = update_json.archived;
+        }
+    }
+    if (update_json.read) {
+        if (update_json.read === true || update_json.read === false) {
+            query_json.read = update_json.read;
+        }
+    }
+    Message.findOneAndUpdate({
+        owner: user_id,
+        _id: message_id
+    }, query_json, function(err, res) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, res);
+        }
+    });
+}
+
+app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function (req, res) {
+
+    updateMessage(req.user._id, req.params.message_id, req.body, function(err, results) {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        } else {
+            console.log(results);
+            res.send(200);
+        }
+
+    });
+
+});
+
+app.get('/mail/:box', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
     var starting_limit = 0;
     var ending_limit = 50;
     if (req.query.start && (isNaN(req.query.start) === false) && req.query.start > 0) {
@@ -349,30 +413,10 @@ app.get('/messages/:box', auth.ensureAuthenticated, auth.ensureVerified, functio
 
 });
 
-app.post('/messages', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
 
-    checkMessage(req.body, function(err) {
-        if (err.length > 0) {
-            var errorJSON = {};
-            errorJSON.errors = err;
-            res.send(400, errorJSON);
-        } else {
-            saveMessage(req.user._id, req.body, function(err) {
-                if (err) {
-                    console.log(err);
-                    res.send(500);
-                } else {
-                    res.send(201);
-                }
-            });
-        }
-    });
 
-    //Body has a maximum line length, but no maximum defined message size.  We should set one to keep storage limits down.  Suggest limiting to 1000 for now.
-    //Maximum Message size should be set, will do at 10MB for now (hotmail).
-});
 
-//todo:  add patch and del routes.
+//todo:  add put and del routes.
 
 
 //Everything below this line going away...

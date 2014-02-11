@@ -69,7 +69,7 @@ var testProfile = {
 describe('Pre Authentication Tests', function() {
 
   it('Get Messages Unauthenticated', function(done) {
-    api.get('/messages/meta')
+    api.get('/mail/info')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -81,7 +81,7 @@ describe('Pre Authentication Tests', function() {
   });
 
   it('Get Message Unauthenticated', function(done) {
-    api.get('/messages/message/123')
+    api.get('/mail/messages/123')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -93,7 +93,7 @@ describe('Pre Authentication Tests', function() {
   });
 
   it('Get Inbox Unauthenticated', function(done) {
-    api.get('/messages/inbox')
+    api.get('/mail/inbox')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -105,7 +105,7 @@ describe('Pre Authentication Tests', function() {
   });
 
   it('Get Outbox Unauthenticated', function(done) {
-    api.get('/messages/outbox')
+    api.get('/mail/outbox')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -117,7 +117,7 @@ describe('Pre Authentication Tests', function() {
   });
 
   it('Get Archive Unauthenticated', function(done) {
-    api.get('/messages/archive')
+    api.get('/mail/archive')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -129,7 +129,7 @@ describe('Pre Authentication Tests', function() {
   });
 
   it('Get All Unauthenticated', function(done) {
-    api.get('/messages/all')
+    api.get('/mail/all')
       .expect(401)
       .end(function(err, res) {
         if (err) {
@@ -174,7 +174,7 @@ describe('Create User', function() {
 describe('Pre-Verification Testing', function() {
 
   it('Get Messages Unverified', function(done) {
-    api.get('/messages/meta')
+    api.get('/mail/info')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -186,7 +186,7 @@ describe('Pre-Verification Testing', function() {
   });
 
   it('Get Message Unverified', function(done) {
-    api.get('/messages/message/123')
+    api.get('/mail/messages/123')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -198,7 +198,7 @@ describe('Pre-Verification Testing', function() {
   });
 
   it('Get Inbox Unverified', function(done) {
-    api.get('/messages/inbox')
+    api.get('/mail/inbox')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -210,7 +210,7 @@ describe('Pre-Verification Testing', function() {
   });
 
   it('Get Outbox Unverified', function(done) {
-    api.get('/messages/outbox')
+    api.get('/mail/outbox')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -222,7 +222,7 @@ describe('Pre-Verification Testing', function() {
   });
 
   it('Get Archived Unverified', function(done) {
-    api.get('/messages/archive')
+    api.get('/mail/archive')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -234,7 +234,7 @@ describe('Pre-Verification Testing', function() {
   });
 
   it('Get All Unverified', function(done) {
-    api.get('/messages/all')
+    api.get('/mail/all')
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -279,7 +279,7 @@ describe('Verification', function() {
 describe('Verified: 0 Messages', function() {
 
   it('Test Meta API', function(done) {
-    api.get('/messages/meta')
+    api.get('/mail/info')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -336,7 +336,7 @@ describe('Create Messages', function() {
   it('Load Sample Outbox Messages', function(done) {
 
     function postMessages(iteration, outboxMessage) {
-      api.post('/messages')
+      api.post('/mail/messages')
         .send(outboxMessage)
         .expect(201)
         .end(function(err, res) {
@@ -394,7 +394,7 @@ describe('Create Messages', function() {
 describe('Verified: Messages', function() {
 
   it('GET Meta API', function(done) {
-    api.get('/messages/meta')
+    api.get('/mail/info')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -410,7 +410,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Inbox API', function(done) {
-    api.get('/messages/inbox')
+    api.get('/mail/inbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -423,7 +423,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox API', function(done) {
-    api.get('/messages/outbox')
+    api.get('/mail/outbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -436,7 +436,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Archive API', function(done) {
-    api.get('/messages/archive')
+    api.get('/mail/archive')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -449,7 +449,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET All API', function(done) {
-    api.get('/messages/all')
+    api.get('/mail/all')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -462,7 +462,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Bad API', function(done) {
-    api.get('/messages/fail')
+    api.get('/mail/fail')
       .expect(404)
       .end(function(err, res) {
         if (err) {
@@ -475,7 +475,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Limit Pagination test', function(done) {
-    api.get('/messages/outbox?limit=20')
+    api.get('/mail/outbox?limit=20')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -488,7 +488,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Max Limit Pagination test', function(done) {
-    api.get('/messages/outbox?limit=2000')
+    api.get('/mail/outbox?limit=2000')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -501,7 +501,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Negative Limit Pagination test', function(done) {
-    api.get('/messages/outbox?limit=-200')
+    api.get('/mail/outbox?limit=-200')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -514,7 +514,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Alpha Limit Pagination test', function(done) {
-    api.get('/messages/outbox?limit=yousuck!!!')
+    api.get('/mail/outbox?limit=yousuck!!!')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -527,7 +527,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Start Pagination test', function(done) {
-    api.get('/messages/outbox?start=70')
+    api.get('/mail/outbox?start=70')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -540,7 +540,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Negative Start Pagination test', function(done) {
-    api.get('/messages/outbox?start=-200')
+    api.get('/mail/outbox?start=-200')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -553,7 +553,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Too long Start Pagination test', function(done) {
-    api.get('/messages/outbox?start=2000')
+    api.get('/mail/outbox?start=2000')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -566,7 +566,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Alpha Start Pagination test', function(done) {
-    api.get('/messages/outbox?start=yousuck!!!')
+    api.get('/mail/outbox?start=yousuck!!!')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -579,7 +579,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Combined Pagination test 1', function(done) {
-    api.get('/messages/outbox?start=70&limit=40')
+    api.get('/mail/outbox?start=70&limit=40')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -592,7 +592,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Combined Pagination test 1', function(done) {
-    api.get('/messages/outbox?start=yousuck!!&limit=400')
+    api.get('/mail/outbox?start=yousuck!!&limit=400')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -605,7 +605,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Combined Pagination test 1', function(done) {
-    api.get('/messages/outbox?start=10&limit=5')
+    api.get('/mail/outbox?start=10&limit=5')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -618,7 +618,7 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Outbox - Sorting Test', function(done) {
-    api.get('/messages/outbox?start=0&limit=30')
+    api.get('/mail/outbox?start=0&limit=30')
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -641,11 +641,11 @@ describe('Verified: Messages', function() {
   });
 
   it('GET Valid Outbox Message', function(done) {
-    api.get('/messages/outbox')
+    api.get('/mail/outbox')
       .expect(200)
       .end(function(err, res) {
         function getMessage(iteration, message) {
-          api.get('/messages/message/' + message._id)
+          api.get('/mail/messages/' + message._id)
             .expect(200)
             .end(function(err, res) {
               if (err) {
@@ -672,7 +672,7 @@ describe('Verified: Messages', function() {
 
 
   it('POST Messages API ', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'recipient': 'test@amida-tech.com',
         'contents': 'Test Message',
@@ -689,7 +689,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Too long Subject', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'subject': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
       })
@@ -704,7 +704,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Missing Recipient', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'body': 'fail'
       })
@@ -719,7 +719,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Empty Recipient', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'recipient': ''
       })
@@ -734,7 +734,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Bad Recipient', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'recipient': 'IM NOT AN EMAIL'
       })
@@ -749,7 +749,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Too Long Recipient', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'recipient': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@fake.com'
       })
@@ -764,7 +764,7 @@ describe('Verified: Messages', function() {
   });
 
   it('POST Messages API - Too Long Message', function(done) {
-    api.post('/messages')
+    api.post('/mail/messages')
       .send({
         'recipient': 'test@fake.com',
         'subject': 'test message',
@@ -778,6 +778,56 @@ describe('Verified: Messages', function() {
           done();
         }
       });
+  });
+
+  it('POST Valid Update to Outbox Message - Archive', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[0]._id;
+          console.log(record_id);
+          api.patch('/mail/messages/' + record_id)
+          .send({archived: true})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(true);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+  it('POST Valid Update to Outbox Message - Read', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          console.log(record_id);
+          api.patch('/mail/messages/' + record_id)
+          .send({archived: true})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(true);
+              done();
+            });
+          });
+        }
+    });
   });
 
 });
