@@ -292,21 +292,13 @@ function removeProviders(callback) {
   });
 }
 
-function removeMessages(testDirectAddress, callback) {
-  Message.remove({
-    'sender': testDirectAddress
-  }, function(err, res) {
-    if (err) {
-      done(err);
-    }
-    Message.remove({
-      'recipient': testDirectAddress
-    }, function(err, res) {
-      if (err) {
-        done(err);
-      }
-      callback();
+function removeMessages(userName, callback) {
+  Account.findOne({username: userName}, function(err, res) {
+    Message.remove({'owner': res._id}, function(err, res) {
+      if (err) {callback(err);} else {
+      callback();}
     });
+
   });
 }
 

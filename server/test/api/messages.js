@@ -1054,6 +1054,15 @@ describe('Cleanup Test Account', function() {
     });
   });
 
+  it('Remove Messages', function(done) {
+    common.removeMessages(testName, function(err) {
+      if (err) {
+        done(err);
+      }
+      done();
+    });
+  });
+
   it('Remove Account', function(done) {
     common.removeAccount(testName, function(err) {
       if (err) {
@@ -1065,15 +1074,6 @@ describe('Cleanup Test Account', function() {
 
   it('Remove Profile', function(done) {
     common.removeProfile(testName, function(err) {
-      if (err) {
-        done(err);
-      }
-      done();
-    });
-  });
-
-  it('Remove Messages', function(done) {
-    common.removeMessages(directEmail, function(err) {
       if (err) {
         done(err);
       }

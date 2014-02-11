@@ -244,7 +244,7 @@ function checkMessage(message, callback) {
     callback(checkArray);
 }
 
-function saveMessage(user_id, message, callback) {
+function saveOutboxMessage(user_id, message, callback) {
     var messageJSON = {};
     messageJSON.owner = user_id;
     messageJSON.stored = new Date();
@@ -293,7 +293,7 @@ app.get('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerif
             if (mailMessage === null) {
                 res.send(404);
             } else {
-            res.send(mailMessage);
+                res.send(mailMessage);
             }
         }
 
@@ -309,7 +309,7 @@ app.post('/mail/messages', auth.ensureAuthenticated, auth.ensureVerified, functi
             errorJSON.errors = err;
             res.send(400, errorJSON);
         } else {
-            saveMessage(req.user._id, req.body, function(err) {
+            saveOutboxMessage(req.user._id, req.body, function(err) {
                 if (err) {
                     console.log(err);
                     res.send(500);
@@ -341,23 +341,25 @@ function updateMessage(user_id, message_id, update_json, callback) {
         query_json.read = update_json.read;
     }
 
-    function isEmpty(ob){
-        for(var i in ob){ return false;}
+    function isEmpty(ob) {
+        for (var i in ob) {
+            return false;
+        }
         return true;
     }
 
     if (message_object_id && isEmpty(query_json) === false) {
 
-    Message.findOneAndUpdate({
-        owner: user_id,
-        _id: message_id
-    }, query_json, function(err, res) {
-        if (err) {
-            callback(err);
-        } else {
-            callback(null, res);
-        }
-    });
+        Message.findOneAndUpdate({
+            owner: user_id,
+            _id: message_id
+        }, query_json, function(err, res) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, res);
+            }
+        });
     } else {
         callback(null, null);
     }
@@ -388,7 +390,7 @@ function deleteMessage(user_id, message_id, callback) {
     }
 }
 
-app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function (req, res) {
+app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
 
     updateMessage(req.user._id, req.params.message_id, req.body, function(err, results) {
         if (err) {
@@ -398,8 +400,8 @@ app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVer
             if (results === null) {
                 res.send(404);
             } else {
-            res.send(200);
-        }
+                res.send(200);
+            }
         }
 
     });
@@ -476,11 +478,6 @@ app.get('/mail/:box', auth.ensureAuthenticated, auth.ensureVerified, function(re
     }
 
 });
-
-
-
-
-//todo:  add put and del routes.
 
 
 //Everything below this line going away...
