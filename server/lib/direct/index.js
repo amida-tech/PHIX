@@ -290,7 +290,11 @@ app.get('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerif
             console.log(err);
             res.send(500);
         } else {
+            if (mailMessage === null) {
+                res.send(404);
+            } else {
             res.send(mailMessage);
+            }
         }
 
     });
@@ -321,17 +325,29 @@ app.post('/mail/messages', auth.ensureAuthenticated, auth.ensureVerified, functi
 });
 
 function updateMessage(user_id, message_id, update_json, callback) {
-    query_json = {};
-    if (update_json.archived) {
-        if (update_json.archived === true || update_json.archived === false) {
-            query_json.archived = update_json.archived;
-        }
+
+    var message_object_id;
+    try {
+        message_object_id = new ObjectId(message_id);
+    } catch (error) {
+        console.error(error);
     }
-    if (update_json.read) {
-        if (update_json.read === true || update_json.read === false) {
-            query_json.read = update_json.read;
-        }
+
+    var query_json = {};
+    if (update_json.archived === true || update_json.archived === false) {
+        query_json.archived = update_json.archived;
     }
+    if (update_json.read === true || update_json.read === false) {
+        query_json.read = update_json.read;
+    }
+
+    function isEmpty(ob){
+        for(var i in ob){ return false;}
+        return true;
+    }
+
+    if (message_object_id && isEmpty(query_json) === false) {
+
     Message.findOneAndUpdate({
         owner: user_id,
         _id: message_id
@@ -342,6 +358,34 @@ function updateMessage(user_id, message_id, update_json, callback) {
             callback(null, res);
         }
     });
+    } else {
+        callback(null, null);
+    }
+
+}
+
+function deleteMessage(user_id, message_id, callback) {
+    var message_object_id;
+    try {
+        message_object_id = new ObjectId(message_id);
+    } catch (error) {
+        console.error(error);
+    }
+
+    if (message_object_id) {
+        Message.findOneAndRemove({
+            owner: user_id,
+            _id: message_object_id
+        }, function(err, results) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, results);
+            }
+        });
+    } else {
+        callback(null, null);
+    }
 }
 
 app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function (req, res) {
@@ -351,10 +395,30 @@ app.patch('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVer
             console.log(err);
             res.send(500);
         } else {
-            console.log(results);
+            if (results === null) {
+                res.send(404);
+            } else {
             res.send(200);
         }
+        }
 
+    });
+
+});
+
+app.delete('/mail/messages/:message_id', auth.ensureAuthenticated, auth.ensureVerified, function(req, res) {
+
+    deleteMessage(req.user._id, req.params.message_id, function(err, results) {
+        if (err) {
+            console.error(err);
+            res.send(500);
+        } else {
+            if (results === null) {
+                res.send(404);
+            } else {
+                res.send(200);
+            }
+        }
     });
 
 });

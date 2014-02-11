@@ -379,7 +379,7 @@ describe('Create Messages', function() {
           if (iteration === (messageArray.length - 1)) {
             done();
           }
-        })
+        });
       }
 
       for (var i = 0; i < messageArray.length; i++) {
@@ -626,10 +626,10 @@ describe('Verified: Messages', function() {
         } else {
           res.body.messages.length.should.equal(30);
           var sortedArray = generatedDateArray.sort(function(date1, date2) {
-            if (date1 > date2) return -1;
-            if (date1 < date2) return 1;
+            if (date1 > date2) {return -1;}
+            if (date1 < date2) {return 1;}
             return 0;
-          })
+          });
           for (var i = 0; i < res.body.messages.length; i++) {
           //console.log('Array:  ' + sortedArray[i].toISOString());
           //console.log('Server: ' + res.body.messages[i].stored);
@@ -780,14 +780,47 @@ describe('Verified: Messages', function() {
       });
   });
 
-  it('POST Valid Update to Outbox Message - Archive', function(done) {
+  it('PATCH invalid update to non-existent record', function(done) {
+    api.patch('/mail/messages/123')
+      .send({
+        archived: true
+      })
+      .expect(404)
+      .end(function(err, res) {
+        if (err) {
+          done(err);
+        }
+        done();
+      });
+
+  });
+
+  it ('PATCH empty update message to existing record', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[3]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({})
+          .expect(404)
+          .end(function(err, res) {
+              if (err) {done(err);} else {
+              done();
+            }
+          });
+        }
+    });
+  });
+
+  it('PATCH Valid Update to Outbox Message - Archive True', function(done) {
     var record_id = '';
     api.get('/mail/outbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {done(err);} else {
           record_id = res.body.messages[0]._id;
-          console.log(record_id);
           api.patch('/mail/messages/' + record_id)
           .send({archived: true})
           .expect(200)
@@ -805,16 +838,113 @@ describe('Verified: Messages', function() {
     });
   });
 
-  it('POST Valid Update to Outbox Message - Read', function(done) {
+  it('PATCH Valid Update to Outbox Message - Read True', function(done) {
     var record_id = '';
     api.get('/mail/outbox')
       .expect(200)
       .end(function(err, res) {
         if (err) {done(err);} else {
           record_id = res.body.messages[1]._id;
-          console.log(record_id);
           api.patch('/mail/messages/' + record_id)
-          .send({archived: true})
+          .send({read: true})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.read.should.equal(true);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+    it('PATCH Valid Update to Outbox Message - Archive False', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[0]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({archived: false})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(false);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+  it('PATCH Valid Update to Outbox Message - Read False', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({read: false})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.read.should.equal(false);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+  //Build out the rest of these.
+  it('PATCH Valid Update to Outbox Message - Read False Archived False', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({read: false, archived: false})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(false);
+              res.body.read.should.equal(false);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+    it('PATCH Valid Update to Outbox Message - Read True Archived True', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({read: true, archived: true})
           .expect(200)
           .end(function(err, res) {
             api.get('/mail/messages/' + record_id)
@@ -823,10 +953,91 @@ describe('Verified: Messages', function() {
               if (err) {done(err);}
               res.body._id.should.equal(record_id);
               res.body.archived.should.equal(true);
+              res.body.read.should.equal(true);
               done();
             });
           });
         }
+    });
+  });
+
+      it('PATCH Valid Update to Outbox Message - Read False Archived True', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({read: false, archived: true})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(true);
+              res.body.read.should.equal(false);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+          it('PATCH Valid Update to Outbox Message - Read True Archived False', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[1]._id;
+          api.patch('/mail/messages/' + record_id)
+          .send({read: true, archived: false})
+          .expect(200)
+          .end(function(err, res) {
+            api.get('/mail/messages/' + record_id)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) {done(err);}
+              res.body._id.should.equal(record_id);
+              res.body.archived.should.equal(false);
+              res.body.read.should.equal(true);
+              done();
+            });
+          });
+        }
+    });
+  });
+
+it('DELETE Valid Outbox Message', function(done) {
+    var record_id = '';
+    api.get('/mail/outbox')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {done(err);} else {
+          record_id = res.body.messages[2]._id;
+          api.del('/mail/messages/' + record_id)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {done(err);}
+            api.get('/mail/messages/' + record_id)
+            .expect(404)
+            .end(function(err, res) {
+              if (err) {done(err);} else {done();}
+            });
+          });
+        }
+    });
+  });
+
+  it('DELETE Invalid Outbox Message', function(done) {
+    api.del('/mail/messages/123')
+    .expect(404)
+    .end(function(err, res) {
+      if (err) {done(err);}
+      done();
     });
   });
 
