@@ -54,6 +54,9 @@ module.exports = {
   template: {
     path: '.' //The path to the template.  For server deployment, may need to be hard coded.
   },
+  direct: {
+    api_key: 'e1f4f8a0-9358-11e3-baa8-0800200c9a66'  //API key for direct server.  Should be changed in production.
+  },
   redis: {
     enabled: true, //Whether or not redis is enabled.  Can be turned off for local testing, but should be enabled in production.
     url: 'localhost',  //The URL of the redis instance for session management.

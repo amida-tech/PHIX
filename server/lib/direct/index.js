@@ -114,9 +114,9 @@ function getMailInbox(user_id, response_start, response_end, callback) {
         owner: user_id,
         inbox: true,
         archived: false
-    }, 'sender stored subject read', {
+    }, 'sender transmitted subject read', {
         sort: {
-            'stored': -1
+            'transmitted': -1
         },
         skip: response_start,
         limit: response_end
@@ -137,9 +137,9 @@ function getMailOutbox(user_id, response_start, response_end, callback) {
         owner: user_id,
         outbox: true,
         archived: false
-    }, 'recipient stored subject', {
+    }, 'recipient transmitted subject', {
         sort: {
-            'stored': -1
+            'transmitted': -1
         },
         skip: response_start,
         limit: response_end
@@ -159,9 +159,9 @@ function getMailArchive(user_id, response_start, response_end, callback) {
     Message.find({
         owner: user_id,
         archived: true
-    }, 'recipient sender stored subject read', {
+    }, 'recipient sender transmitted subject read', {
         sort: {
-            'stored': -1
+            'transmitted': -1
         },
         skip: response_start,
         limit: response_end
@@ -180,7 +180,7 @@ function getMailArchive(user_id, response_start, response_end, callback) {
 function getMailAll(user_id, response_start, response_end, callback) {
     Message.find({
         owner: user_id
-    }, 'sender recipient stored subject read', {
+    }, 'sender recipient transmitted subject read', {
         sort: {
             'sent': -1
         },
@@ -201,7 +201,7 @@ function getMailMessage(user_id, message_id, callback) {
     Message.findOne({
         owner: user_id,
         _id: message_id
-    }, 'sender recipient stored subject contents attachments archived read', function(err, results) {
+    }, 'sender recipient transmitted subject contents attachments archived read', function(err, results) {
         if (err) {
             callback(err);
         } else {
@@ -244,10 +244,13 @@ function checkMessage(message, callback) {
     callback(checkArray);
 }
 
+//Exported for use by system to validate inbound messages.
+module.exports.checkMessage = checkMessage;
+
 function saveOutboxMessage(user_id, message, callback) {
     var messageJSON = {};
     messageJSON.owner = user_id;
-    messageJSON.stored = new Date();
+    messageJSON.transmitted = new Date();
     messageJSON.outbox = true;
     if (message.subject) {
         messageJSON.subject = message.subject;

@@ -23,6 +23,7 @@ var Delegation = require('../../models/delegation');
 var mongoose = require('mongoose');
 var ObjectId = require('mongodb').ObjectID;
 var outboxMessages = require('../records/outboxMessages.json');
+var inboxMessages = require('../records/inboxMessages.json');
 
 var config = require('../../config.js');
 if (config.server.ssl.enabled) {
@@ -48,7 +49,7 @@ var generatedDateArray = [];
 
 var testName = 'mailboxUser';
 var testPass = 'mailboxPass';
-var testEmail = 'test@demo.org';
+var testEmail = 'mailboxUser@amida-tech.com';
 var directEmail = '';
 var testProfile = {
   firstname: 'Jane',
@@ -296,42 +297,41 @@ describe('Verified: 0 Messages', function() {
 
 });
 
-describe('Create Test Messages', function() {
+describe('Create Messages', function() {
 
-  it('Generate Test Inbox Message', function(done) {
+  it('Load Sample Inbox Messages', function(done) {
 
-    Account.findOne({
-      username: testName
-    }, function(err, res) {
+    function postMessages(iteration, inboxMessage, owner) {
+
+      var saveMessageJSON = {
+        "owner": owner,
+        "inbox": true
+      };
+      var saveMessage = new Message(saveMessageJSON);
+
+      saveMessage.save(function(err, res) {
+        if (err) {
+            console.log(err);
+          } else {
+          if (iteration === (inboxMessages.messages.length - 1)) {
+            done();
+          }
+        }
+      });
+    }
+
+
+     Account.findOne({username: testName}, function(err, res) {
       if (err) {
         done(err);
-      }
-
-      var testInboxMessage = {
-        owner: res._id,
-        inbox: true,
-        sender: 'doctor@node.amida-demo.com',
-        stored: Date.now(),
-        subject: 'Your recent visit.',
-        contents: 'Your medical records are attached',
-        read: false,
-        attachments: []
-      };
-
-      var sampleMessage = new Message(testInboxMessage);
-      sampleMessage.save(function(err, res) {
-        if (err) {
-          done(err);
+      } else {
+        for (var i = 0; i < inboxMessages.messages.length; i++) {
+          postMessages(i, inboxMessages.messages[i], res._id);
         }
-        testInboxMessage.message_id = res._id;
-        done();
-      });
+      }
     });
-  });
 
-});
-
-describe('Create Messages', function() {
+  });  
 
   it('Load Sample Outbox Messages', function(done) {
 
@@ -371,7 +371,7 @@ describe('Create Messages', function() {
           generatedDateArray.push(myDate);
         }
         Message.findByIdAndUpdate(message_id, {
-          'stored': myDate
+          'transmitted': myDate
         }, function(err, res) {
           if (err) {
             done(err);
@@ -400,9 +400,9 @@ describe('Verified: Messages', function() {
         if (err) {
           done(err);
         } else {
-          res.body.inbox.should.equal(1);
+          res.body.inbox.should.equal(100);
           res.body.outbox.should.equal(100);
-          res.body.inboxUnread.should.equal(1);
+          res.body.inboxUnread.should.equal(100);
           res.body.archived.should.equal(0);
           done();
         }
@@ -632,8 +632,8 @@ describe('Verified: Messages', function() {
           });
           for (var i = 0; i < res.body.messages.length; i++) {
           //console.log('Array:  ' + sortedArray[i].toISOString());
-          //console.log('Server: ' + res.body.messages[i].stored);
-            sortedArray[i].toISOString().should.equal(res.body.messages[i].stored);
+          //console.log('Server: ' + res.body.messages[i].transmitted);
+            sortedArray[i].toISOString().should.equal(res.body.messages[i].transmitted);
           }
           done();
         }

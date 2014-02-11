@@ -27,7 +27,7 @@ var Message = new Schema({
     owner: {type: Schema.ObjectId, required: true },
     inbox: Boolean,  //Flagged to true if it is an inbox record.
     outbox: Boolean, //Flagged to true if it is an outbox record.
-    stored: Date,
+    transmitted: Date,
     sender: String,
     recipient: String,
     subject: String,
