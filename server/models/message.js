@@ -21,13 +21,15 @@ var mongoose = require('mongoose'),
 var Attachments = new Schema({
     fileName: String, //filename of file.
     identifier: String //identifier pointing to grid record.
-});
+}, {autoIndex: false});
 
 var Message = new Schema({
-    user: String,
+    owner: {type: Schema.ObjectId, required: true },
+    inbox: Boolean,  //Flagged to true if it is an inbox record.
+    outbox: Boolean, //Flagged to true if it is an outbox record.
+    transmitted: Date,
     sender: String,
     recipient: String,
-    received: Date,
     subject: String,
     contents: String,
     read: {
@@ -39,7 +41,7 @@ var Message = new Schema({
         "default": false
     },
     attachments: [Attachments]
-});
+}, {autoIndex: false});
 
 module.exports = mongoose.model('Message', Message);
 module.exports.msg = Message;

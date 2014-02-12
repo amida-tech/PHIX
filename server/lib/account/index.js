@@ -35,7 +35,15 @@ function ensureAuthenticated(req, res, next) {
   res.send(401);
 }
 
+function ensureVerified(req, res, next) {
+  if (req.user.verified) {
+    return next();  
+  }
+  res.send(403);
+}
+
 module.exports.ensureAuthenticated = ensureAuthenticated;
+module.exports.ensureVerified = ensureVerified;
 
 
 //Verify user, used by lookup page.

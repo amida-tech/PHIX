@@ -88,6 +88,7 @@ app.post('/access/pending/:clinician', auth.ensureAuthenticated, function(req, r
             file: masterRecord
           }, req.user.username, function(err, results) {
             var messageJSON = {
+              owner: req.user._id,
               username: req.user.username,
               sender: '',
               recipient: requestResponse.clinician.directemail,

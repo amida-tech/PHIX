@@ -120,11 +120,22 @@ function createMessage(message, done) {
     received: new Date(),
     subject: message.subject,
     contents: message.contents,
-    archived: false,
-    read: false,
+    archived: message.archived,
+    read: message.read,
     attachments: message.attachments
   });
   myMessage.save(function(err, res) {
+    if (err) {
+      done(err);
+    }
+    done();
+  });
+}
+
+function createMessageOutbox(api, message, done) {
+  api.post('/message')
+  .expect(200)
+  .end(function(err, res) {
     if (err) {
       done(err);
     }
@@ -281,21 +292,13 @@ function removeProviders(callback) {
   });
 }
 
-function removeMessages(testDirectAddress, callback) {
-  Message.remove({
-    'sender': testDirectAddress
-  }, function(err, res) {
-    if (err) {
-      done(err);
-    }
-    Message.remove({
-      'recipient': testDirectAddress
-    }, function(err, res) {
-      if (err) {
-        done(err);
-      }
-      callback();
+function removeMessages(userName, callback) {
+  Account.findOne({username: userName}, function(err, res) {
+    Message.remove({'owner': res._id}, function(err, res) {
+      if (err) {callback(err);} else {
+      callback();}
     });
+
   });
 }
 

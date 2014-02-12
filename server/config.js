@@ -44,14 +44,18 @@ module.exports = {
     port: 3001 // The port on which the client is located.  Must be different than server for development.
   },
   smtp: {
-    enabled: true, // Enables or disables the SMTP server.
-    url: 'localhost', // The URL of the SMTP server used to transmit DIRECT messages.
-    port: 465, // The port on which the SMTP server is listenting.
+    enabled: true, // Enables or disables the SMTP server.  If disabled, will still persist message to db without sending.
+    debug: true, //Whether or not the SMTP server will be run in debug mode.
+    url: '127.0.0.1', // The URL of the SMTP server used to transmit DIRECT messages.
+    port: 2500, // The port on which the SMTP server is listenting.
     username: 'test', // The username the SMTP server requires for login.
     password: 'test' // The password associated with the username to login to the SMTP server.
   },
   template: {
     path: '.' //The path to the template.  For server deployment, may need to be hard coded.
+  },
+  direct: {
+    api_key: 'e1f4f8a0-9358-11e3-baa8-0800200c9a66'  //API key for direct server.  Should be changed in production.
   },
   redis: {
     enabled: true, //Whether or not redis is enabled.  Can be turned off for local testing, but should be enabled in production.

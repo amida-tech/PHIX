@@ -26,6 +26,9 @@ var config = require('./config.js');
 var redisStore = require('connect-redis')(express);
 var app = express();
 
+app.set("domain", config.server.url);
+
+
 //Optionally enable ssl.
 if (config.server.ssl.enabled) {
   var privateKey  = fs.readFileSync(config.server.ssl.privateKey).toString();
@@ -43,6 +46,19 @@ if (config.server.ssl.enabled) {
 } else {
   var server = http.createServer(app);
 }
+
+//Optionally load SMTP parameters.
+if (config.smtp.enabled) {
+  app.set('smtp_enabled', true);
+  app.set('smtp_debug', config.smtp.debug);
+  app.set('smtp_username', config.smtp.username);
+  app.set('smtp_password', config.smtp.password);
+  app.set('smtp_port', config.smtp.port);
+  app.set('smtp_host', config.smtp.host);
+}
+
+//Load Direct API Key.
+app.set('direct_api_key', config.direct.api_key);
 
 //Start local client if enabled.
 if (config.client.enabled) {
@@ -148,7 +164,7 @@ var account = require('./lib/account');
 var profile = require('./lib/profile');
 var provider = require('./lib/provider');
 var delegation  = require('./lib/delegation');
-
+var system  = require('./lib/system');
 
 
 app.use(identity);
@@ -161,6 +177,7 @@ app.use(account);
 app.use(profile);
 app.use(delegation);
 app.use(provider);
+app.use(system);
 
 //This is code used to override the need of a second database.
 var db_settings = {database: 'portal',
