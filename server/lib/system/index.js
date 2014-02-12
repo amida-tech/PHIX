@@ -59,7 +59,7 @@ function ensureDirectSystemAuthentication (req, res, next) {
     } else {
         res.send(401);
     }
-};
+}
 
 
 //TODO:  Stubbed without authentication, must be added in.
@@ -77,7 +77,7 @@ app.post('/system/mailbox/messages', function(req, res) {
     console.log(req.body);
     
 
-})
+});
 
 
 
