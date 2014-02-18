@@ -43,6 +43,7 @@
 
     - name: clone PHIX repo from GitHub
       git: repo=https://github.com/amida-tech/PHIX.git dest={{repo_path}}
+           version=1.1-fix
 
     - name: install all NPM packages required by PHIX
       npm: path={{repo_path}}
