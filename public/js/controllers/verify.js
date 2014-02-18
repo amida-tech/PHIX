@@ -19,6 +19,12 @@ angular.module('phix.verifyCtrl', ['bt.forms'])
     $scope.data={};
     $scope.verified=null;
 
+    //Ignore DateTime timezone and return Date portion as string (in MM/DD/YYYY format)
+    $scope.filteredDate = function(date) {
+      date = date.substring(0,10);
+      return date.substr(5,2)+"/"+date.substr(8,2)+"/"+date.substr(0,4);
+    }
+
 
     $scope.verify = function () {
       //Verify API call here

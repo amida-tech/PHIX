@@ -52,7 +52,7 @@ div
             .well
               {{data.personal.gender}}
             strong Birthday
-            .well  {{data.personal.birthdate | date: "MMMM dd, yyyy"}}
+            .well  {{filteredDate(data.personal.birthdate)}}
           .col-md-6  
             strong Social Security Number 
             .well {{data.personal.ssn}}

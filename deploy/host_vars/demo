@@ -39,14 +39,14 @@ phix_port: 3001
 phix_sender_host: phix-patient.amida-demo.com
 phix_receiver_host: phix-clinician.amida-demo.com
 
-clinician_database: {{phix_other_database}}
-clinician_other_database: {{phix_database}}
+clinician_database: "{{ phix_other_database }}"
+clinician_other_database: "{{ phix_database }}"
 
 clinician_role: clinician
 clinician_port: 3002
 
-clinician_sender_host: {{phix_receiver_host}}
-clinician_receiver_host: {{phix_sender_host}}
+clinician_sender_host: "{{ phix_receiver_host }}"
+clinician_receiver_host: "{{ phix_sender_host }}"
 
 
 angular_dev_phix_host: phix-patient.amida-demo.com
