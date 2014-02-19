@@ -33,6 +33,8 @@
           a(ng-click='tab = "allergies"') allergies
         li(ng-class="tab == 'problems' && 'active'")
           a(ng-click='tab = "problems"') problems
+        li(ng-class="tab == 'procedures' && 'active'")
+          a(ng-click='tab = "procedures"') procedures
     .col-md-8(ng-show='tab == "encounters"')
       .row
         .col-md-12

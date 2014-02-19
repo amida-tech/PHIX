@@ -61,6 +61,8 @@
                   a(ng-click='tab = "medications"') medications
                 li(ng-class="tab == 'problems' && 'active'", style='cursor:pointer;')
                   a(ng-click='tab = "problems"') problems
+                li(ng-class="tab == 'procedures' && 'active'", style='cursor:pointer;')
+                  a(ng-click='tab = "procedures"') procedures
                 li(ng-class="tab == 'vitals' && 'active'", style='cursor:pointer;')
                   a(ng-click='tab = "vitals"') vitals
             .col-md-8(ng-show='tab == "encounters"')
@@ -79,6 +81,8 @@
               ng-include(src='"partials/preview/allergies"', ng-hide='previewHidden')
             .col-md-8(ng-show='tab == "problems"')
               ng-include(src='"partials/preview/problems"', ng-hide='previewHidden')
+            .col-md-8(ng-show='tab == "procedures"')
+              ng-include(src='"partials/preview/procedures"', ng-hide='previewHidden')
       .modal-footer
 
         button.btn(type='button', ng-click='loadPreview(modal.record.identifier)', ng-show='previewHidden && modal.record.contentType==="CCDA"') Preview

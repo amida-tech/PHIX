@@ -33,6 +33,8 @@ div.container
           a(ng-click='tab = "medications"') medications
         li(ng-class="tab == 'problems' && 'active'", style='cursor:pointer;')
           a(ng-click='tab = "problems"') problems
+        li(ng-class="tab == 'procedures' && 'active'", style='cursor:pointer;')
+          a(ng-click='tab = "procedures"') procedures
         li(ng-class="tab == 'vitals' && 'active'", style='cursor:pointer;')
           a(ng-click='tab = "vitals"') vitals
     .col-md-10(ng-show='tab == "encounters"')
@@ -51,4 +53,6 @@ div.container
       ng-include(src='"partials/record/allergies"')
     .col-md-10(ng-show='tab == "problems"')
       ng-include(src='"partials/record/problems"')
+    .col-md-10(ng-show='tab == "procedures"')
+      ng-include(src='"partials/record/procedures"')
 
