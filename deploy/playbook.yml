@@ -56,7 +56,7 @@
       sudo: yes
 
     - name: clone PHIX repo from GitHub
-      git: repo=https://github.com/amida-tech/PHIX.git dest={{repo_path}}
+      git: repo=https://github.com/amida-tech/PHIX.git dest={{repo_path}} version=vagrant-ansible-fix
 
     - name: install all NPM packages required by PHIX client
       npm: path={{repo_path}}/client

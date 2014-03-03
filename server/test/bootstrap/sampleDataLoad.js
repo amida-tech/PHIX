@@ -102,7 +102,7 @@ describe('Create Messages', function() {
     for (var i = 0; i < outboxMessages.messages.length; i++) {
 
       function postMessages(iteration, outboxMessage) {
-        api.post('/messages')
+        api.post('/mail/messages')
           .send(outboxMessage)
           .expect(201)
           .end(function(err, res) {
