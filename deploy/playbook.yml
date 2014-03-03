@@ -3,8 +3,14 @@
   vars:
     email: "dmitry@amida-tech.com"
     repo_path: "{{ansible_env.HOME}}/repos/PHIX"
+    env:
+      NODE_TLS_REJECT_UNAUTHORIZED : 0    
 
   tasks:
+    - name: apt-get update
+      apt: update_cache=yes
+      sudo: true
+  
     - name: install prerequisites for node.js
       apt: pkg=python-software-properties,python,g++,make state=present
       sudo: true
@@ -29,6 +35,14 @@
       action: apt pkg=nginx state=latest
       sudo: true
 
+    - name: Install Redis
+      action: apt pkg=redis-server state=latest
+      sudo: true
+    
+    - name: Start Redis service
+      action: service name=redis-server state=started
+      sudo: yes
+
     - name: Copy mongo install script
       template: src=files/mongo_install.bash dest={{ansible_env.HOME}}
       sudo: yes
@@ -44,8 +58,11 @@
     - name: clone PHIX repo from GitHub
       git: repo=https://github.com/amida-tech/PHIX.git dest={{repo_path}}
 
-    - name: install all NPM packages required by PHIX
-      npm: path={{repo_path}}
+    - name: install all NPM packages required by PHIX client
+      npm: path={{repo_path}}/client
+
+    - name: install all NPM packages required by PHIX server
+      npm: path={{repo_path}}/server
 
     - name: Remove PHIX code
       action: command rm -r /usr/share/nginx/www/PHIX/ removes=/usr/share/nginx/www/PHIX/
@@ -55,15 +72,23 @@
       action: command cp -r PHIX/ /usr/share/nginx/www/ chdir={{ansible_env.HOME}}/repos
       sudo: yes
 
-    #need to restart phix and clinician services after this
-    - name: Update node app configuration
-      template: src=files/app_node.js dest=/usr/share/nginx/www/PHIX/app.js
+    - name: Install grunt globally
+      shell: npm install -g grunt-cli
+      sudo: yes
+
+    - name: Install mocha globally
+      shell: npm install -g mocha
       sudo: yes
 
     #need to restart phix and clinician services after this
-    - name: Update angular app configuration
-      template: src=files/app_angular.js dest=/usr/share/nginx/www/PHIX/public/js/app.js
-      sudo: yes
+    #- name: Update node app configuration
+    #  template: src=files/app_node.js dest=/usr/share/nginx/www/PHIX/app.js
+    #  sudo: yes
+
+    #need to restart phix and clinician services after this
+    #- name: Update angular app configuration
+    #  template: src=files/app_angular.js dest=/usr/share/nginx/www/PHIX/public/js/app.js
+    #  sudo: yes
 
     - name: Update phix app configuration
       template: src=files/phix.conf dest=/etc/init/phix.conf
@@ -73,13 +98,13 @@
       action: service name=phix state=started
       sudo: yes
 
-    - name: Update clinician app configuration
-      template: src=files/clinician.conf dest=/etc/init/clinician.conf
-      sudo: yes
+    #- name: Update clinician app configuration
+    #  template: src=files/clinician.conf dest=/etc/init/clinician.conf
+    #  sudo: yes
 
-    - name: Start Clinician service
-      action: service name=clinician state=started
-      sudo: yes
+    #- name: Start Clinician service
+    #  action: service name=clinician state=started
+    #  sudo: yes
 
     - name: Update NGINX configuration
       template: src=files/nginx.conf dest=/etc/nginx/sites-available/default
@@ -97,11 +122,20 @@
       command: mongo {{ phix_other_database }} --eval "db.dropDatabase()"
 
     #run bootstrap mocha scrips 
-    - name: Init PHIX database
-      command: /usr/share/nginx/www/PHIX/node_modules/mocha/bin/mocha -R spec demoPHIX.js -t 10000 chdir=/usr/share/nginx/www/PHIX/test/bootstrap 
+    #- name: Init PHIX database
+    #  command: /usr/share/nginx/www/PHIX/server/node_modules/mocha/bin/mocha -R spec demoPHIX.js -t 10000 chdir=/usr/share/nginx/www/PHIX/server/test/bootstrap 
 
-    - name: Init Clinician database
-      command: /usr/share/nginx/www/PHIX/node_modules/mocha/bin/mocha -R spec demoClinicians.js -t 10000 chdir=/usr/share/nginx/www/PHIX/test/bootstrap 
+    #- name: Init Clinician database
+    #  command: /usr/share/nginx/www/PHIX/server/node_modules/mocha/bin/mocha -R spec demoClinicians.js -t 10000 chdir=/usr/share/nginx/www/PHIX/server/test/bootstrap 
+
+    - name: Disable self-signed certs check
+      shell: export NODE_TLS_REJECT_UNAUTHORIZED=0
+      sudo: yes
+
+
+    - name: Init sample data load
+      command: /usr/share/nginx/www/PHIX/server/node_modules/mocha/bin/mocha -R spec sampleDataLoad.js -t 10000 chdir=/usr/share/nginx/www/PHIX/server/test/bootstrap 
+      environment: env
 
   handlers:
 
@@ -117,6 +151,6 @@
       service:  name=phix state=restarted
       sudo: yes
 
-    - name: restart clinician
-      service:  name=clinician state=restarted
-      sudo: yes
+    #- name: restart clinician
+    #  service:  name=clinician state=restarted
+    #  sudo: yes
