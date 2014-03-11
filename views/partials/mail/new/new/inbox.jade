@@ -1,0 +1,16 @@
+ul(ng-controller="InboxCtrl", data-view="inbox").
+
+  <!-- Message -->
+  <li ng-repeat="message in inboxMessages" ng-class="{ selected: message.selected }">
+    <article class="message" ng-click="selectMessage(message)">
+      <input type="checkbox" ng-model="message.selected" selected="false" />
+
+      <span class="message-pad from unread">{{ message.sender }}</span>
+
+      <span class="subject unread">
+        {{ message.subject }}
+      </span>
+
+      <span class="time unread pull-right">{{ message.received | date: 'hh:mm' }}</span>
+    </article>
+  </li>

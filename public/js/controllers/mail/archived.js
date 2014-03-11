@@ -14,31 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-angular.module('phix.inboxCtrl', ['phix.utilityService']).controller('InboxCtrl',
-  [ '$rootScope',
-    '$scope',
+angular.module('phix.archivedCtrl', ['bt.forms', 'phix.utilityService', 'phix.authenticationService']).controller('ArchivedCtrl',
+  [ '$scope',
+    '$q',
+    '$http',
+    '$rootScope',
+    '$location',
     'UtilityService',
     'MailService',
-  function ($rootScope, $scope, utils, mailService) {
+    'AuthenticationService',
+  function ($scope, $q, $http, $rootScope, $location, utils, mailService, AuthenticationService) {
 
     // Initialize the inbox service and call the method to grab the inbox from it.
     mailService.initializeMailbox
       .then(function ()               { return mailService.getMailbox('/direct/inbox'); })
-      .then(function (messages)       { return mailService.process(messages, 'inbox');  })
-      .then(function (inboxMessages)  { $scope.inboxMessages = inboxMessages;           });
-
-
-    // Core messages that need current $scope.
-    $scope.selectMessage = function (message) {
-      mailService.selectMessage(message);
-    };
-
-    // Events coming from the base mail service.
-    $scope.$on('inbox:toggleSelectAll', function (selectedState) {
-      var i = 0;
-      for ( ; i < $scope.inboxMessages.length; i += 1) {
-        mailService.selectMessage($scope.inboxMessages[i]);
-      }
-    });
+      .then(function (messages)       { return mailService.process(messages, 'archived'); })
+      .then(function (archivedMessages)  {
+        $scope.archivedMessages = archivedMessages;
+        console.log($scope.archivedMessages);
+      });
 
 }]);

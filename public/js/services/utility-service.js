@@ -14,29 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ======================================================================*/
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-
-//This is data model used for access rules
-var Access = new Schema({
-    username: String,
-    clinician:
-        {clinicianName: String,
-         clinicianID: String
-        },
-    name: String,
-    permissions:
-    	{all:Boolean,
-    		demographics:Boolean,
-    		medications:Boolean,
-    		allergies:Boolean,
-    		vitals:Boolean,
-    		immunizations:Boolean,
-    		encounters:Boolean,
-    		problems:Boolean},
-
-    timestamp: Date
-
-});
-
-module.exports = mongoose.model('Access', Access);
+angular.module('phix.utilityService', []).factory('UtilityService', 
+  [ '$http',
+  function ($http) {
+    
+    var extend = function (obj1, obj2) {
+      for (var i in obj2) {
+        if (!obj1.hasOwnProperty(i)) {
+           obj1[i] = obj2[i]; 
+        }
+      }
+    };
+    
+    return {
+      extend: extend
+    };
+  
+  }
+]);

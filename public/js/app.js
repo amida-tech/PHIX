@@ -23,7 +23,13 @@ angular
     'phix.inboxService',
     'phix.enrollCtrl',
     'phix.verifyCtrl',
+
+    // Mail
+    'phix.mailService',
     'phix.inboxCtrl',
+    'phix.sentCtrl',
+    'phix.archivedCtrl',
+
     'phix.landingCtrl',
     'phix.listRecordsCtrl',
     'phix.listRulesCtrl',
@@ -39,7 +45,7 @@ angular
     'phix.lookupCtrl'
   ])
     // Note TabService is included but not used to ensure its been instantiated
-  .run(['$rootScope', '$location', 'AuthenticationService', 'TabService', 'InboxService', function ($rootScope, $location, AuthenticationService) {
+  .run(['$rootScope', '$q', '$location', 'AuthenticationService', 'TabService', 'MailService', function ($rootScope, $q, $location, AuthenticationService) {
 
     var configuration="phix";
     var nodeLocation="http://localhost:3001";
@@ -90,6 +96,10 @@ angular
       .when('/', {
         templateUrl: '/partials/landing',
         controller: 'LandingCtrl'
+      })
+      .when('/mail/new', {
+        templateUrl: '/partials/mail/new/mail',
+        controller: 'MailCtrl'
       })
       .when('/login', {
         templateUrl: '/partials/login',

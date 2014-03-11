@@ -1,0 +1,16 @@
+ul(ng-controller="SentCtrl", data-view="sent").
+
+  <!-- Message -->
+  <li ng-repeat="message in sentMessages">
+    <article class="message" ng-click="{{toggleSelected()}}">
+      <input type="checkbox" selected="false" />
+
+      <span class="message-pad from unread">{{ message.sender }}</span>
+
+      <span class="subject unread">
+        {{ message.subject }}
+      </span>
+
+      <span class="time unread pull-right">{{ message.received }}</span>
+    </article>
+  </li>

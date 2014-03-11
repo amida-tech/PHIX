@@ -1,0 +1,44 @@
+ng-include(src="'partials/header'")
+
+div.mail-wrapper(ng-controller="MailCtrl", ng-cloak).
+
+  <section class="row">
+    <div class="col-md-9 action-bar">
+      <div class="btn btn-default btn-sm" style="margin-left: -20px;">
+        <a href="" id="select-all" class="fn-wh" ng-click="toggleSelectAll()" ng-selected="false">Select All</a>
+      </div>
+
+      <div class="btn btn-default btn-sm" style="margin-left: 0;">
+        <a href="" id="archive-selected" class="fn-wh" ng-click="archiveSelected()" ng-selected="false">Archive Selected</a>
+      </div>
+
+      <div class="btn btn-default btn-sm" style="margin-left: 0;">
+        <a href="" id="archive-all" class="fn-wh" ng-click="archiveAll()" ng-selected="false">Archive All</a>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <div class="row">
+
+    <section class="sidebar pull-left col-md-2">
+
+      <nav class="actions">
+        <ul>
+          <li><a href="#" id="compose" class="btn btn-primary btn-xl">Compose</a></li>
+
+          <li><a href="" id="inbox-mailbox" ng-click="subView='/partials/mail/new/inbox'">Inbox</a></li>
+          <li><a href="" ng-click="subView='/partials/mail/new/sent'">Sent Mail</a></li>
+          <li><a href="" ng-click="subView='/partials/mail/new/all'">All Mail</a></li>
+          <li><a href="" ng-click="subView='/partials/mail/new/archived'">Archived</a></li>
+        </ul>
+      </nav>
+
+    </section>
+
+    <section class="mail pull-left col-md-10">
+      <ng-include src="subView"></ng-include>
+    </section>
+
+  </div>
